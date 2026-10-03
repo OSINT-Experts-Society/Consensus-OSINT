@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="168" height="24" viewBox="0 0 168 24" role="img" aria-label="Licence: GPL-3.0-or-later">
+  <title>Licence: GPL-3.0-or-later</title>
+  <clipPath id="rounded"><rect width="168" height="24" rx="4"/></clipPath>
+  <g clip-path="url(#rounded)"><rect width="60" height="24" fill="#30363d"/><rect x="60" width="108" height="24" fill="#f09a45"/></g>
+  <g font-family="Verdana,Arial,sans-serif" font-size="11" text-anchor="middle">
+    <text x="30.0" y="16" fill="#fff">Licence</text>
+    <text x="114.0" y="16" fill="#18212b" font-weight="bold">GPL-3.0-or-later</text>
+  </g>
+</svg>

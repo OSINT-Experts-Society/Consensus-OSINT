@@ -21,6 +21,16 @@
   </picture>
 </p>
 
+<p align="center">
+  <a href="#key-features"><img src="consensus_osint/templates/consensus-badge-projects.svg" alt="19 source projects" height="24"></a>
+  <a href="#key-features"><img src="consensus_osint/templates/consensus-badge-modules.svg" alt="7,900+ lookup modules" height="24"></a>
+  <a href="LICENSE"><img src="consensus_osint/templates/consensus-badge-license.svg" alt="Licence: GPL-3.0-or-later" height="24"></a>
+  <br>
+  <a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/graphs/contributors"><img src="consensus_osint/templates/consensus-badge-contributors.svg" alt="1 contributor as of 3 October 2026" title="Snapshot: 3 October 2026" height="24"></a>
+  <a href="CONTRIBUTING.md"><img src="consensus_osint/templates/consensus-badge-prs.svg" alt="PRs welcome" height="24"></a>
+  <a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/stargazers"><img src="consensus_osint/templates/consensus-badge-stars.svg" alt="0 GitHub stars as of 3 October 2026" title="Snapshot: 3 October 2026" height="24"></a>
+</p>
+
 <details>
 <summary>Compare Consensus with its 19 source projects</summary>
 
@@ -76,12 +86,13 @@ Counts cover catalogue rules and modules as of 3 October 2026, excluding explici
 
 ## Key features
 
-- **Username, email and phone lookups** in one tool.
-- **Source coverage**: see which imported tools list each lookup.
-- **Bulk and advanced search**: process lists, expand username patterns and apply filters.
-- **Proxy support** for your lookup workflow.
-- **Reports and interactive graphs** to explore findings; optional PDF export.
-- **Interactive menu or command line** for guided or repeatable searches.
+- **7,900+ lookup modules. 19 projects. One tool.** Search usernames, email addresses and phone numbers using combined open-source capabilities, standardised into one workflow.
+- **One search per site by default.** Consensus reconciles overlapping sources and selects a lookup for each site, reducing duplicate searches and repeated results.
+- **Reviewed & updated weekly by our experts.** New modules evaluated, tested, improved and integrated; broken modules retired.
+- **See which sources cover a lookup.** Source attribution shows which imported projects list each lookup, making their overlap visible.
+- **Bulk search and advanced controls.** Work through lists, use username patterns and filters, and choose specific modules when you need more control.
+- **Reports and interactive graphs.** Explore connections and export findings to share or investigate further, with optional PDF support.
+- **Proxy support, menu or command line.** Use a guided interface or repeatable CLI commands, with proxy options for your workflow.
 
 ## Install
 
