@@ -28,7 +28,7 @@
 </div>
 
 <details>
-<summary align="center">About these counts ? 3 October 2026</summary>
+<summary align="center">About these counts (3 October 2026)</summary>
 
 Catalogue snapshot: 3 October 2026. Counts site rules/module files, excluding explicitly disabled/invalid entries and package helpers. Overlapping implementations can cover the same service; these are not unique-site counts or a live reliability benchmark. Phone counts cover account lookups, excluding number analysis and search links. Actual checks depend on scan options and service requirements. — = no definitions in these catalogues.
 
