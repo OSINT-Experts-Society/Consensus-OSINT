@@ -1,14 +1,16 @@
 <p align="center">
-  <img src="consensus_osint/templates/consensus-logo.png" width="760" alt="Consensus">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-wordmark-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="consensus_osint/templates/consensus-wordmark-light.svg">
+    <img src="consensus_osint/templates/consensus-wordmark-light.svg" width="460" alt="Consensus">
+  </picture>
 </p>
 
-<h3 align="center">One platform. The strength of many.</h3>
+<p align="center">By the <a href="https://osint.ngo">OSINT Experts Society</a></p>
 
 <p align="center"><strong>Search usernames, email addresses and phone numbers with the combined capabilities of leading open-source OSINT tools.</strong></p>
 
-<p align="center">
-  <a href="https://osint.ngo"><img src="consensus_osint/templates/society-signature.svg" width="310" alt="By the OSINT Experts Society"></a>
-</p>
+<p align="center">One platform. The strength of many.</p>
 
 **One search. Clear results. See which source tools cover each match.**
 

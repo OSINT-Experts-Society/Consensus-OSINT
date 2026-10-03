@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="448" height="112" viewBox="0 0 448 112" role="img" aria-labelledby="title desc">
+  <title id="title">Consensus</title>
+  <desc id="desc">Three source paths converge into a single result beside the Consensus wordmark.</desc>
+  <g fill="none" stroke="#f58a45" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 25h17c18 0 18 31 36 31M22 56h53M22 87h17c18 0 18-31 36-31"/>
+    <circle cx="85" cy="56" r="10"/>
+  </g>
+  <g fill="#f58a45">
+    <circle cx="19" cy="25" r="5"/>
+    <circle cx="19" cy="56" r="5"/>
+    <circle cx="19" cy="87" r="5"/>
+  </g>
+  <text x="121" y="78" fill="#f0f3f6" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="68" font-weight="600" letter-spacing="-2">Consensus</text>
+</svg>
