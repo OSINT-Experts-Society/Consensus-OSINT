@@ -4,31 +4,21 @@
 
 <h3 align="center">One platform. The strength of many.</h3>
 
-<p align="center">Search usernames, email addresses and phone numbers.</p>
+<p align="center"><strong>Search usernames, email addresses and phone numbers with the combined capabilities of leading open-source OSINT tools.</strong></p>
 
 <p align="center">
   <a href="https://osint.ngo"><img src="consensus_osint/templates/society-signature.svg" width="310" alt="By the OSINT Experts Society"></a>
 </p>
 
-<p align="center">
-  <a href="#features">Features</a> &middot;
-  <a href="#install">Install</a> &middot;
-  <a href="#start-searching">Quick start</a> &middot;
-  <a href="#join-the-community">Community</a>
-</p>
+**One search. Clear results. See which source tools cover each match.**
 
-Consensus combines lookup modules and site lists from major OSINT tools into one reverse lookup platform for emails, usernames and phone numbers. Its rules and algorithms reconcile overlapping checks, assess evidence strength and bring available account and profile details into one clear view, helping you identify the strongest leads.
+Consensus brings together selected lookup modules and site lists from **15+ open-source projects**, including:
 
-Built by the **OSINT Experts Society** for investigators, researchers and anyone exploring their own digital footprint.
+**[Sherlock](https://github.com/sherlock-project/sherlock) | [Maigret](https://github.com/soxoj/maigret) | [WhatsMyName](https://github.com/WebBreacher/WhatsMyName) | [Holehe](https://github.com/megadose/holehe) | [User Scanner](https://github.com/kaifcodec/user-scanner)**
 
-## Features
+**Bulk search &middot; Proxy support &middot; Reports &middot; Interactive graphs &middot; Advanced search options**
 
-- **Multiple tools, one workflow.** Selected lookup modules and site lists from Sherlock, Maigret, WhatsMyName, Holehe, User Scanner and more, without running each tool separately.
-- **More than a match.** See available names, biographies, profile links and other returned details, with their sources.
-- **Username, email and phone lookups.** Explore public profiles, eligible account signals and phone information from one application.
-- **Bulk searches and comparisons.** Investigate several identifiers and optionally compare their shared details.
-- **Reports you can keep.** Save HTML, JSON or CSV, or explore an interactive evidence graph.
-- **Menu or command line.** Follow guided prompts or use commands for repeatable searches. Optional PDF and MCP integrations extend the workflow.
+Built by the **OSINT Experts Society**. Our maintenance target is weekly expert reviews of new community lookup modules, evaluating suitable additions for Consensus.
 
 ## Install
 
