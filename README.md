@@ -33,159 +33,75 @@ Use the interactive menu for an investigation, or the command line for repeatabl
 
 ## Get started
 
-### Install from source (available now)
-
-You need **Python 3.10 or later**, Git and a terminal. Clone the repository:
+Install **Python 3.10 or later** and **Git**, then run:
 
 ```console
 git clone https://github.com/OSINT-Experts-Society/Consensus-OSINT.git
 cd Consensus-OSINT
-```
-
-Create an isolated environment using the command for your operating system:
-
-| Operating system | Command |
-| --- | --- |
-| Windows | `py -3 -m venv .venv` |
-| macOS / Linux | `python3 -m venv .venv` |
-
-If your Windows Python installation does not include the `py` launcher, use `python -m venv .venv` instead.
-
-Activate it using the command for your terminal:
-
-| Terminal | Command |
-| --- | --- |
-| Windows PowerShell | `.\.venv\Scripts\Activate.ps1` |
-| Windows Command Prompt | `.venv\Scripts\activate.bat` |
-| macOS / Linux | `source .venv/bin/activate` |
-
-Then install Consensus with its lookup-module dependencies and open it:
-
-```console
-python -m pip install --upgrade pip
 python -m pip install ".[modules]"
 consensus
 ```
 
-Activate the same environment when you open a new terminal. Once active, `consensus` works from any folder. `consensus info` shows the application and report locations.
+That's it: the interactive menu opens. The install command includes the lookup-module dependencies. On macOS/Linux, use `python3` if `python` is unavailable. While the repository is private, GitHub access is required to clone it.
 
-To make a source installation available without activating the environment each time, add its executable directory to your user PATH. Run the appropriate block **from the cloned Consensus folder**, after installation.
+Next time, run `consensus`. If your terminal cannot find the command, use `python -m consensus_osint.cli` with the same Python you used to install it.
+
+<details>
+<summary><strong>Need a virtual environment? (Linux system Python or an isolated install)</strong></summary>
+
+If pip reports an **externally managed environment**, or you want to keep Consensus separate from other Python applications, use these commands from the cloned folder.
+
+**Windows PowerShell**
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install ".[modules]"
+consensus
+```
 
 **macOS / Linux**
 
 ```sh
-consensusBin="$(pwd)/.venv/bin"
-export PATH="$consensusBin:$PATH"
-printf 'Add this directory to your shell PATH configuration: %s\n' "$consensusBin"
-consensus info
-```
-
-This updates the current terminal. For future terminals, add `export PATH="/absolute/path/to/Consensus/.venv/bin:$PATH"` to `~/.zshrc` (zsh) or `~/.bashrc` (bash), replacing the example path with the directory printed above. Keep the quotes if the path contains spaces.
-
-**Windows PowerShell**
-
-```powershell
-$consensusBin = (Resolve-Path '.venv\Scripts').Path
-$consensusUserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-if ($consensusBin -notin ($consensusUserPath -split ';')) {
-    [Environment]::SetEnvironmentVariable('Path', "$consensusBin;$consensusUserPath", 'User')
-}
-if ($consensusBin -notin ($env:Path -split ';')) {
-    $env:Path = "$consensusBin;$env:Path"
-}
-consensus info
-```
-
-This updates the current terminal and your saved user PATH. If PowerShell blocks the activation script, you can install and run directly with `.\.venv\Scripts\python.exe -m pip install -e ".[modules]"` and `.\.venv\Scripts\consensus.exe`, without changing your execution policy.
-
-Keep the checkout and its virtual environment at the same location. If you move them, recreate the environment, reinstall and update the PATH entry.
-
-Update source installations with `git pull --ff-only` and the same editable-install command. `consensus update` deliberately does not modify a development checkout or an environment owned by another package manager.
-
-### Managed installation (requires a published release)
-
-The managed installer sets up Consensus, its lookup-module and PDF dependencies, and a private Python runtime. You do not need to install Python, Git or a package manager yourself.
-
-The commands below require the first installer-enabled GitHub release and its matching PyPI package. Until those are published, use the source installation above.
-
-**Windows PowerShell**
-
-```powershell
-irm https://github.com/OSINT-Experts-Society/Consensus-OSINT/releases/latest/download/install.ps1 | iex
-```
-
-**macOS / Linux Terminal** (requires `curl`)
-
-```sh
-curl -fsSL https://github.com/OSINT-Experts-Society/Consensus-OSINT/releases/latest/download/install.sh | sh
-```
-
-Open a new terminal, then start Consensus from any folder:
-
-```console
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install ".[modules]"
 consensus
 ```
 
-The installer adds the command to your user PATH. Running the installer again checks for the latest release. Application files and the private runtime live in `~/.local/share/consensus-app`; settings remain in `~/.consensus` and reports stay where you saved them. `CONSENSUS_INSTALL_DIR` selects a different application directory. Set `CONSENSUS_NO_MODIFY_PATH=1` before installation to manage PATH yourself; the launcher is in that directory's `bin` folder.
-
-<details>
-<summary><strong>Add Consensus to PATH manually</strong></summary>
-
-If `consensus` is not found after a managed installation, use the commands for your shell below. These use the default installation directory; if you set `CONSENSUS_INSTALL_DIR`, substitute that directory's `bin` folder.
-
-**macOS — zsh (the default shell)**
-
-```sh
-echo 'export PATH="$HOME/.local/share/consensus-app/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-consensus
-```
-
-**Linux — bash**
-
-```sh
-echo 'export PATH="$HOME/.local/share/consensus-app/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-consensus
-```
-
-Choose the block for your shell even if you use a different operating system. For another shell, add the same `bin` directory using that shell's PATH configuration.
-
-**Windows — PowerShell** (no administrator terminal needed)
-
-```powershell
-$consensusBin = Join-Path $env:USERPROFILE '.local\share\consensus-app\bin'
-$consensusUserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-if ($consensusBin -notin ($consensusUserPath -split ';')) {
-    [Environment]::SetEnvironmentVariable('Path', "$consensusBin;$consensusUserPath", 'User')
-}
-if ($consensusBin -notin ($env:Path -split ';')) {
-    $env:Path = "$consensusBin;$env:Path"
-}
-consensus
-```
-
-The Windows commands update both this terminal and your saved user PATH. Open a new terminal for other sessions to pick up the change.
-
-PATH setup does not install the application. The managed launcher is `~/.local/share/consensus-app/bin/consensus` on macOS/Linux and `%USERPROFILE%\.local\share\consensus-app\bin\consensus.cmd` on Windows. Source installations use the virtual environment described above instead.
+Activate this environment again in each new terminal before running `consensus`. If PowerShell blocks activation, install with `.\.venv\Scripts\python.exe -m pip install ".[modules]"` and launch with `.\.venv\Scripts\consensus.exe`.
 
 </details>
 
 <details>
-<summary><strong>Source-install extras and integrations</strong></summary>
+<summary><strong>Update Consensus</strong></summary>
 
-Use `python -m pip install -e .` for the core installation, including HTML parsing. Optional integrations report when their dependencies are missing.
+From the cloned folder, using the same Python/environment as your installation:
+
+```console
+git pull --ff-only
+python -m pip install --upgrade ".[modules]"
+consensus
+```
+
+Keep any extras you added in the install command, for example `".[modules,pdf]"`.
+
+</details>
+
+<details>
+<summary><strong>Optional features</strong></summary>
+
+Add PDF reports with `python -m pip install ".[modules,pdf]"`, or choose other extras:
 
 | Extra | Adds |
 | --- | --- |
-| `modules` | Bundled module dependencies, HTML profile extraction and browser TLS impersonation. |
+| `modules` | Lookup-module dependencies, profile extraction and browser TLS impersonation; included above. |
 | `pdf` | PDF reports. |
 | `browser` | Playwright integration; also run `python -m playwright install chromium`. |
 | `mcp` | A Model Context Protocol server for compatible clients. |
-| `all` | All the optional integrations above. |
-| `dev` | Development tools and all optional integrations. |
+| `all` | All optional integrations above. |
 
-Combine extras as needed: `python -m pip install -e ".[modules,pdf]"`. Some providers require separately configured credentials or subscriptions.
+For the smaller core installation, use `python -m pip install .`. Some providers require separately configured credentials or subscriptions.
 
 </details>
 
