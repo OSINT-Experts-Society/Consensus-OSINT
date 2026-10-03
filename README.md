@@ -8,15 +8,25 @@
 
 <p align="center">By the <a href="https://osint.ngo">OSINT Experts Society</a></p>
 
-<p align="center"><strong>Search usernames, email addresses and phone numbers with the combined capabilities of leading open-source OSINT tools.</strong></p>
+<p align="center"><strong>Search usernames, email addresses and phone numbers with 7,900+ enabled lookup modules and site rules.</strong></p>
+
+| Tool | Username | Email | Phone |
+| :--- | ---: | ---: | ---: |
+| [Sherlock](https://github.com/sherlock-project/sherlock/blob/e40a45ec2a074b90703b3b4b842c8a3adbd6ada3/sherlock_project/resources/data.json) | 481 | — | — |
+| [Maigret](https://github.com/soxoj/maigret/blob/b6642744988e7e6c2d21f75db60ec3093019ba25/maigret/resources/data.json) | 5,483 | — | — |
+| [WhatsMyName](https://github.com/WebBreacher/WhatsMyName/blob/062bcfe48df79fa618e96edc79dc9673f3fe5643/wmn-data.json) | 716 | — | — |
+| [User Scanner](https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b/user_scanner) | 2,511 | 211 | — |
+| [Holehe](https://github.com/megadose/holehe/tree/14da70f588538936b20d238783c5e28a0772a2b3/holehe/modules) | — | 123 | — |
+| [Ignorant](https://github.com/megadose/ignorant/tree/40b3eb734ef3d55e6d16eb314e49dbf520fa1f64/ignorant/modules) | — | — | 3 |
+| **Consensus** | **7,782** | **205** | **2** |
+
+*Catalogue snapshot: 3 October 2026. Counts site rules/module files, excluding explicitly disabled/invalid entries and package helpers. Overlapping implementations can cover the same service; these are not unique-site counts or a live reliability benchmark. Phone counts cover account lookups, excluding number analysis and search links. Actual checks depend on scan options and service requirements. — = no definitions in these catalogues.*
 
 <p align="center">One platform. The strength of many.</p>
 
 **One search. Clear results. See which source tools cover each match.**
 
-Consensus brings together selected lookup modules and site lists from **15+ open-source projects**, including:
-
-**[Sherlock](https://github.com/sherlock-project/sherlock) | [Maigret](https://github.com/soxoj/maigret) | [WhatsMyName](https://github.com/WebBreacher/WhatsMyName) | [Holehe](https://github.com/megadose/holehe) | [User Scanner](https://github.com/kaifcodec/user-scanner)**
+Consensus brings together selected lookup modules and site lists from **15+ open-source projects**.
 
 **Bulk search &middot; Proxy support &middot; Reports &middot; Interactive graphs &middot; Advanced search options**
 
