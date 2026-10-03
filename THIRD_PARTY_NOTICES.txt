@@ -1,0 +1,253 @@
+Consensus third-party notices
+=============================
+
+Scope reviewed: 11 September 2026.
+The combined source work is distributed under GPL-3.0-or-later (LICENSE).
+Incorporated components and data retain the notices and terms identified here.
+This index does not replace those terms or grant provider access, rights to
+lookup results, endorsement, or rights to use project names and marks.
+
+Full notice texts are included in the source archive and in the installed
+distribution's .dist-info/licenses directory, including this index. Use
+'python -m pip show -f consensus-osint' to locate installed files.
+
+The pinned revisions below identify the upstream notices reviewed, not an
+assertion that every historical import was taken from that exact revision.
+Generated rows retain source labels, but their exact original import commits
+have not all been recorded. Do not infer an upstream working-status guarantee.
+
+Imported username definitions
+-----------------------------
+consensus_osint/data/sites.json and sites_wmn.json combine definitions from
+the following sources. The per-entry 'sources' records lineage/overlap;
+'detect_source' identifies the selected detection rule. Consensus normalises
+placeholders, merges metadata and detection rules, and applies local repairs
+and policy holds. These are modified datasets, not verbatim upstream releases.
+WhatsMyName detection-derived entries are kept in sites_wmn.json under
+CC BY-SA 4.0; the file's attribution and adaptation notice also applies.
+
+sherlock
+  Project: https://github.com/sherlock-project/sherlock
+  Reviewed revision: 9100f9d40a3274bd46f4ce903c5c6fee6f3745bc
+  Retained notice: licenses/sherlock-LICENSE.txt
+  Original: https://github.com/sherlock-project/sherlock/blob/9100f9d40a3274bd46f4ce903c5c6fee6f3745bc/LICENSE
+
+maigret
+  Project: https://github.com/soxoj/maigret
+  Selected community definitions additionally reviewed through 0be8038d56aea11d850005b5439893b4c4cb559b
+  and PR #3176 (422e0419bee027c0553ee24a8705f436ec0a4fd0); detection is adapted by Consensus.
+  Reviewed revision: 29746b8c419a21e01aa2bbdcfc6ee97b869f00a0
+  Retained notice: licenses/maigret-LICENSE.txt
+  Original: https://github.com/soxoj/maigret/blob/29746b8c419a21e01aa2bbdcfc6ee97b869f00a0/LICENSE
+
+WhatsMyName
+  Project: https://github.com/WebBreacher/WhatsMyName
+  Reviewed revision: e62338e4fc88536a330733d355a9d33a3a1697c6
+  Retained notice: licenses/wmn-LICENSE.txt
+  Original: https://github.com/WebBreacher/WhatsMyName/blob/e62338e4fc88536a330733d355a9d33a3a1697c6/LICENSE.md
+
+nexfil
+  Project: https://github.com/thewhiteh4t/nexfil
+  Reviewed revision: c540238dd510b865daac1eb59a328f8fa68b1ce5
+  Retained notice: licenses/nexfil-LICENSE.txt
+  Original: https://github.com/thewhiteh4t/nexfil/blob/c540238dd510b865daac1eb59a328f8fa68b1ce5/LICENSE
+
+gosearch
+  Project: https://github.com/ibnaleem/gosearch
+  Reviewed revision: ea6b00412db4278fd0970e5007a843df098c69e7
+  Retained notice: LICENSE
+  Original: https://github.com/ibnaleem/gosearch/blob/ea6b00412db4278fd0970e5007a843df098c69e7/LICENSE
+
+vesper
+  Project: https://github.com/krishpranav/vesper
+  Reviewed revision: 6f861692d7a37b5d001ce188477fc65854566043
+  Retained notice: licenses/vesper-LICENSE.txt
+  Original: https://github.com/krishpranav/vesper/blob/6f861692d7a37b5d001ce188477fc65854566043/LICENSE
+
+findme
+  Project: https://github.com/0xSaikat/findme
+  Reviewed revision: 85a860357f9b6a0df2dfb16ccd495fef93a5dfa1
+  Retained notice: licenses/findme-LICENSE.txt
+  Original: https://github.com/0xSaikat/findme/blob/85a860357f9b6a0df2dfb16ccd495fef93a5dfa1/LICENSE
+
+linkook
+  Project: https://github.com/JackJuly/linkook
+  Reviewed revision: be5220df47a348f138ea01ee4830aad55ea485db
+  Retained notice: licenses/linkook-LICENSE.txt
+  Original: https://github.com/JackJuly/linkook/blob/be5220df47a348f138ea01ee4830aad55ea485db/LICENSE
+
+sherlockV2
+  Project: https://github.com/hanyxd/sherlockV2
+  Reviewed revision: 237b4f75801b4c0acb85f62d8ad7977145f5e289
+  Retained notice: licenses/sherlockv2-LICENSE.txt
+  Original: https://github.com/hanyxd/sherlockV2/blob/237b4f75801b4c0acb85f62d8ad7977145f5e289/LICENSE
+  Retained notice: licenses/sherlockv2-NOTICE.txt
+  Original: https://github.com/hanyxd/sherlockV2/blob/237b4f75801b4c0acb85f62d8ad7977145f5e289/NOTICE
+
+DetectDee
+  Project: https://github.com/Yvesssn/DetectDee
+  Reviewed revision: 551817c911ddf3a25eba9d4addb56df1e15b8f2b
+  Retained notice: licenses/Apache-2.0.txt
+  Original: https://github.com/Yvesssn/DetectDee/blob/551817c911ddf3a25eba9d4addb56df1e15b8f2b/LICENSE
+
+Aliens_eye
+  Project: https://github.com/arxhr007/Aliens_eye
+  Reviewed revision: f102892be184757920b537a9a95b3c8d0381261a
+  Retained notice: licenses/aliens_eye-LICENSE.txt
+  Original: https://github.com/arxhr007/Aliens_eye/blob/f102892be184757920b537a9a95b3c8d0381261a/LICENSE
+
+UserJoo
+  Project: https://github.com/ar33s0/UserJoo
+  Reviewed revision: c0901343c003dcbf4dc9a758d5ec3270a390226f
+  Retained notice: licenses/userjoo-LICENSE.txt
+  Original: https://github.com/ar33s0/UserJoo/blob/c0901343c003dcbf4dc9a758d5ec3270a390226f/LICENSE
+
+Sreg
+  Project: https://github.com/n0tr00t/Sreg
+  Reviewed revision: ed11d094d490b4732239ad8715f3734bfd7e91a7
+  Retained notice: licenses/sreg-LICENSE.txt
+  Original: https://github.com/n0tr00t/Sreg/blob/ed11d094d490b4732239ad8715f3734bfd7e91a7/LICENSE
+
+sherlockV2's original LICENSE contains unfilled author/year placeholders.
+They are preserved without inventing an attribution. Its separate corpus
+NOTICE, including its Sherlock attribution, is retained in full. This is an
+unresolved upstream attribution limitation.
+
+Adapted native implementations
+------------------------------
+Sherlock and Maigret: consensus_osint/core/errors.py adapts error-page and
+challenge markers to Consensus CheckError objects. Their complete notices
+are listed above; they also apply to this incorporated material.
+
+marple
+  Project: https://github.com/soxoj/marple
+  Reviewed revision: 4c3313642088036c078fc2c82767c112c6c50d3e
+  Scope: consensus_osint/core/searchengines.py.
+  Search link parsing, ranking and engine checks rewritten for the async Http
+  transport, unified findings, defensive response handling and policy holds.
+  Retained notice: licenses/marple-LICENSE.txt
+  Original: https://github.com/soxoj/marple/blob/4c3313642088036c078fc2c82767c112c6c50d3e/LICENSE
+
+mailcat
+  Project: https://github.com/sharsil/mailcat
+  Reviewed revision: 3d1e3a1f73febd65a279eda2ec343a7eb1d488be
+  Scope: consensus_osint/core/mailcat.py.
+  Provider checks adapted to async Http and unified findings. Browser/token
+  flows are omitted; local restrictions and error handling differ. The source
+  retains the original attribution and a prominent modification notice.
+  Retained notice: licenses/Apache-2.0.txt
+  Original: https://github.com/sharsil/mailcat/blob/3d1e3a1f73febd65a279eda2ec343a7eb1d488be/LICENSE
+
+Telespotter
+  Project: https://github.com/thumpersecure/Telespotter
+  Reviewed revision: 516c0701f807d7c6650e88312aa1edf5b9fc4378
+  Scope: North-American people-search URL templates in
+  consensus_osint/core/phone.py, adapted to validated, formatted phone input.
+  Retained notice: licenses/telespotter-LICENSE.txt
+  Original: https://github.com/thumpersecure/Telespotter/blob/516c0701f807d7c6650e88312aa1edf5b9fc4378/LICENSE
+
+phoneinfoga
+  Project: https://github.com/sundowndev/phoneinfoga
+  Reviewed revision: 55807b05b753dab7bc6fe67403ca385668dda179
+  Scope: phone search templates in consensus_osint/core/phone.py and
+  consensus_osint/data/phone_dorks.yaml, reorganised into categories and
+  number variants. The bundled root LICENSE retains the GPL-3.0 text.
+  Retained notice: LICENSE
+  Original: https://github.com/sundowndev/phoneinfoga/blob/55807b05b753dab7bc6fe67403ca385668dda179/LICENSE
+
+Mr.Holmes
+  Project: https://github.com/Lucksi/Mr.Holmes
+  Reviewed revision: 028bffba615c8b95db4cf1babe1b0e5925237eb4
+  Credited additions to consensus_osint/data/phone_dorks.yaml.
+  The bundled root LICENSE retains the GPL-3.0 text. Exact per-template
+  historical provenance remains incompletely recorded.
+  Retained notice: LICENSE
+  Original: https://github.com/Lucksi/Mr.Holmes/blob/028bffba615c8b95db4cf1babe1b0e5925237eb4/LICENSE
+
+The phone templates also credit 'phoneintel'; the exact source revision and
+per-template origin have not been established. That credit is not a claim of
+a verified licence grant. Historical template provenance remains under review.
+
+Vendored implementations
+------------------------
+Each family retains its original license in the source and installed package:
+  holehe: consensus_osint/vendor/holehe/LICENSE (GPL-3.0 text)
+  ignorant: consensus_osint/vendor/ignorant/LICENSE (GPL-3.0 text)
+  numint: consensus_osint/vendor/numint/LICENSE (MIT)
+  socialscan: consensus_osint/vendor/socialscan/LICENSE (MPL-2.0)
+  user-scanner: consensus_osint/vendor/user_scanner/LICENSE (MIT)
+
+Consensus modifies imports, transport, parsing, error handling and restrictions
+in these copies. Numint's Amazon/Instagram/Snapchat bridges call the vendored
+GPL Ignorant implementations; Numint's MIT notice does not relicense them.
+consensus_osint/core/legacy_profiles.py adapts User Scanner parsers and retains
+its Kaif attribution. Rules tagged 'user-scanner' in data/rules.json derive
+from its request/detection definitions and retain the same MIT notice.
+
+holehe
+  Project: https://github.com/megadose/holehe
+  Reviewed revision: 14da70f588538936b20d238783c5e28a0772a2b3
+  Retained notice: consensus_osint/vendor/holehe/LICENSE
+  Original: https://github.com/megadose/holehe/blob/14da70f588538936b20d238783c5e28a0772a2b3/LICENSE.md
+
+ignorant
+  Project: https://github.com/megadose/ignorant
+  Reviewed revision: 40b3eb734ef3d55e6d16eb314e49dbf520fa1f64
+  Retained notice: consensus_osint/vendor/ignorant/LICENSE
+  Original: https://github.com/megadose/ignorant/blob/40b3eb734ef3d55e6d16eb314e49dbf520fa1f64/LICENSE
+
+numint
+  Project: https://github.com/whoamitang/numint
+  Reviewed revision: 9186c35ad0836e8094bfa1a0e264fe6e01a82823
+  Retained notice: consensus_osint/vendor/numint/LICENSE
+  Original: https://github.com/whoamitang/numint/blob/9186c35ad0836e8094bfa1a0e264fe6e01a82823/LICENSE
+
+socialscan
+  Project: https://github.com/iojw/socialscan
+  Reviewed revision: 5ae42d0f82b0ebd717b3ae52b693b4ececa902b1
+  Retained notice: consensus_osint/vendor/socialscan/LICENSE
+  Original: https://github.com/iojw/socialscan/blob/5ae42d0f82b0ebd717b3ae52b693b4ececa902b1/LICENSE
+
+user-scanner
+  Project: https://github.com/kaifcodec/user-scanner
+  October 2026 community definitions and eight validation-only email wrappers
+  additionally adapted from 780d077a468035c6afd6b4a0f987317db651528b.
+  The shared implementation is consensus_osint/core/registration_checks.py.
+  Selected profile modules, validation-only email modules and community definitions
+  additionally adapted from 670ce0499e8309e33c639af3f9d5b80ed5a6c0e1 and PR #658.
+  Existing modified modules and restrictions are retained; this is not a wholesale vendor update.
+  Reviewed revision: 21ea2fa21e09eee450d6084fc4800b01f56ae24c
+  Retained notice: consensus_osint/vendor/user_scanner/LICENSE
+  Original: https://github.com/kaifcodec/user-scanner/blob/21ea2fa21e09eee450d6084fc4800b01f56ae24c/LICENSE
+
+Other data, assets and dependencies
+----------------------------------
+consensus_osint/data/sites_fediverse.json contains instance metadata obtained
+from https://api.fediverse.observer/ and generated platform URL templates.
+Its service/data redistribution terms have not been established in this
+review; it must not be represented as separately cleared for every reuse.
+The service terms at https://fediverse.observer/terms were checked on
+17 September 2026. They identify AGPLv3 for the Poduptime source code;
+no separate licence for redistribution of the collected instance data was
+located in those terms. This remains an unresolved data-notice limitation.
+
+consensus_osint/templates/tool-logos.json records each bundled third-party
+logo's exact source, hash, modification status and complete original notice.
+These notices were already bundled with the logos before this index existed.
+The Society logo is the Society's own asset from osint.ngo. Marks identify
+their respective projects; see the README's Name and marks section.
+
+The README also credits ideas and endpoint research from other tools, such as
+Zehef, Eyes, hashtray and mosint. A technique credit is not evidence that their
+entire codebase is included. Dependencies such as socid-extractor, phonenumbers
+(libphonenumber), prompt-toolkit and wcwidth are installed separately with
+their own license metadata. They are not relicensed by this index.
+
+Provider accounts, paid subscriptions, lookup evidence, commercial API use,
+and data redistribution require their own applicable permissions and terms.
+This source/notice inventory is not a complete provider-terms assessment.
+
+Live-verified selective User Scanner intake, 2 October 2026
+  Source: kaifcodec/user-scanner at 780d077a468035c6afd6b4a0f987317db651528b (MIT).
+  Selected new module files retain upstream logic with namespaced imports.
+  Existing guarded adaptations and other earlier provider repairs are retained.

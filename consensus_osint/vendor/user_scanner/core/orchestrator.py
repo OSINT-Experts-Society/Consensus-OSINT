@@ -1,0 +1,347 @@
+import asyncio
+import inspect
+import concurrent.futures
+from pathlib import Path
+from types import ModuleType
+from typing import Callable, List, Dict, Optional, Set, Union
+import threading
+import logging
+
+import httpx
+from colorama import Fore, Style
+
+from consensus_osint.vendor.user_scanner.core.helpers import (
+    ScanConfig,
+    find_category,
+    get_proxy,
+    get_scan_func,
+    get_site_name,
+    is_loud,
+    load_categories,
+    load_modules,
+    get_global_timeout,
+)
+from consensus_osint.vendor.user_scanner.core.result import Result
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, MofNCompleteColumn
+
+
+MAX_CONCURRENT_REQUESTS = 60
+_shared_executor = concurrent.futures.ThreadPoolExecutor(max_workers=max(MAX_CONCURRENT_REQUESTS * 2, 250))
+
+def set_concurrency(val: int):
+    global MAX_CONCURRENT_REQUESTS, _shared_executor
+    MAX_CONCURRENT_REQUESTS = val
+    _shared_executor = concurrent.futures.ThreadPoolExecutor(max_workers=max(val * 2, 250))
+
+async def _async_worker(
+    module: ModuleType,
+    username: str,
+    sem: asyncio.Semaphore,
+    configs: ScanConfig,
+    printed_cats: Optional[Set] = None,
+    cat_override: Optional[str] = None,
+    on_start: Optional[Callable[[str], None]] = None
+) -> Result:
+    async with sem:
+        site_name = get_site_name(module)
+        if on_start:
+            on_start(site_name)
+        func = get_scan_func(module)
+        actual_cat = cat_override or find_category(module) or "Unknown"
+
+        params = {
+            "site_name": site_name.capitalize(),
+            "username": username,
+            "category": actual_cat,
+        }
+
+        if not func:
+            return Result.error(f"{site_name} has no validate_ function", **params)
+
+        if not configs.allow_loud and is_loud(site_name):
+            return Result.skipped().update(**params)
+
+        try:
+            module_timeout = (get_global_timeout() or 15.0) + 10.0
+            if inspect.iscoroutinefunction(func):
+                result = await asyncio.wait_for(func(username), timeout=module_timeout)
+            else:
+                loop = asyncio.get_running_loop()
+                result = await asyncio.wait_for(
+                    loop.run_in_executor(_shared_executor, func, username),
+                    timeout=module_timeout
+                )
+        except asyncio.TimeoutError:
+            result = Result.error(f"Module execution timed out after {module_timeout}s")
+        except Exception as e:
+            result = Result.error(e)
+
+        return result.update(**params)
+
+
+async def _run_batch(
+    modules: List[ModuleType],
+    username: str,
+    configs: ScanConfig,
+    printed_cats: Optional[Set] = None,
+    cat_override: Optional[str] = None,
+    sem: Optional[asyncio.Semaphore] = None
+) -> List[Result]:
+    if sem is None:
+        sem = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+        
+    results = []
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        transient=True,
+    ) as progress:
+        task_id = progress.add_task(f"[cyan]Scanning {username}...", total=len(modules))
+
+        def on_start_cb(site: str):
+            progress.update(task_id, description=f"[cyan]Scanning {username}... ({site})")
+
+        tasks = []
+        for module in modules:
+            t = asyncio.create_task(
+                _async_worker(module, username, sem, configs, cat_override=cat_override, on_start=on_start_cb)
+            )
+            t.add_done_callback(lambda t: progress.advance(task_id))
+            tasks.append(t)
+
+        for coro in asyncio.as_completed(tasks):
+            result = await coro
+            
+            actual_cat = result.category or "Unknown"
+            # Handle specific logic where skipping needs to happen early
+            if configs.show_all or result.is_visible(configs):
+                if printed_cats is not None and actual_cat not in printed_cats:
+                    print(f"\n{Fore.MAGENTA}== {actual_cat.upper()} SITES =={Style.RESET_ALL}")
+                    printed_cats.add(actual_cat)
+                    
+            result.show(configs)
+            results.append(result)
+        
+    return results
+
+
+def run_user_module(
+    module: Union[ModuleType, List[ModuleType]], username: str, configs: ScanConfig
+) -> List[Result]:
+    modules = [module] if isinstance(module, ModuleType) else list(module)
+    return asyncio.run(_run_batch(modules, username, configs, printed_cats=set()))
+
+
+def run_user_category(
+    category_path: Path, username: str, configs: ScanConfig
+) -> List[Result]:
+    category_name = category_path.stem.capitalize()
+    modules = load_modules(category_path)
+    printed_cats = set()
+
+    if configs.show_all:
+        print(f"\n{Fore.MAGENTA}== {category_name.upper()} SITES =={Style.RESET_ALL}")
+        printed_cats.add(category_name)
+
+    return asyncio.run(
+        _run_batch(
+            modules,
+            username,
+            configs,
+            printed_cats=printed_cats,
+        )
+    )
+
+
+async def _run_user_full_async(username: str, configs: ScanConfig) -> List[Result]:
+    categories = list(load_categories(no_nsfw=configs.no_nsfw).items())
+    all_results = []
+    printed_cats = set()
+
+    sem = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+    
+    # 1. Pre-spawn all tasks for all categories (global concurrency)
+    category_modules = []
+    total_tasks = 0
+    for cat_name, cat_path in categories:
+        display_name = cat_name.capitalize()
+        modules = load_modules(cat_path)
+        category_modules.append((display_name, modules))
+        total_tasks += len(modules)
+
+    # 2. Await tasks category by category to stream grouped output
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        transient=True,
+    ) as progress:
+        task_id = progress.add_task(f"[cyan]Scanning {username}...", total=total_tasks)
+        
+        def on_start_cb(site: str):
+            progress.update(task_id, description=f"[cyan]Scanning {username}... ({site})")
+            
+        spawned_category_tasks = []
+        for display_name, modules in category_modules:
+            tasks = []
+            for module in modules:
+                t = asyncio.create_task(
+                    _async_worker(module, username, sem, configs, cat_override=display_name, on_start=on_start_cb)
+                )
+                t.add_done_callback(lambda t: progress.advance(task_id))
+                tasks.append(t)
+            spawned_category_tasks.append((display_name, tasks))
+        
+        for display_name, tasks in spawned_category_tasks:
+            if not tasks:
+                continue
+                
+            if configs.show_all:
+                print(f"\n{Fore.MAGENTA}== {display_name.upper()} SITES =={Style.RESET_ALL}")
+                printed_cats.add(display_name)
+                
+            for coro in asyncio.as_completed(tasks):
+                result = await coro
+                
+                if configs.show_all or result.is_visible(configs):
+                    display_name = result.category or "Unknown"
+                    if display_name not in printed_cats:
+                        print(f"\n{Fore.MAGENTA}== {display_name.upper()} SITES =={Style.RESET_ALL}")
+                        printed_cats.add(display_name)
+                        
+                result.show(configs)
+                all_results.append(result)
+
+    return all_results
+
+
+def run_user_full(username: str, configs: ScanConfig) -> List[Result]:
+    return asyncio.run(_run_user_full_async(username, configs))
+
+
+
+
+
+
+_clients: Dict[tuple, httpx.Client] = {}
+_clients_lock = threading.Lock()
+
+
+def close_cached_transports() -> None:
+    """Called by the adapter only after every worker has released its lease."""
+    with _clients_lock:
+        clients = list(_clients.values())
+        _clients.clear()
+    for client in clients:
+        try:
+            client.close()
+        except Exception:
+            logging.getLogger(__name__).warning("Could not close cached HTTPX client", exc_info=True)
+
+
+def get_client(use_http2: bool, proxy_val: Optional[str], verify: bool = True) -> httpx.Client:
+    key = (use_http2, proxy_val, verify)
+    if key not in _clients:
+        with _clients_lock:
+            if key not in _clients:
+                _clients[key] = httpx.Client(http2=use_http2, proxy=proxy_val, verify=verify)
+    return _clients[key]
+
+
+def make_request(url: str, **kwargs) -> httpx.Response:
+    """Simple wrapper to **httpx.get** that predefines headers and timeout"""
+    if "headers" not in kwargs:
+        kwargs["headers"] = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "en-US,en;q=0.9",
+            "sec-fetch-dest": "document",
+        }
+    if "show_url" in kwargs:
+        kwargs.pop("show_url", None)
+
+    global_timeout = get_global_timeout()
+    if global_timeout is not None:
+        configured = httpx.Timeout(kwargs.get("timeout", global_timeout)).as_dict()
+        kwargs["timeout"] = httpx.Timeout(**{
+            phase: value if type(value) in (int, float) and 0 <= value <= global_timeout else global_timeout
+            for phase, value in configured.items()
+        })
+    elif "timeout" not in kwargs:
+        kwargs["timeout"] = 5.0
+
+    if "proxy" not in kwargs:
+        proxy_val = get_proxy()
+    else:
+        proxy_val = kwargs.pop("proxy")
+
+    method = kwargs.pop("method", "GET")
+    use_http2 = kwargs.pop("http2", False)
+    verify = kwargs.pop("verify", True)
+
+    client = get_client(use_http2, proxy_val, verify)
+
+    max_retries = 0
+    for attempt in range(max_retries + 1):
+        try:
+            return client.request(method.upper(), url, **kwargs)
+        except (httpx.ConnectTimeout, httpx.ReadTimeout) as e:
+            if attempt == max_retries:
+                raise e
+    raise RuntimeError("Request failed after retries")
+
+
+def generic_validate(
+    url: str, func: Callable[[httpx.Response], Result], **kwargs
+) -> Result:
+    """
+    A generic validate function that makes a request and executes the provided function on the response.
+    """
+    # Look for 'show_url' in kwargs, if not found, use the request 'url'
+    display_url = kwargs.get("show_url", None)
+
+    try:
+        response = make_request(url, **kwargs)
+        result = func(response)
+        # Update the result with the chosen display url
+        return result.update(url=display_url)
+    except Exception as e:
+        return Result.error(e, url=display_url)
+
+
+def status_validate(
+    url: str, available: int | List[int], taken: int | List[int], **kwargs
+) -> Result:
+    """
+    Function that takes a **url** and **kwargs** for the request and
+    checks if the request status matches the available or taken.
+    **Available** and **Taken** must either be whole numbers or lists of whole numbers.
+    """
+
+    def inner(response: httpx.Response):
+        # Checks if a number is equal or is contained inside
+        def contains(a, b):
+            return (isinstance(a, list) and b in a) or (a == b)
+
+        status = response.status_code
+        available_value = contains(available, status)
+        taken_value = contains(taken, status)
+
+        if available_value and taken_value:
+            # Can't be both available and taken
+            return Result.error("Invalid status match. Report this on Github.")
+        elif available_value:
+            return Result.available()
+        elif taken_value:
+            return Result.taken()
+        return Result.error(f"[{status}] Status didn't match. Report this on Github.")
+
+    # We pass all kwargs (including show_url if it exists) to generic_validate
+    return generic_validate(url, inner, **kwargs)

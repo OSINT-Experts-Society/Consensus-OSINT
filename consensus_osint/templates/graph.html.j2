@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Consensus evidence graph</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101924;color:#e8edf3;font:15px system-ui,sans-serif}header{padding:20px 24px;border-bottom:1px solid #344352}h1{font-size:22px;margin:0 0 8px}p{margin:6px 0;color:#b5c3d2}nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}button,input,select{font:inherit;background:#203044;color:inherit;border:1px solid #63758a;border-radius:6px;padding:8px}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid #70cff1}main{display:grid;grid-template-columns:minmax(0,1fr) 330px;height:70vh;min-height:420px}#canvas{overflow:auto;position:relative}svg{display:block;width:100%;height:100%;min-height:420px;touch-action:none}aside{padding:20px;border-left:1px solid #344352;overflow:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.6 system-ui,sans-serif}.node{cursor:pointer}.node rect{stroke-width:1.5}.node text{fill:#eef4fc;font:13px system-ui,sans-serif;pointer-events:none}.edge{stroke:#61758e;stroke-width:1.5}.edge-label{fill:#a2b2c5;font:10px system-ui,sans-serif}#count{padding:12px 24px}label{display:flex;align-items:center;gap:6px;max-width:100%;min-width:0}select,input{min-width:0;max-width:100%}#selected{overflow-wrap:anywhere}.legend{font-size:13px}.query rect{fill:#173d54;stroke:#6bd0ee}.result rect{fill:#293653;stroke:#a5aefb}.site rect{fill:#234739;stroke:#88d5ac}@media(max-width:800px){main{grid-template-columns:1fr;height:auto}aside{border-left:0;border-top:1px solid #344352;max-height:300px}svg{height:60vh}}
+</style></head><body>
+<header><h1>Consensus evidence graph</h1><p>Explore what each search returned and where it came from. Connections do not establish identity or account ownership.</p>
+<p class="legend">Blue: search input · Purple: result · Green: source site. Select a node to inspect evidence and metadata.</p>
+<nav aria-label="Graph controls"><label>Find <input id="search" type="search" placeholder="Query, site or status"></label><label>Node <select id="nodes"><option value="">Choose a node</option></select></label><button id="fit">Fit graph</button><button id="in" aria-label="Zoom in">+</button><button id="out" aria-label="Zoom out">−</button></nav></header>
+<div id="count" role="status"></div><main><div id="canvas"><svg id="graph" role="img" aria-label="Interactive evidence graph"></svg></div><aside><h2 id="selected">Evidence details</h2><pre id="details">Select a node. Scroll or drag to move through the graph; use Fit graph for an overview and + or − to zoom. This report works offline.</pre></aside></main>
+<script id="graph-data" type="application/json">{{ graph_json | safe }}</script>
+<script>
+"use strict";
+const data=JSON.parse(document.getElementById("graph-data").textContent), svg=document.getElementById("graph"), ns="http://www.w3.org/2000/svg";
+let box=[-30,-30,1000,600], positions=new Map(), visible=[], drag=null;
+function element(tag,attributes,text){const el=document.createElementNS(ns,tag);for(const [key,value] of Object.entries(attributes||{}))el.setAttribute(key,value);if(text!==undefined)el.textContent=text;return el}
+function view(){svg.setAttribute("viewBox",box.join(" "))}
+function select(id){const n=data.nodes.find(n=>n.id===Number(id));if(!n)return;document.getElementById("selected").textContent=n.label;document.getElementById("details").textContent=JSON.stringify(n.details,null,2);document.getElementById("nodes").value=String(n.id);reveal(n.id)}
+function bounds(){return Math.max(250,...visible.map(n=>positions.get(n.id)[1]+100))}
+function fit(){box=[-30,-30,1060,bounds()];view()}
+// Open at a size where labels can be read; a long graph continues below and is reached by scrolling or dragging.
+function readable(){const w=svg.clientWidth,h=svg.clientHeight;if(!w||!h)return fit();const width=Math.min(1060,Math.max(w,560)),height=width*h/w;if(height>=bounds())return fit();box=[-30,-30,width,height];view()}
+function reveal(id){const p=positions.get(Number(id));if(!p)return;let [x,y,w,h]=box;if(p[0]<x)x=p[0]-30;else if(p[0]+260>x+w)x=p[0]+290-w;if(p[1]<y)y=p[1]-30;else if(p[1]+44>y+h)y=p[1]+74-h;box=[x,y,w,h];view()}
+function draw(){
+ const term=document.getElementById("search").value.toLocaleLowerCase();let ids=new Set(data.nodes.filter(n=>!term||n.label.toLocaleLowerCase().includes(term)).map(n=>n.id));
+ if(term){const matched=new Set(ids);for(const e of data.edges)if(matched.has(e.source)||matched.has(e.target)){ids.add(e.source);ids.add(e.target)}}
+ visible=data.nodes.filter(n=>ids.has(n.id));svg.replaceChildren();positions=new Map();const rows={query:0,result:0,site:0},x={query:0,result:370,site:740};
+ for(const n of visible)positions.set(n.id,[x[n.kind],rows[n.kind]++*76]);
+ for(const e of data.edges){if(!ids.has(e.source)||!ids.has(e.target))continue;const a=positions.get(e.source),b=positions.get(e.target);svg.append(element("line",{x1:a[0]+260,y1:a[1]+22,x2:b[0],y2:b[1]+22,class:"edge"}));svg.append(element("text",{x:a[0]+265,y:(a[1]+b[1])/2+15,class:"edge-label"},e.label))}
+ for(const n of visible){const [x,y]=positions.get(n.id),g=element("g",{transform:`translate(${x} ${y})`,class:`node ${n.kind}`,tabindex:0,role:"button","aria-label":n.label});g.append(element("title",{},n.label));g.append(element("rect",{width:260,height:44,rx:8}));g.append(element("text",{x:12,y:27},n.label.length>32?n.label.slice(0,31)+"…":n.label));g.addEventListener("click",()=>select(n.id));g.addEventListener("focus",()=>reveal(n.id));g.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();select(n.id)}});svg.append(g)}
+ document.getElementById("count").textContent=visible.length?`${visible.length} of ${data.nodes.length} nodes shown` : "No matching evidence to display";readable();
+}
+const selector=document.getElementById("nodes");for(const n of data.nodes){const option=document.createElement("option");option.value=n.id;option.textContent=`${n.kind}: ${n.label}`;selector.append(option)}selector.addEventListener("change",()=>select(selector.value));
+document.getElementById("search").addEventListener("input",draw);document.getElementById("fit").addEventListener("click",fit);
+function zoom(factor){const width=box[2]*factor,height=box[3]*factor;if(width<100||width>1000000)return;box=[box[0]+(box[2]-width)/2,box[1]+(box[3]-height)/2,width,height];view()}
+document.getElementById("in").addEventListener("click",()=>zoom(.8));document.getElementById("out").addEventListener("click",()=>zoom(1.25));
+svg.addEventListener("pointerdown",event=>{if(event.target.closest(".node"))return;drag=[event.clientX,event.clientY,...box];svg.setPointerCapture(event.pointerId)});
+svg.addEventListener("pointermove",event=>{if(!drag)return;const scale=Math.max(drag[4]/svg.clientWidth,drag[5]/svg.clientHeight);box=[drag[2]-(event.clientX-drag[0])*scale,drag[3]-(event.clientY-drag[1])*scale,drag[4],drag[5]];view()});
+svg.addEventListener("wheel",event=>{if(event.ctrlKey){event.preventDefault();zoom(event.deltaY<0?.8:1.25);return}const scale=box[3]/(svg.clientHeight||1)*(event.deltaMode===1?16:1),limit=Math.max(-30,bounds()-box[3]),y=Math.min(limit,Math.max(-30,box[1]+event.deltaY*scale));if(y===box[1])return;event.preventDefault();box[1]=y;view()},{passive:false});
+svg.addEventListener("pointerup",()=>drag=null);svg.addEventListener("pointercancel",()=>drag=null);draw();
+</script></body></html>

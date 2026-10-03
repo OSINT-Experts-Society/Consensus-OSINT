@@ -1,0 +1,3748 @@
+{
+ "$comment": "Consensus data rules: one request and one answer per site, for usernames, e-mail addresses and phone numbers. Maintained by Consensus (some rules were derived from upstream code modules; 'source' keeps the credit and 'replaces' names the module the rule supersedes). Signed with the rest of the data - do not edit by hand.",
+ "built": "2026-09-02",
+ "rules": [
+  {
+   "id": "gravatar",
+   "name": "Gravatar",
+   "kind": "email",
+   "url": "https://gravatar.com",
+   "check_url": "https://gravatar.com/{sha256}.json",
+   "method": "GET",
+   "headers": {},
+   "payload": null,
+   "detect": {
+    "type": "json",
+    "found_status": [],
+    "found_strings": [],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [],
+    "json_found_path": [
+     "entry",
+     0,
+     "displayName"
+    ],
+    "json_missing_path": []
+   },
+   "category": "images",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": [
+    {
+     "name": "Avatar",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "thumbnailUrl"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "Name",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "displayName"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "Username",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "preferredUsername"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "About Me",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "aboutMe"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "Location",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "currentLocation"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "Job",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "job_title"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "Company",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "company"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "Contact",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "contactInfo"
+     ],
+     "prefix": null,
+     "item_path": [
+      "value"
+     ]
+    },
+    {
+     "name": "Emails",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "emails"
+     ],
+     "prefix": null,
+     "item_path": [
+      "value"
+     ]
+    },
+    {
+     "name": "Accounts",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "accounts"
+     ],
+     "prefix": null,
+     "item_path": [
+      "url"
+     ]
+    },
+    {
+     "name": "URLs",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "urls"
+     ],
+     "prefix": null,
+     "item_path": [
+      "value"
+     ]
+    },
+    {
+     "name": "Contact",
+     "schema": "JSON",
+     "path": [
+      "entry",
+      0,
+      "emails"
+     ],
+     "prefix": null,
+     "item_path": [
+      "value"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "adobe",
+   "name": "Adobe",
+   "kind": "email",
+   "url": "https://adobe.com",
+   "check_url": "https://auth.services.adobe.com/signin/v2/users/accounts",
+   "method": "POST",
+   "headers": {
+    "X-Ims-Clientid": "homepage_milo",
+    "Content-Type": "application/json"
+   },
+   "payload": "{\"username\":\"{email}\",\"usernameType\":\"EMAIL\"}",
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "authenticationMethods"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "[]"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "misc",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": [
+    {
+     "name": "Avatar",
+     "schema": "JSON",
+     "path": [
+      0,
+      "images",
+      "230"
+     ],
+     "prefix": null,
+     "item_path": null
+    }
+   ]
+  },
+  {
+   "id": "duolingo",
+   "name": "Duolingo",
+   "kind": "email",
+   "url": "https://duolingo.com",
+   "check_url": "https://www.duolingo.com/2017-06-30/users?email={email}",
+   "method": "GET",
+   "headers": {},
+   "payload": null,
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "username"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "{\"users\":[]}"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "hobby",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": [
+    {
+     "name": "Avatar",
+     "schema": "JSON",
+     "path": [
+      "users",
+      0,
+      "picture"
+     ],
+     "prefix": "https:",
+     "item_path": null
+    },
+    {
+     "name": "Name",
+     "schema": "JSON",
+     "path": [
+      "users",
+      0,
+      "name"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "Bio",
+     "schema": "JSON",
+     "path": [
+      "users",
+      0,
+      "bio"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "Courses",
+     "schema": "JSON",
+     "path": [
+      "users",
+      0,
+      "courses"
+     ],
+     "prefix": null,
+     "item_path": [
+      "title"
+     ]
+    },
+    {
+     "name": "username",
+     "schema": "JSON",
+     "path": [
+      "users",
+      0,
+      "username"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "display_name",
+     "schema": "JSON",
+     "path": [
+      "users",
+      0,
+      "name"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "avatar_url",
+     "schema": "JSON",
+     "path": [
+      "users",
+      0,
+      "picture"
+     ],
+     "prefix": null,
+     "item_path": null
+    }
+   ]
+  },
+  {
+   "id": "chess-com",
+   "name": "Chess.com",
+   "kind": "email",
+   "url": "https://chess.com",
+   "check_url": "https://www.chess.com/callback/email/available?email={email}",
+   "method": "GET",
+   "headers": {},
+   "payload": null,
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "Email In Use"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "Email Available"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "gaming",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "notion",
+   "name": "Notion",
+   "kind": "email",
+   "url": "https://notion.so",
+   "check_url": "https://www.notion.so/api/v3/getLoginOptions",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/json"
+   },
+   "payload": "{\"email\":\"{email}\"}",
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "\"hasAccount\":true"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "\"hasAccount\":false"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "misc",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "spotify",
+   "name": "Spotify",
+   "kind": "email",
+   "url": "https://spotify.com",
+   "check_url": "https://spclient.wg.spotify.com/signup/public/v1/account?validate=1&email={email}",
+   "method": "GET",
+   "headers": {},
+   "payload": null,
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "\"status\":20"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "\"status\":1"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "music",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "strava",
+   "name": "Strava",
+   "kind": "email",
+   "url": "https://strava.com",
+   "check_url": "https://www.strava.com/athletes/email_unique?email={email}",
+   "method": "GET",
+   "headers": {},
+   "payload": null,
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "false"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "true"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "music",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "twitter",
+   "name": "Twitter",
+   "kind": "email",
+   "url": "https://twitter.com",
+   "check_url": "https://api.twitter.com/i/users/email_available.json?email={email}",
+   "method": "GET",
+   "headers": {},
+   "payload": null,
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "\"taken\":true"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "\"taken\":false"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "music",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": [
+    {
+     "name": "Avatar",
+     "schema": "HTML",
+     "path": "<a[^>]*class=\"profile-card-avatar\"[^>]*><img[^>]+src=\"([^\"]+)\"",
+     "prefix": "https://nitter.privacydev.net",
+     "item_path": null
+    },
+    {
+     "name": "Name",
+     "schema": "HTML",
+     "path": "<a[^>]*class=\"profile-card-fullname\"[^>]*>([^<]+)",
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "Bio",
+     "schema": "HTML",
+     "path": "<div class=\"profile-bio\">([^<]+)</div>",
+     "prefix": null,
+     "item_path": null
+    }
+   ]
+  },
+  {
+   "id": "netshoes",
+   "name": "NetShoes",
+   "kind": "email",
+   "url": "https://netshoes.com.br",
+   "check_url": "https://www.netshoes.com.br/auth/account/exists/{email}",
+   "method": "GET",
+   "headers": {},
+   "payload": null,
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "\"exists\":true"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "\"email\""
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "shopping",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "olx",
+   "name": "OLX",
+   "kind": "email",
+   "url": "https://olx.com.br",
+   "check_url": "https://apigw.olx.com.br/v0/user/login/check_email",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/json",
+    "X-Olx-Team-Key": "5XzjuCgmYE7qMlYpsLZbTvm98ik4CS4a"
+   },
+   "payload": "{\"email\":\"{email}\"}",
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "EMAIL"
+    ],
+    "missing_status": [
+     401
+    ],
+    "missing_strings": [
+     "ACCOUNT_NOT_FOUND"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "shopping",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "milanuncios",
+   "name": "Milanuncios",
+   "kind": "email",
+   "url": "https://milanuncios.com",
+   "check_url": "https://userprofiles.gw.milanuncios.com/api/v2/users",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/json"
+   },
+   "payload": "{\"name\":\"SAsASA\",\"password\":\"1234561\",\"email\":\"{email}\",\"isConsentApproved\":\"true\",\"sellerType\":\"PRIVATE\",\"role\":\"USER\"}",
+   "detect": {
+    "type": "message",
+    "found_status": [
+     409
+    ],
+    "found_strings": [
+     "user-profiles.email-already-exists"
+    ],
+    "missing_status": [
+     400
+    ],
+    "missing_strings": [
+     "user-profiles.invalid-password"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "shopping",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "el-mundo",
+   "name": "El Mundo",
+   "kind": "email",
+   "url": "https://elmundo.es",
+   "check_url": "https://seguro.elmundo.es/ueregistro/v2/usuarios/registro",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/json"
+   },
+   "payload": "{\"email\":\"{email}\",\"pass\":\"11\",\"portal\":8,\"aceptaCondicionesLegales\":true,\"aceptaEsMayorDeDieciseis\":true,\"comunicacionesComerciales\":[],\"rid\":null,\"csp\":null,\"urlOrigen\":\"\",\"movil\":\"\",\"aceptaSuscripcionClub\":false,\"pianoTrackingId\":null}",
+   "detect": {
+    "type": "message",
+    "found_status": [
+     400
+    ],
+    "found_strings": [
+     "\"codigo\":\"176\""
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "\"codigo\":\"001\""
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "shopping",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "xvideos",
+   "name": "Xvideos",
+   "kind": "email",
+   "url": "https://xvideos.com",
+   "check_url": "https://www.xvideos.com/account/checkemail?email={email}",
+   "method": "POST",
+   "headers": {},
+   "payload": "email={email}",
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "\"result\":false"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "\"result\":true"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "nsfw",
+   "nsfw": true,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "picsart",
+   "name": "Picsart",
+   "kind": "email",
+   "url": "https://picsart.com",
+   "check_url": "https://api.picsart.com/users/email/existence?email_encoded=0&emails={email}",
+   "method": "GET",
+   "headers": {},
+   "payload": null,
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "\"response\":[\""
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "\"registration_flow\""
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "art",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "eventbrite",
+   "name": "Eventbrite",
+   "kind": "email",
+   "url": "https://eventbrite.com",
+   "check_url": "https://www.eventbrite.com/api/v3/users/lookup/",
+   "method": "POST",
+   "headers": {
+    "Cookie": "csrftoken={csrftoken_value}",
+    "X-Csrftoken": "{csrftoken_value}",
+    "Referer": "https://www.eventbrite.com/",
+    "Content-Type": "application/json"
+   },
+   "payload": "{\"email\":\"{email}\",\"source_user_id\":\"\",\"source_provider\":\"\"}",
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "\"exists\":true"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "\"exists\":false"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": [
+    {
+     "name": "User ID",
+     "schema": "JSON",
+     "path": [
+      "user_id"
+     ],
+     "prefix": null,
+     "item_path": null
+    }
+   ]
+  },
+  {
+   "id": "imageshack",
+   "name": "Imageshack",
+   "kind": "email",
+   "url": "https://imageshack.com",
+   "check_url": "https://imageshack.com/rest_api/v2/user",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+   },
+   "payload": "email={email}&username=user&password=1&set_cookies=true",
+   "detect": {
+    "type": "message",
+    "found_status": [
+     400
+    ],
+    "found_strings": [
+     "\"error_code\":30"
+    ],
+    "missing_status": [
+     404
+    ],
+    "missing_strings": [
+     "\"error_code\":29"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "images",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "apple",
+   "name": "Apple",
+   "kind": "email",
+   "url": "https://apple.com",
+   "check_url": "https://appleid.apple.com/account/check/email",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Referer": "https://appleid.apple.com/account"
+   },
+   "payload": {
+    "email": "{email}"
+   },
+   "detect": {
+    "type": "json",
+    "found_status": [],
+    "found_strings": [],
+    "missing_status": [],
+    "missing_strings": [],
+    "json_found_path": [
+     "used"
+    ],
+    "json_missing_path": []
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "discord",
+   "name": "Discord",
+   "kind": "email",
+   "url": "https://discord.com",
+   "check_url": "https://discord.com/api/v9/auth/register",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/json"
+   },
+   "payload": {
+    "email": "{email}",
+    "username": "a",
+    "password": "Aa1!aaaa",
+    "date_of_birth": "1990-01-01",
+    "consent": true
+   },
+   "detect": {
+    "type": "json",
+    "found_status": [],
+    "found_strings": [],
+    "missing_status": [],
+    "missing_strings": [],
+    "json_found_path": [
+     "errors",
+     "email"
+    ],
+    "json_missing_path": []
+   },
+   "category": "communication",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "dropbox",
+   "name": "Dropbox",
+   "kind": "email",
+   "url": "https://dropbox.com",
+   "check_url": "https://www.dropbox.com/register",
+   "method": "POST",
+   "headers": {},
+   "payload": {
+    "login_email": "{email}",
+    "login_password": "x"
+   },
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "already in use",
+     "already taken",
+     "exists",
+     "incorrect"
+    ],
+    "missing_status": [],
+    "missing_strings": [],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "github",
+   "name": "GitHub",
+   "kind": "email",
+   "url": "https://github.com",
+   "check_url": "https://api.github.com/search/users?q={email}%20in:email",
+   "method": "GET",
+   "headers": {
+    "Accept": "application/vnd.github+json"
+   },
+   "payload": null,
+   "detect": {
+    "type": "json",
+    "found_status": [],
+    "found_strings": [],
+    "missing_status": [],
+    "missing_strings": [],
+    "json_found_path": [
+     "items",
+     0,
+     "login"
+    ],
+    "json_missing_path": []
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": [
+    {
+     "name": "login",
+     "schema": "JSON",
+     "path": [
+      "items",
+      0,
+      "login"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "avatar_url",
+     "schema": "JSON",
+     "path": [
+      "items",
+      0,
+      "avatar_url"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "html_url",
+     "schema": "JSON",
+     "path": [
+      "items",
+      0,
+      "html_url"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "profile_url",
+     "schema": "JSON",
+     "path": [
+      "items",
+      0,
+      "html_url"
+     ],
+     "prefix": null,
+     "item_path": null
+    },
+    {
+     "name": "type",
+     "schema": "JSON",
+     "path": [
+      "items",
+      0,
+      "type"
+     ],
+     "prefix": null,
+     "item_path": null
+    }
+   ]
+  },
+  {
+   "id": "linkedin",
+   "name": "LinkedIn",
+   "kind": "email",
+   "url": "https://linkedin.com",
+   "check_url": "https://www.linkedin.com/uas/request-password-reset",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/x-www-form-urlencoded"
+   },
+   "payload": {
+    "email": "{email}"
+   },
+   "detect": {
+    "type": "status_code",
+    "found_status": [],
+    "found_strings": [],
+    "missing_status": [],
+    "missing_strings": [],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "communication",
+   "nsfw": false,
+   "loud": true,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "patreon",
+   "name": "Patreon",
+   "kind": "email",
+   "url": "https://patreon.com",
+   "check_url": "https://www.patreon.com/api/auth?include=campaign",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/json"
+   },
+   "payload": {
+    "data": {
+     "type": "user",
+     "attributes": {
+      "email": "{email}",
+      "password": "invalid_password_123"
+     }
+    }
+   },
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [],
+    "missing_status": [],
+    "missing_strings": [
+     "not found",
+     "does not exist",
+     "invalid email"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "skype-microsoft",
+   "name": "Skype / Microsoft",
+   "kind": "email",
+   "url": "https://live.com",
+   "check_url": "https://login.live.com/GetCredentialType.srf",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/json"
+   },
+   "payload": {
+    "username": "{email}",
+    "uaid": "",
+    "isOtherIdpSupported": true
+   },
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "\"IfExistsResult\":0"
+    ],
+    "missing_status": [],
+    "missing_strings": [],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "communication",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "snapchat",
+   "name": "Snapchat",
+   "kind": "email",
+   "url": "https://snapchat.com",
+   "check_url": "https://accounts.snapchat.com/accounts/get_username_suggestions",
+   "method": "POST",
+   "headers": {
+    "Content-Type": "application/json"
+   },
+   "payload": {
+    "email": "{email}"
+   },
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [
+     "suggestions",
+     "reference",
+     "error_message",
+     "taken",
+     "exists"
+    ],
+    "missing_status": [],
+    "missing_strings": [],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "zoom",
+   "name": "Zoom",
+   "kind": "email",
+   "url": "https://zoom.us",
+   "check_url": "https://zoom.us/signin/confirm_account",
+   "method": "POST",
+   "headers": {},
+   "payload": {
+    "email": "{email}"
+   },
+   "detect": {
+    "type": "message",
+    "found_status": [],
+    "found_strings": [],
+    "missing_status": [],
+    "missing_strings": [
+     "not found",
+     "does not exist",
+     "invalid"
+    ],
+    "json_found_path": [],
+    "json_missing_path": []
+   },
+   "category": "communication",
+   "nsfw": false,
+   "loud": true,
+   "source": "consensus",
+   "extract": []
+  },
+  {
+   "id": "babepedia",
+   "name": "Babepedia",
+   "kind": "username",
+   "url": "https://www.babepedia.com/user/{username}",
+   "check_url": "https://www.babepedia.com/user/{username}",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": false,
+   "impersonate": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "'s Profile</title>"
+    ],
+    "missing_strings": [
+     "Profile not found"
+    ],
+    "found_first": true,
+    "found_status": [
+     200
+    ]
+   },
+   "extract": [
+    {
+     "name": "status",
+     "schema": "HTML",
+     "path": "Account status:.*?<span[^>]*>(.*?)</span>"
+    },
+    {
+     "name": "signup_date",
+     "schema": "HTML",
+     "path": "Signed up on:.*?<td>(.*?)</td>"
+    },
+    {
+     "name": "last_seen",
+     "schema": "HTML",
+     "path": "Last seen on:.*?<td>(.*?)</td>"
+    },
+    {
+     "name": "logins",
+     "schema": "HTML",
+     "path": "Logins:.*?<td>(.*?)</td>"
+    },
+    {
+     "name": "views",
+     "schema": "HTML",
+     "path": "Views of this page:.*?<td>(.*?)</td>"
+    }
+   ],
+   "category": "adult",
+   "nsfw": true,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-adult-babepedia"
+  },
+  {
+   "id": "bdsmsingles",
+   "name": "Bdsmsingles",
+   "kind": "username",
+   "url": "https://www.bdsmsingles.com/members/{username}/",
+   "check_url": "https://www.bdsmsingles.com/members/{username}/",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "<title>Profile"
+    ],
+    "found_status": [
+     200
+    ]
+   },
+   "extract": [
+    {
+     "name": "headline",
+     "schema": "HTML",
+     "path": "<h1>(.*?)</h1>"
+    },
+    {
+     "name": "image",
+     "schema": "HTML",
+     "path": "src=\"(https://media\\.bdsmsingles\\.com/images/user_photo/[^\"]+)\"",
+     "media": true
+    }
+   ],
+   "category": "adult",
+   "nsfw": true,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-adult-bdsmsingles"
+  },
+  {
+   "id": "zmarsa",
+   "name": "Zmarsa",
+   "kind": "username",
+   "url": "https://zmarsa.com/uzytkownik/{username}",
+   "check_url": "https://zmarsa.com/uzytkownik/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "Statystyki"
+    ],
+    "missing_strings": [
+     "<title>Error 404 - zMarsa.com<"
+    ],
+    "found_first": true,
+    "found_status": [
+     200,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "extract": [
+    {
+     "name": "image",
+     "schema": "HTML",
+     "path": "src=\"(https://zmarsa.com/storage/avatar/[^\"]+)\"",
+     "media": true
+    },
+    {
+     "name": "joined",
+     "schema": "HTML",
+     "path": "<p>Dołączył/a (.*?)</p>"
+    },
+    {
+     "name": "points",
+     "schema": "HTML",
+     "path": "Punkty:\\s*<b>(.*?)</b>"
+    },
+    {
+     "name": "ranking",
+     "schema": "HTML",
+     "path": "Pozycja w Rankingu:.*?<b>#(.*?)</b>"
+    },
+    {
+     "name": "followers",
+     "schema": "HTML",
+     "path": "Obserwujących:\\s*<b>(.*?)</b>"
+    },
+    {
+     "name": "following",
+     "schema": "HTML",
+     "path": "Obserwowani:\\s*<b>(.*?)</b>"
+    },
+    {
+     "name": "posts",
+     "schema": "HTML",
+     "path": "Dodanych postów:\\s*<b>(.*?)</b>"
+    },
+    {
+     "name": "comments",
+     "schema": "HTML",
+     "path": "Dodanych komentarzy:\\s*<b>(.*?)</b>"
+    }
+   ],
+   "category": "adult",
+   "nsfw": true,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-adult-zmarsa"
+  },
+  {
+   "id": "airliners",
+   "name": "Airliners",
+   "kind": "username",
+   "url": "https://www.airliners.net/user/{username}/profile",
+   "check_url": "https://www.airliners.net/user/{username}/profile",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "community",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-community-airliners"
+  },
+  {
+   "id": "coderlegion",
+   "name": "Coderlegion",
+   "kind": "username",
+   "url": "https://coderlegion.com/user/{username}",
+   "check_url": "https://coderlegion.com/user/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "name",
+     "schema": "HTML",
+     "path": "<h1 class=\"profile-name\">([^<]+)</h1>"
+    },
+    {
+     "name": "headline",
+     "schema": "HTML",
+     "path": "<div class=\"profile-headline\">([^<]+)</div>"
+    },
+    {
+     "name": "joined",
+     "schema": "HTML",
+     "path": "<span class=\"profile-joined\">Joined ([^<]+)</span>"
+    },
+    {
+     "name": "avatar",
+     "schema": "HTML",
+     "path": "<div class=\"profile-avatar\">\\s*<a[^>]+>\\s*<img[^>]+src=\"([^\"]+)\"",
+     "media": true
+    },
+    {
+     "name": "points",
+     "schema": "HTML",
+     "path": "<strong>([^<]+)</strong> Points"
+    },
+    {
+     "name": "badges",
+     "schema": "HTML",
+     "path": "<strong>([^<]+)</strong> Badges"
+    },
+    {
+     "name": "followers",
+     "schema": "HTML",
+     "path": "<strong>([^<]+)</strong> Followers"
+    },
+    {
+     "name": "following",
+     "schema": "HTML",
+     "path": "<strong>([^<]+)</strong> Following"
+    }
+   ],
+   "category": "community",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-community-coderlegion"
+  },
+  {
+   "id": "hackernews",
+   "name": "Hackernews",
+   "kind": "username",
+   "url": "https://news.ycombinator.com/user?id={username}",
+   "check_url": "https://news.ycombinator.com/user?id={username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": true,
+   "regex_check": "(?=.{2,15}$)(?=(?:^[a-zA-Z0-9_-]+$)).*",
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "created:"
+    ],
+    "found_regex": [
+     "created:</td><td><span class=\"age\"><a[^>]+>([^<]+)</a></span></td>",
+     "created:</td><td>([^<]+)</td>"
+    ],
+    "missing_strings": [
+     "No such user."
+    ],
+    "ignore_case": true,
+    "found_status": [
+     200,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "extract": [
+    {
+     "name": "joined",
+     "schema": "HTML",
+     "path": "created:</td><td>([^<]+)</td>"
+    }
+   ],
+   "category": "community",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-community-hackernews"
+  },
+  {
+   "id": "harvard",
+   "name": "Harvard",
+   "kind": "username",
+   "url": "https://cyber.harvard.edu/people/{username}",
+   "check_url": "https://cyber.harvard.edu/people/{username}",
+   "method": "GET",
+   "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
+    "Accept-Language": "en-US,en;q=0.9"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "community",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-community-harvard"
+  },
+  {
+   "id": "instructables",
+   "name": "Instructables",
+   "kind": "username",
+   "url": "https://www.instructables.com/member/{username}/",
+   "check_url": "https://www.instructables.com/member/{username}/",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "title",
+     "schema": "HTML",
+     "path": "<title>(.*?)</title>"
+    },
+    {
+     "name": "description",
+     "schema": "HTML",
+     "path": "<meta[^>]*name=[\"\\']description[\"\\'][^>]*content=[\"\\']([^\"\\']+)[\"\\']"
+    }
+   ],
+   "category": "community",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-community-instructables"
+  },
+  {
+   "id": "weforum",
+   "name": "Weforum",
+   "kind": "username",
+   "url": "https://www.weforum.org/people/{username}",
+   "check_url": "https://www.weforum.org/people/{username}",
+   "method": "GET",
+   "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
+    "Accept-Language": "en-US,en;q=0.9"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "community",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-community-weforum"
+  },
+  {
+   "id": "behance",
+   "name": "Behance",
+   "kind": "username",
+   "url": "https://www.behance.net/{username}",
+   "check_url": "https://www.behance.net/{username}/appreciated",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "creative",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-creative-behance"
+  },
+  {
+   "id": "deviantart",
+   "name": "Deviantart",
+   "kind": "username",
+   "url": "https://www.deviantart.com/{username}",
+   "check_url": "https://www.deviantart.com/{username}",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "title",
+     "schema": "HTML",
+     "path": "<title>(.*?)</title>"
+    },
+    {
+     "name": "description",
+     "schema": "HTML",
+     "path": "<meta[^>]*name=[\"\\']description[\"\\'][^>]*content=[\"\\']([^\"\\']+)[\"\\']"
+    }
+   ],
+   "category": "creative",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-creative-deviantart"
+  },
+  {
+   "id": "figma",
+   "name": "Figma",
+   "kind": "username",
+   "url": "https://www.figma.com/@{username}",
+   "check_url": "https://www.figma.com/@{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     202,
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "name",
+     "schema": "HTML",
+     "path": "<meta\\s+property=\"twitter:title\"\\s+content=\"([^\"]+)\""
+    }
+   ],
+   "category": "creative",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-creative-figma"
+  },
+  {
+   "id": "ameblo",
+   "name": "Ameblo",
+   "kind": "username",
+   "url": "https://ameblo.jp/{username}",
+   "check_url": "https://ameblo.jp/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "name",
+     "schema": "HTML",
+     "path": "<title>([^<]+)</title>",
+     "replace": [
+      [
+       "プロフィール",
+       ""
+      ]
+     ]
+    }
+   ],
+   "category": "creator",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-creator-ameblo"
+  },
+  {
+   "id": "kaggle",
+   "name": "Kaggle",
+   "kind": "username",
+   "url": "https://www.kaggle.com/{username}",
+   "check_url": "https://www.kaggle.com/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "name",
+     "schema": "HTML",
+     "path": "<title>([^\\|]+)\\|"
+    }
+   ],
+   "category": "creator",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-creator-kaggle"
+  },
+  {
+   "id": "patreon-us",
+   "name": "Patreon",
+   "kind": "username",
+   "url": "https://www.patreon.com/{username}",
+   "check_url": "https://www.patreon.com/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "creator",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-creator-patreon"
+  },
+  {
+   "id": "arduino",
+   "name": "Arduino",
+   "kind": "username",
+   "url": "https://forum.arduino.cc/u/{username}",
+   "check_url": "https://forum.arduino.cc/u/{username}.json",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-dev-arduino"
+  },
+  {
+   "id": "asciinema",
+   "name": "Asciinema",
+   "kind": "username",
+   "url": "https://asciinema.org/~{username}",
+   "check_url": "https://asciinema.org/~{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-dev-asciinema"
+  },
+  {
+   "id": "gitbook",
+   "name": "Gitbook",
+   "kind": "username",
+   "url": "https://{username}.gitbook.io/",
+   "check_url": "https://{username}.gitbook.io/",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "ignore_case": true,
+    "found_status": [
+     200,
+     301,
+     302,
+     307
+    ]
+   },
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-dev-gitbook"
+  },
+  {
+   "id": "googleplaystore",
+   "name": "Googleplaystore",
+   "kind": "username",
+   "url": "https://play.google.com/store/apps/developer?id={username}",
+   "check_url": "https://play.google.com/store/apps/developer?id={username}",
+   "method": "GET",
+   "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
+    "Accept-Language": "en-US,en;q=0.9"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-dev-googleplaystore"
+  },
+  {
+   "id": "hackerearth",
+   "name": "Hackerearth",
+   "kind": "username",
+   "url": "https://www.hackerearth.com/@{username}",
+   "check_url": "https://www.hackerearth.com/@{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Upgrade-Insecure-Requests": "1"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-dev-hackerearth"
+  },
+  {
+   "id": "launchpad",
+   "name": "Launchpad",
+   "kind": "username",
+   "url": "https://launchpad.net/~{username}",
+   "check_url": "https://launchpad.net/~{username}",
+   "method": "GET",
+   "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Upgrade-Insecure-Requests": "1"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-dev-launchpad"
+  },
+  {
+   "id": "packagist",
+   "name": "Packagist",
+   "kind": "username",
+   "url": "https://packagist.org/users/{username}/",
+   "check_url": "https://packagist.org/users/{username}/",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "name",
+     "schema": "HTML",
+     "path": "<title[^>]*>(.*?)</title>",
+     "replace": [
+      [
+       "- Packagist",
+       ""
+      ]
+     ]
+    }
+   ],
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-dev-packagist"
+  },
+  {
+   "id": "rubygems",
+   "name": "Rubygems",
+   "kind": "username",
+   "url": "https://rubygems.org/profiles/{username}",
+   "check_url": "https://rubygems.org/profiles/{username}",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "gems_count",
+     "schema": "HTML",
+     "path": "Gems\\s*<span[^>]*>(\\d+)</span>",
+     "cast": "int"
+    }
+   ],
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-dev-rubygems"
+  },
+  {
+   "id": "wix",
+   "name": "Wix",
+   "kind": "username",
+   "url": "https://{username}.wix.com",
+   "check_url": "https://{username}.wix.com",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "wix"
+    ],
+    "ignore_case": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "title",
+     "schema": "HTML",
+     "path": "<title>(.*?)</title>"
+    }
+   ],
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-dev-wix"
+  },
+  {
+   "id": "buymeacoffee",
+   "name": "Buymeacoffee",
+   "kind": "username",
+   "url": "https://buymeacoffee.com/{username}",
+   "check_url": "https://buymeacoffee.com/{username}",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "name",
+     "schema": "HTML",
+     "path": "<title[^>]*>([^<]+?)(?:\\s*-\\s*Buymeacoffee)?</title>"
+    },
+    {
+     "name": "bio",
+     "schema": "HTML",
+     "path": "<meta property=\"og:description\" content=\"([^\"]+)\""
+    },
+    {
+     "name": "avatar",
+     "schema": "HTML",
+     "path": "<meta property=\"og:image\" content=\"([^\"]+)\"",
+     "media": true
+    }
+   ],
+   "category": "donation",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-donation-buymeacoffee"
+  },
+  {
+   "id": "donatealerts",
+   "name": "Donatealerts",
+   "kind": "username",
+   "url": "https://www.donationalerts.com/r/{username}",
+   "check_url": "https://www.donationalerts.com/api/v1/user/{username}/donationpagesettings",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     202
+    ]
+   },
+   "category": "donation",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-donation-donatealerts"
+  },
+  {
+   "id": "advfn",
+   "name": "Advfn",
+   "kind": "username",
+   "url": "https://uk.advfn.com/forum/profile/{username}",
+   "check_url": "https://uk.advfn.com/forum/profile/{username}",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": false,
+   "impersonate": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "Profile | ADVFN"
+    ],
+    "missing_strings": [
+     "ADVFN ERROR - Page Not Found"
+    ],
+    "ignore_case": true,
+    "found_first": true,
+    "found_status": [
+     200,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "category": "finance",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-finance-advfn"
+  },
+  {
+   "id": "hamaha",
+   "name": "Hamaha",
+   "kind": "username",
+   "url": "https://hamaha.net/{username}",
+   "check_url": "https://hamaha.net/{username}/tab:info",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "id=\"profile\""
+    ],
+    "missing_strings": [
+     "content=\"HAMAHA  Биткоин форум",
+     "быстрая регистрация"
+    ],
+    "ignore_case": true,
+    "found_first": true,
+    "found_status": [
+     200,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "category": "finance",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-finance-hamaha"
+  },
+  {
+   "id": "tradingview",
+   "name": "Tradingview",
+   "kind": "username",
+   "url": "https://www.tradingview.com/u/{username}/",
+   "check_url": "https://www.tradingview.com/u/{username}/",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "tradingview"
+    ],
+    "missing_strings": [
+     "page not found"
+    ],
+    "ignore_case": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "finance",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-finance-tradingview"
+  },
+  {
+   "id": "geocaching",
+   "name": "Geocaching",
+   "kind": "username",
+   "url": "https://www.geocaching.com/p/default.aspx?u={username}",
+   "check_url": "https://www.geocaching.com/p/default.aspx?u={username}",
+   "method": "GET",
+   "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "hax-profile",
+     "lblmembername",
+     "window.publicprofile"
+    ],
+    "found_regex": [
+     "<span id=\"[^\"]*lblMemberName\">([^<]+)</span>"
+    ],
+    "missing_strings": [
+     "Error 404",
+     "DNF"
+    ],
+    "found_first": true,
+    "found_status": [
+     200
+    ]
+   },
+   "extract": [
+    {
+     "name": "name",
+     "schema": "HTML",
+     "path": "<span id=\"[^\"]*lblMemberName\">([^<]+)</span>"
+    },
+    {
+     "name": "avatar",
+     "schema": "HTML",
+     "path": "id=\"[^\"]*uxProfilePhoto\"[^>]+src=\"([^\"]+)\"",
+     "media": true
+    },
+    {
+     "name": "banner",
+     "schema": "HTML",
+     "path": "id=\"[^\"]*uxBannerPhoto\"[^>]+src=\"([^\"]+)\"",
+     "media": true
+    }
+   ],
+   "category": "gaming",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-gaming-geocaching"
+  },
+  {
+   "id": "osu",
+   "name": "Osu",
+   "kind": "username",
+   "url": "https://osu.ppy.sh/users/{username}",
+   "check_url": "https://osu.ppy.sh/users/{username}",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "gaming",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-gaming-osu"
+  },
+  {
+   "id": "audiojungle",
+   "name": "Audiojungle",
+   "kind": "username",
+   "url": "https://audiojungle.net/user/{username}",
+   "check_url": "https://audiojungle.net/user/{username}",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "music",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-music-audiojungle"
+  },
+  {
+   "id": "bandcamp",
+   "name": "Bandcamp",
+   "kind": "username",
+   "url": "https://bandcamp.com/{username}",
+   "check_url": "https://bandcamp.com/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     " collection | Bandcamp</title>"
+    ],
+    "missing_strings": [
+     "<h2>Sorry, that something isn’t here.</h2>"
+    ],
+    "found_first": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "music",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-music-bandcamp"
+  },
+  {
+   "id": "gpodder_net",
+   "name": "Gpodder.net",
+   "kind": "username",
+   "url": "https://gpodder.net/user/{username}/",
+   "check_url": "https://gpodder.net/user/{username}/",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "music",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-music-gpodder_net"
+  },
+  {
+   "id": "lastfm",
+   "name": "Lastfm",
+   "kind": "username",
+   "url": "https://www.last.fm/user/{username}",
+   "check_url": "https://www.last.fm/user/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "music",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-music-lastfm"
+  },
+  {
+   "id": "soundcloud",
+   "name": "Soundcloud",
+   "kind": "username",
+   "url": "https://soundcloud.com/{username}",
+   "check_url": "https://soundcloud.com/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "soundcloud://users:",
+     "\"username\":\""
+    ],
+    "match": "all",
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "verified",
+     "schema": "CONST",
+     "value": "Yes"
+    }
+   ],
+   "category": "music",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-music-soundcloud"
+  },
+  {
+   "id": "bitly",
+   "name": "Bitly",
+   "kind": "username",
+   "url": "https://bit.ly/{username}",
+   "check_url": "https://bit.ly/{username}",
+   "method": "GET",
+   "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "other",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-other-bitly"
+  },
+  {
+   "id": "zomato",
+   "name": "Zomato",
+   "kind": "username",
+   "url": "https://www.zomato.com/{username}/reviews",
+   "check_url": "https://www.zomato.com/{username}/reviews",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:133.0) Gecko/20100101 Firefox/133.0"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "other",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-other-zomato"
+  },
+  {
+   "id": "americanthinker",
+   "name": "Americanthinker",
+   "kind": "username",
+   "url": "https://www.americanthinker.com/author/{username}/",
+   "check_url": "https://www.americanthinker.com/author/{username}/",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "name",
+     "schema": "HTML",
+     "path": "<h3 class=\"author_name\">([^<]+)</h3>"
+    }
+   ],
+   "category": "political",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-political-americanthinker"
+  },
+  {
+   "id": "amazon",
+   "name": "Amazon",
+   "kind": "username",
+   "url": "https://amazon.com/author/{username}",
+   "check_url": "https://amazon.com/author/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
+    "Accept-Language": "en-US,en;q=0.9"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "authorName"
+    ],
+    "missing_strings": [
+     "Sorry! We couldn't find that page",
+     "Sorry! We couldn&#39;t find that page"
+    ],
+    "found_first": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "shopping",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-shopping-amazon"
+  },
+  {
+   "id": "andelemandele",
+   "name": "Andelemandele",
+   "kind": "username",
+   "url": "https://www.andelemandele.lv/{username}",
+   "check_url": "https://www.andelemandele.lv/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_regex": [
+     "<article class=\"user-profile\\b.*?</article>"
+    ],
+    "found_status": [
+     200
+    ]
+   },
+   "extract": [
+    {
+     "name": "verified",
+     "schema": "CONST",
+     "value": true
+    }
+   ],
+   "category": "shopping",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-shopping-andelemandele"
+  },
+  {
+   "id": "fiverr",
+   "name": "Fiverr",
+   "kind": "username",
+   "url": "https://www.fiverr.com/{username}",
+   "check_url": "https://www.fiverr.com/{username}",
+   "method": "GET",
+   "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
+    "Accept-Language": "en-US,en;q=0.9"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "shopping",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-shopping-fiverr"
+  },
+  {
+   "id": "7dach",
+   "name": "7dach",
+   "kind": "username",
+   "url": "https://7dach.ru/profile/{username}",
+   "check_url": "https://7dach.ru/profile/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "Информация / Профиль"
+    ],
+    "missing_strings": [
+     "<title>Ошибка / 7dach.ru"
+    ],
+    "found_first": true,
+    "found_status": [
+     200,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-7dach"
+  },
+  {
+   "id": "about_me",
+   "name": "About.me",
+   "kind": "username",
+   "url": "https://about.me/{username}",
+   "check_url": "https://about.me/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     " | about.me"
+    ],
+    "missing_strings": [
+     "<title>about.me</title>"
+    ],
+    "found_first": true,
+    "found_status": [
+     200,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-about_me"
+  },
+  {
+   "id": "blogger",
+   "name": "Blogger",
+   "kind": "username",
+   "url": "https://{username}.blogspot.com/",
+   "check_url": "https://{username}.blogspot.com/",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "title",
+     "schema": "HTML",
+     "path": "<title>(.*?)</title>"
+    }
+   ],
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-blogger"
+  },
+  {
+   "id": "foursquare",
+   "name": "Foursquare",
+   "kind": "username",
+   "url": "https://foursquare.com/{username}",
+   "check_url": "https://foursquare.com/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Safari/605.1.15"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "title",
+     "schema": "HTML",
+     "path": "<title>(.*?)</title>"
+    },
+    {
+     "name": "description",
+     "schema": "HTML",
+     "path": "<meta[^>]*property=[\"\\']og:description[\"\\'][^>]*content=[\"\\']([^\"\\']+)[\"\\']"
+    }
+   ],
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-foursquare"
+  },
+  {
+   "id": "goodreads",
+   "name": "Goodreads",
+   "kind": "username",
+   "url": "https://example.invalid/",
+   "check_url": "https://www.goodreads.com/{username}",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "title",
+     "schema": "HTML",
+     "path": "<title>(.*?)</title>"
+    },
+    {
+     "name": "name",
+     "schema": "HTML",
+     "path": "<meta[^>]*property=[\"\\']og:title[\"\\'][^>]*content=[\"\\']([^\"\\']+)[\"\\']",
+     "replace": [
+      [
+       " (",
+       ""
+      ]
+     ]
+    }
+   ],
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-goodreads"
+  },
+  {
+   "id": "ifttt",
+   "name": "Ifttt",
+   "kind": "username",
+   "url": "https://ifttt.com/p/{username}",
+   "check_url": "https://ifttt.com/p/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0"
+   },
+   "follow_redirects": false,
+   "regex_check": "(?=[^\\.]*$).*",
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-ifttt"
+  },
+  {
+   "id": "linkedin-us",
+   "name": "Linkedin",
+   "kind": "username",
+   "url": "https://www.linkedin.com/in/{username}/",
+   "check_url": "https://www.linkedin.com/in/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Twitterbot/1.0"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "property=\"og:type\" content=\"profile\""
+    ],
+    "found_status": [
+     200
+    ]
+   },
+   "extract": [
+    {
+     "name": "connections",
+     "schema": "HTML",
+     "path": "([\\d,]+)\\+? connections on LinkedIn"
+    }
+   ],
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-linkedin"
+  },
+  {
+   "id": "minds",
+   "name": "Minds",
+   "kind": "username",
+   "url": "https://www.minds.com/{username}",
+   "check_url": "https://www.minds.com/api/v3/register/validate?username={username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "\"valid\":false"
+    ],
+    "missing_strings": [
+     "\"valid\":true"
+    ],
+    "found_first": true,
+    "found_status": [
+     200
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-minds"
+  },
+  {
+   "id": "mix",
+   "name": "Mix",
+   "kind": "username",
+   "url": "https://mix.com/{username}",
+   "check_url": "https://mix.com/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-mix"
+  },
+  {
+   "id": "mssg_me",
+   "name": "Mssg.me",
+   "kind": "username",
+   "url": "https://mssg.me/{username}",
+   "check_url": "https://mssg.me/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200,
+     301,
+     302,
+     307,
+     308
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-mssg_me"
+  },
+  {
+   "id": "ok",
+   "name": "Ok",
+   "kind": "username",
+   "url": "https://ok.ru/{username}",
+   "check_url": "https://ok.ru/{username}",
+   "method": "GET",
+   "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
+    "Accept-Language": "en-US,en;q=0.9"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "missing_strings": [
+     "Этой страницы нет на OK.RU",
+     "This page does not exist on OK.RU"
+    ],
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "ok_id",
+     "schema": "HTML",
+     "path": "path:\"/(?:profile/)?.+?\",state:\".+?friendId=(\\d+?)\""
+    }
+   ],
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-ok"
+  },
+  {
+   "id": "openstreetmap",
+   "name": "Openstreetmap",
+   "kind": "username",
+   "url": "https://www.openstreetmap.org/user/{username}",
+   "check_url": "https://www.openstreetmap.org/user/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": true,
+   "regex_check": "(?=[^\\.]*$).*",
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "Mapper since"
+    ],
+    "missing_strings": [
+     "does not exist"
+    ],
+    "found_first": true,
+    "found_status": [
+     200,
+     204,
+     301,
+     302,
+     400,
+     410
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-openstreetmap"
+  },
+  {
+   "id": "snapchat-us",
+   "name": "Snapchat",
+   "kind": "username",
+   "url": "https://www.snapchat.com/@{username}",
+   "check_url": "https://www.snapchat.com/@{username}",
+   "method": "GET",
+   "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "sec-ch-ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+    "sec-ch-ua-mobile": "?1",
+    "sec-ch-ua-platform": "\"Android\"",
+    "upgrade-insecure-requests": "1",
+    "sec-fetch-site": "none",
+    "sec-fetch-mode": "navigate",
+    "sec-fetch-user": "?1",
+    "sec-fetch-dest": "document",
+    "accept-language": "en-US,en;q=0.9",
+    "priority": "u=0, i"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-snapchat"
+  },
+  {
+   "id": "threads",
+   "name": "Threads",
+   "kind": "username",
+   "url": "https://www.threads.net/@{username}",
+   "check_url": "https://www.threads.net/api/v1/users/web_profile_info/?username={username}",
+   "method": "GET",
+   "headers": {
+    "X-IG-App-ID": "936619743392459",
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-US,en;q=0.9",
+    "X-Requested-With": "XMLHttpRequest",
+    "Referer": "https://www.threads.net/@{username}"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-threads"
+  },
+  {
+   "id": "virgool",
+   "name": "Virgool",
+   "kind": "username",
+   "url": "https://virgool.io/@{username}",
+   "check_url": "https://virgool.io/@{username}",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "follower_count",
+     "schema": "HTML",
+     "path": "\"followersCount\":(\\d+)",
+     "cast": "int"
+    },
+    {
+     "name": "fullname",
+     "schema": "HTML",
+     "path": "\"name\":\"([^\"]+)\""
+    },
+    {
+     "name": "bio",
+     "schema": "HTML",
+     "path": "\"bio\":\"([^\"]+)\""
+    }
+   ],
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-virgool"
+  },
+  {
+   "id": "vk",
+   "name": "Vk",
+   "kind": "username",
+   "url": "https://vk.com/{username}",
+   "check_url": "https://vk.com/{username}",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-vk"
+  },
+  {
+   "id": "weebly",
+   "name": "Weebly",
+   "kind": "username",
+   "url": "https://{username}.weebly.com/",
+   "check_url": "https://{username}.weebly.com/",
+   "method": "GET",
+   "headers": {},
+   "follow_redirects": true,
+   "detect": {
+    "type": "status_code",
+    "strict": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "extract": [
+    {
+     "name": "title",
+     "schema": "HTML",
+     "path": "<title>(.*?)</title>"
+    },
+    {
+     "name": "description",
+     "schema": "HTML",
+     "path": "<meta[^>]*name=[\"\\']description[\"\\'][^>]*content=[\"\\']([^\"\\']+)[\"\\']"
+    }
+   ],
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-weebly"
+  },
+  {
+   "id": "zhihu",
+   "name": "Zhihu",
+   "kind": "username",
+   "url": "https://www.zhihu.com/people/{username}",
+   "check_url": "https://api.zhihu.com/books/people/{username}/publications?offset=0&limit=5",
+   "method": "GET",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-fetch-dest": "document"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "is_start"
+    ],
+    "missing_strings": [
+     "NotFoundException"
+    ],
+    "found_first": true,
+    "found_status": [
+     200
+    ],
+    "missing_status": [
+     404
+    ]
+   },
+   "category": "social",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-user-social-zhihu"
+  },
+  {
+   "id": "sexvid-email",
+   "name": "Sexvid",
+   "kind": "email",
+   "url": "https://www.sexvid.pro/reset-password/",
+   "check_url": "https://www.sexvid.pro/reset-password/",
+   "method": "POST",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36",
+    "Accept": "*/*",
+    "X-Requested-With": "XMLHttpRequest",
+    "Origin": "https://www.sexvid.pro",
+    "Referer": "https://www.sexvid.pro/reset-password/",
+    "Content-Type": "application/x-www-form-urlencoded"
+   },
+   "form": {
+    "action": "restore_password",
+    "mode": "async",
+    "format": "json",
+    "email_link": "https://www.sexvid.pro/signup.php",
+    "email": "{email}",
+    "code": "xxxxx"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "A new generated password has been sent",
+     "status\":\"success"
+    ],
+    "missing_strings": [
+     "doesnt_exist",
+     "No user with such email exists"
+    ],
+    "found_status": [
+     200,
+     202,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410,
+     429
+    ]
+   },
+   "category": "adult",
+   "nsfw": true,
+   "loud": true,
+   "source": "user-scanner",
+   "replaces": "us-email-adult-sexvid"
+  },
+  {
+   "id": "stackoverflow-email",
+   "name": "Stackoverflow",
+   "kind": "email",
+   "url": "https://stackoverflow.com/users/login",
+   "check_url": "https://stackoverflow.com/users/login",
+   "method": "POST",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "Accept-Encoding": "identity",
+    "sec-ch-ua-platform": "\"Linux\"",
+    "origin": "https://stackoverflow.com",
+    "referer": "https://stackoverflow.com/users/login"
+   },
+   "form": {
+    "ssrc": "login",
+    "email": "{email}",
+    "password": "Password109-grt",
+    "oauth_version": "",
+    "oauth_server": ""
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "The email or password is incorrect"
+    ],
+    "missing_strings": [
+     "No user found with matching email"
+    ],
+    "found_status": [
+     200,
+     202,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "category": "community",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-email-community-stackoverflow"
+  },
+  {
+   "id": "flickr-email",
+   "name": "Flickr",
+   "kind": "email",
+   "url": "https://cognito-idp.us-east-1.amazonaws.com",
+   "check_url": "https://cognito-idp.us-east-1.amazonaws.com",
+   "method": "POST",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+    "x-amz-target": "AWSCognitoIdentityProviderService.SignUp",
+    "content-type": "application/x-amz-json-1.1",
+    "origin": "https://identity.flickr.com",
+    "referer": "https://identity.flickr.com/sign-up"
+   },
+   "payload": "{\"ClientId\": \"3ck15a1ov4f0d3o97vs3tbjb52\", \"Username\": \"{email}\", \"Password\": \"You#are-a-n80\", \"UserAttributes\": [{\"Name\": \"email\", \"Value\": \"{email}\"}, {\"Name\": \"birthdate\", \"Value\": \"1983-02-05\"}, {\"Name\": \"given_name\", \"Value\": \"John\"}, {\"Name\": \"family_name\", \"Value\": \"Doe\"}, {\"Name\": \"locale\", \"Value\": \"en-us\"}], \"ValidationData\": [{\"Name\": \"recaptchaToken\", \"Value\": \"Not-required\"}], \"ClientMetadata\": {\"referrerUrl\": \"\"}}",
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "An account with the given email already exists"
+    ],
+    "missing_strings": [
+     "PreSignUp failed with error Sign Up failure"
+    ],
+    "found_first": true,
+    "found_status": [
+     200,
+     202,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "category": "creator",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-email-creator-flickr"
+  },
+  {
+   "id": "insightly-email",
+   "name": "Insightly",
+   "kind": "email",
+   "url": "https://accounts.insightly.com/signup/isemailvalid",
+   "check_url": "https://accounts.insightly.com/signup/isemailvalid",
+   "method": "POST",
+   "headers": {
+    "authority": "accounts.insightly.com",
+    "accept": "application/json, text/javascript, */*; q=0.01",
+    "x-requested-with": "XMLHttpRequest",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "origin": "https://accounts.insightly.com",
+    "referer": "https://accounts.insightly.com/?plan=trial",
+    "accept-language": "en-US,en;q=0.9"
+   },
+   "form": {
+    "emailaddress": "{email}"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "An account exists for this address."
+    ],
+    "found_status": [
+     200,
+     202,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "category": "crm",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-email-crm-insightly"
+  },
+  {
+   "id": "codewars-email",
+   "name": "Codewars",
+   "kind": "email",
+   "url": "https://www.codewars.com/join?language=javascript",
+   "check_url": "https://www.codewars.com/join?language=javascript",
+   "method": "POST",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    "Origin": "https://www.codewars.com",
+    "Referer": "https://www.codewars.com/join",
+    "Upgrade-Insecure-Requests": "1"
+   },
+   "form": {
+    "utf8": "✓",
+    "_method": "patch",
+    "user[email]": "{email}",
+    "user[username]": "",
+    "user[password]": "",
+    "user[password_confirmation]": "",
+    "utm[source]": "",
+    "utm[medium]": "",
+    "utm[campaign]": "",
+    "utm[term]": "",
+    "utm[content]": "",
+    "utm[referrer]": "https://www.google.com/"
+   },
+   "follow_redirects": true,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "is already taken"
+    ],
+    "missing_strings": [
+     "can&#39;t be blank"
+    ],
+    "found_first": true,
+    "found_status": [
+     200,
+     202,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "category": "dev",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-email-dev-codewars"
+  },
+  {
+   "id": "bnrlanguages-email",
+   "name": "Bnrlanguages",
+   "kind": "email",
+   "url": "https://play.google.com/store/apps/details?id=com.breboucas.japonesparaviajar",
+   "check_url": "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getOobConfirmationCode?key=AIzaSyCLqZQ3hh3mAGxFRGgdBz33kV6mTGadwuU",
+   "method": "POST",
+   "headers": {
+    "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 6 Build/TP1A.220624.021)",
+    "Connection": "Keep-Alive",
+    "Accept-Encoding": "gzip",
+    "Content-Type": "application/json",
+    "X-Android-Package": "com.breboucas.japonesparaviajar",
+    "Accept-Language": "en-US",
+    "X-Client-Version": "Android/Fallback/X23001000/FirebaseCore-Android",
+    "X-Firebase-Locale": "en_US"
+   },
+   "payload": {
+    "requestType": 1,
+    "email": "{email}",
+    "androidInstallApp": false,
+    "canHandleCodeInApp": false,
+    "clientType": "CLIENT_TYPE_ANDROID"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "json",
+    "strict": true,
+    "json_found_path": [
+     "kind"
+    ],
+    "json_found_value": "identitytoolkit#GetOobConfirmationCodeResponse",
+    "found_status": [
+     200
+    ]
+   },
+   "category": "learning",
+   "nsfw": false,
+   "loud": true,
+   "source": "user-scanner",
+   "replaces": "us-email-learning-bnrlanguages"
+  },
+  {
+   "id": "bunpo-email",
+   "name": "Bunpo",
+   "kind": "email",
+   "url": "https://play.google.com/store/apps/details?id=com.bunpoapp",
+   "check_url": "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getOobConfirmationCode?key=AIzaSyAxg8aXqILmTAN_OOAGIRt0IL6nkQyj3p8",
+   "method": "POST",
+   "headers": {
+    "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 13; Pixel 6 Build/TP1A.220624.021)",
+    "Connection": "Keep-Alive",
+    "Accept-Encoding": "gzip",
+    "Content-Type": "application/json",
+    "X-Android-Package": "com.bunpoapp",
+    "Accept-Language": "en-, en-US",
+    "X-Client-Version": "Android/Fallback/X23000000/FirebaseCore-Android"
+   },
+   "payload": {
+    "requestType": 1,
+    "email": "{email}",
+    "androidInstallApp": false,
+    "canHandleCodeInApp": false,
+    "clientType": "CLIENT_TYPE_ANDROID"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "json",
+    "strict": true,
+    "json_found_path": [
+     "kind"
+    ],
+    "json_found_value": "identitytoolkit#GetOobConfirmationCodeResponse",
+    "found_status": [
+     200
+    ]
+   },
+   "category": "learning",
+   "nsfw": false,
+   "loud": true,
+   "source": "user-scanner",
+   "replaces": "us-email-learning-bunpo"
+  },
+  {
+   "id": "hanzii-email",
+   "name": "Hanzii",
+   "kind": "email",
+   "url": "https://play.google.com/store/apps/details?id=com.eup.hanzii",
+   "check_url": "https://api.hanzii.net/api/password/reset",
+   "method": "POST",
+   "headers": {
+    "User-Agent": "com.eup.hanzii/768 (Linux; U; Android 13; en_US; Pixel 6; Build/TP1A.220624.021; Cronet/149.0.7827.102)",
+    "Accept-Encoding": "gzip, deflate",
+    "content-type": "application/json; charset=UTF-8",
+    "priority": "u=1, i"
+   },
+   "payload": {
+    "X-localization": "en",
+    "email": "{email}"
+   },
+   "follow_redirects": false,
+   "detect": {
+    "type": "json",
+    "strict": true,
+    "json_found_path": [
+     "message"
+    ],
+    "json_found_value": "Success",
+    "found_status": [
+     200
+    ]
+   },
+   "category": "learning",
+   "nsfw": false,
+   "loud": true,
+   "source": "user-scanner",
+   "replaces": "us-email-learning-hanzii"
+  },
+  {
+   "id": "cnn-email",
+   "name": "Cnn",
+   "kind": "email",
+   "url": "https://audience.cnn.com/core/api/1/identity",
+   "check_url": "https://audience.cnn.com/core/api/1/identity",
+   "method": "POST",
+   "headers": {
+    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36",
+    "Content-Type": "application/json",
+    "x-client-application": "Android|Android 10|Chrome 144.0.0.0",
+    "Origin": "https://edition.cnn.com",
+    "Referer": "https://edition.cnn.com/"
+   },
+   "payload": "{\"identityRequests\": [{\"identityType\": \"EMAIL\", \"principal\": \"{email}\", \"credential\": \"th3_sil3nt_fir3wall_hid3s_most\"}]}",
+   "follow_redirects": false,
+   "detect": {
+    "type": "message",
+    "strict": true,
+    "found_strings": [
+     "identity.already.in.use"
+    ],
+    "found_status": [
+     200,
+     202,
+     204,
+     301,
+     302,
+     400,
+     404,
+     410
+    ]
+   },
+   "category": "news",
+   "nsfw": false,
+   "loud": false,
+   "source": "user-scanner",
+   "replaces": "us-email-news-cnn"
+  }
+ ]
+}

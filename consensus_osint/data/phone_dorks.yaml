@@ -1,0 +1,104 @@
+# Categorised search dorks for phone numbers (consensus_osint.core.phone.dorks).
+#
+# Ported from sundowndev/phoneinfoga lib/remote/googlesearch_scanner.go
+# (GPL-3.0) with additions from phoneintel and Mr.Holmes.  Edit freely: the
+# module reads this file at runtime and falls back to a small built-in list
+# when it is missing.
+#
+# Entry keys:
+#   site / sites   one domain (site:x) or several (site:a OR site:b)
+#   intext         number variants to search as quoted phrases (OR-ed)
+#   inurl          number variants to search inside URLs (inurl:2024561111)
+#   intitle        extra intitle:"..." phrase
+#   label          display label (defaults to the site name)
+#   regions        optional ISO country list; the entry is skipped for other numbers
+#
+# Variant names: e164 (+12024561111), international (+1 202-456-1111),
+#   international_digits (12024561111), national ((202) 456-1111),
+#   raw_local (2024561111 / 02079460958 = national digits incl. trunk prefix),
+#   nsn (2079460958), dashed (202-456-1111), dotted (202.456.1111),
+#   spaced (202 456 1111)
+
+categories:
+  social:
+    - site: facebook.com
+      intext: [international, e164, raw_local]
+    - site: twitter.com
+      intext: [international, e164, raw_local]
+    - site: x.com
+      intext: [international, e164, raw_local]
+    - site: linkedin.com
+      intext: [international, e164, raw_local]
+    - site: instagram.com
+      intext: [international, e164, raw_local]
+    - site: vk.com
+      intext: [international, e164, raw_local]
+    - site: tiktok.com
+      intext: [international, e164, raw_local]
+
+  # Temporary / disposable SMS-receiving sites: a hit means the number is a
+  # public throw-away number.  Grouped so a scan yields a handful of links
+  # rather than one per site.
+  disposable:
+    - label: "disposable SMS sites (1/4)"
+      sites: [hs3x.com, receive-sms-now.com, smslisten.com, smsnumbersonline.com, freesmscode.com, catchsms.com]
+      intext: [international, raw_local]
+    - label: "disposable SMS sites (2/4)"
+      sites: [smstibo.com, smsreceiving.com, getfreesmsnumber.com, sellaite.com, receive-sms-online.info, receivesmsonline.com]
+      intext: [international, raw_local]
+    - label: "disposable SMS sites (3/4)"
+      sites: [receive-a-sms.com, sms-receive.net, receivefreesms.com, receive-sms.com, receivetxt.com, freephonenum.com]
+      intext: [international, raw_local]
+    - label: "disposable SMS sites (4/4)"
+      sites: [freesmsverification.com, receive-sms-online.com, smslive.co, smsreceivefree.com, receivesmsonline.net, sms-online.co]
+      intext: [international, raw_local]
+
+  reputation:
+    - site: whosenumber.info
+      intext: [e164]
+      intitle: who called
+    - label: '"Phone Fraud" pages'
+      intitle: Phone Fraud
+      intext: [international, e164, raw_local]
+    - site: findwhocallsme.com
+      intext: [e164, international]
+    - site: yellowpages.ca
+      intext: [e164, dashed]
+      regions: [CA]
+    - site: phonenumbers.ie
+      intext: [e164, raw_local]
+      regions: [IE]
+    - site: who-calledme.com
+      intext: [e164]
+    - site: usphonesearch.net
+      intext: [raw_local, dashed]
+      regions: [US, CA]
+    - site: whocalled.us
+      inurl: [raw_local]
+      regions: [US, CA]
+    - site: numberguru.com
+      intext: [raw_local, dashed]
+      regions: [US, CA]
+    - site: quinumero.info
+      intext: [raw_local, international]
+    - site: uk.popularphotolook.com
+      inurl: [raw_local]
+      regions: [GB]
+
+  individuals:
+    - site: numinfo.net
+      intext: [international, e164, raw_local]
+    - site: sync.me
+      intext: [international, e164, raw_local]
+    - site: whocallsyou.de
+      intext: [raw_local]
+      regions: [DE]
+    - site: pastebin.com
+      intext: [international, e164, raw_local]
+    - site: whycall.me
+      intext: [international, e164, raw_local]
+    - site: locatefamily.com
+      intext: [international, e164, raw_local]
+    - site: spytox.com
+      intext: [raw_local, dashed]
+      regions: [US, CA]

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>{{ title }}</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f4f2;--panel:#fff;--text:#202124;--muted:#5e6065;--line:#d6d2cd;--accent:#a94300;--soft:#fff0e5;--warn:#865000;--warn-bg:#fff2d7;--bad:#af3029;--bad-bg:#ffebe8;--shadow:0 4px 20px #16334208}
+@media(prefers-color-scheme:dark){:root{--bg:#0e0f11;--panel:#191b1f;--text:#f2f2f3;--muted:#b6b7bc;--line:#41434a;--accent:#ff6a00;--soft:#342317;--warn:#ffd28a;--warn-bg:#46371e;--bad:#ffb3a9;--bad-bg:#442823;--shadow:none}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:160px}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--accent);text-decoration:none;overflow-wrap:anywhere}a:hover{text-decoration:underline}button,input,select{font:inherit;color:inherit}button,select{cursor:pointer}button,input,select{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:9px 12px}input{width:100%;min-width:0}button:hover{border-color:var(--accent)}:focus-visible{outline:3px solid var(--accent);outline-offset:3px}[hidden]{display:none!important}.wrap{max-width:1360px;margin:auto;padding:32px 32px 48px}.masthead{display:flex;align-items:center;gap:16px}.mark{display:grid;place-items:center;flex:none;width:54px;height:54px;border:2px solid var(--accent);border-radius:16px;color:var(--accent);font-size:30px;font-weight:750;box-shadow:inset 0 0 0 5px var(--bg)}.brand{font-size:13px;letter-spacing:.2em;font-weight:750;color:var(--accent)}h1{font-size:30px;line-height:1.2;margin:2px 0 6px;letter-spacing:-.03em}.meta,.muted{color:var(--muted)}.meta{font-size:12px}.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:26px 0 14px}.stat{padding:18px 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}.stat b{display:block;font-size:29px;line-height:1.2;font-variant-numeric:tabular-nums}.stat span{font-size:12px;color:var(--muted)}.stat:first-child{border-top:3px solid var(--accent)}.legend{margin:12px 0 18px;max-width:100ch;color:var(--muted);font-size:13px}.legend strong{color:var(--text)}.notice{padding:12px 16px;border-left:3px solid var(--warn);background:var(--warn-bg);color:var(--warn);border-radius:6px}.qchips{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.chip{display:inline-block;border-radius:6px;background:var(--soft);padding:2px 8px;color:var(--accent);font-size:11px;overflow-wrap:anywhere}.chip.warn{background:var(--warn-bg);color:var(--warn)}.chip.bad{background:var(--bad-bg);color:var(--bad)}.chip.muted{background:var(--bg);color:var(--muted)}.toolbar{position:sticky;top:0;z-index:5;padding:14px;margin:24px 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}.controls{display:grid;grid-template-columns:minmax(180px,2fr) repeat(3,minmax(130px,1fr)) auto;gap:12px;align-items:end}.control{display:flex;flex-direction:column;gap:4px;min-width:0}.control label{font-size:11px;font-weight:650;color:var(--muted)}.control select{width:100%}.toolbar-foot{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:12px;color:var(--muted)}.text-button{padding:0;border:0;background:transparent;color:var(--accent);font-size:12px}.query{margin:34px 0}.query-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:18px}.query h2{margin:0;font-size:21px;overflow-wrap:anywhere}.query-head .meta{margin-left:auto}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,350px),1fr));gap:16px;align-items:start}.card{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:12px;padding:20px;min-width:0;box-shadow:var(--shadow)}.card[data-assessment="Needs review"]{border-top-color:var(--warn)}.card-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.card h3{font-size:18px;line-height:1.35;margin:2px 0 5px;overflow-wrap:anywhere}.category{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.avatar{width:36px;height:36px;display:grid;place-items:center;flex:none;border-radius:10px;background:var(--soft);font-weight:700}.chips{display:flex;gap:5px;flex-wrap:wrap}.url{font-size:12px;margin:12px 0;overflow-wrap:anywhere}.reason{color:var(--muted);font-size:12px;margin:10px 0}.fields{display:grid;grid-template-columns:minmax(100px,34%) minmax(0,1fr);gap:7px 14px;margin:16px 0 0;font-size:13px}.fields dt{color:var(--muted);overflow-wrap:anywhere}.fields dd{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}.fields dd a{word-break:break-word}.field-title{font-size:11px;font-weight:650;margin:16px 0 8px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}details{margin-top:16px}summary{cursor:pointer;color:var(--accent);font-size:12px;padding:4px 0}.technical{border-top:1px solid var(--line);padding-top:8px}.technical .fields{font-size:11px}.technical p{font-size:11px;color:var(--muted);margin:6px 0}.empty{padding:18px;border:1px dashed var(--line);border-radius:10px;color:var(--muted)}.no-details{font-size:12px;color:var(--muted);background:var(--bg);padding:10px 12px;border-radius:7px;margin-top:14px}.information{margin-bottom:18px;padding:14px 18px;border:1px solid var(--line);border-radius:10px}.information>summary{font-size:13px}.info-row{border-top:1px solid var(--line);padding:12px 0}.info-row h3{font-size:14px;margin:0}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px;background:var(--panel)}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}th{color:var(--muted);font-size:11px}td:nth-child(2){min-width:140px}code{font-size:11px;overflow-wrap:anywhere}footer{border-top:1px solid var(--line);padding-top:20px;margin-top:40px;font-size:12px;color:var(--muted)}footer p{max-width:105ch}.skip{position:absolute;left:-10000px}.skip:focus{left:20px;top:8px;background:var(--panel);padding:8px;z-index:10}
+@media(max-width:900px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{position:static}.controls .control:first-child{grid-column:1/-1}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}html{scroll-padding-top:20px}}
+@media(max-width:520px){.wrap{padding:20px 16px}.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stat{padding:12px}.stat b{font-size:24px}h1{font-size:25px}.card{padding:16px}.fields{grid-template-columns:1fr;gap:2px}.fields dd{margin-bottom:9px}.query-head .meta{margin-left:0}.toolbar-foot{flex-wrap:wrap}}
+@media screen and (max-width:520px){.other-results table,.other-results tbody,.other-results tr,.other-results td{display:block}.other-results thead{display:none}.other-results tr{padding:12px 0;border-bottom:1px solid var(--line)}.other-results td{border:0;padding:4px 12px}.other-results td::before{content:attr(data-label);display:block;font-size:11px;font-weight:650;color:var(--muted)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{:root{color-scheme:light;--bg:#fff;--panel:#fff;--text:#000;--muted:#444;--line:#bbb;--accent:#a94300;--soft:#f5f5f5;--shadow:none}.wrap{padding:0}.toolbar,.qchips,.skip{display:none!important}.query[hidden],.result[hidden],.information[hidden],.other-results[hidden]{display:block!important}tr.result[hidden]{display:table-row!important}#empty-search{display:none!important}.grid{display:block}.card{break-inside:avoid;box-shadow:none;margin:12px 0}.stats{grid-template-columns:repeat(5,1fr)}.stat{padding:10px}.stat b{font-size:23px}details>*{display:block!important}details>summary{display:list-item!important}a{color:inherit}.query{break-before:auto}.query-head{break-after:avoid}.tablewrap{overflow:visible}thead{display:table-header-group}tr{break-inside:avoid}}
+
+.society-lockup{background:#0e0f11;border-radius:10px;padding:14px 18px;max-width:300px;flex:none}
+.project-brand{display:flex;align-items:center;gap:10px}.project-mark{display:inline-block;flex:none;width:36px;height:36px;border-radius:7px;background:#0e0f11 url("{{ identity.project_mark }}") center/contain no-repeat}
+.society-logo{display:block;width:240px;max-width:100%;height:auto}
+.society-links{display:flex;gap:8px 24px;flex-wrap:wrap;margin:16px 0;font-size:12px}
+.slogan{font-size:19px;font-weight:700;line-height:1.4;margin:5px 0;color:var(--accent)}
+.brand-description{max-width:95ch;margin:6px 0 14px;font-size:14px;color:var(--text)}
+.common-details{margin:18px 0 24px;padding:18px 22px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;background:var(--panel)}
+.common-details h3{margin:0 0 8px;font-size:17px}.common-details th,.common-details td{border:1px solid var(--line)}
+.common-details td:nth-child(2){min-width:75px}.common-details summary{font-size:13px}
+.comparison-evidence{list-style:none;padding:0;margin:8px 0}.comparison-evidence li{border-top:1px solid var(--line);padding:8px 0;overflow-wrap:anywhere}
+.comparison-evidence .original{white-space:pre-wrap;color:var(--text);margin:6px 0 0;padding:8px 10px;border-left:3px solid var(--line)}.comparison-evidence .source-field{display:block;margin-top:6px}.comparison-evidence .source-query{display:block;font-size:.85rem;color:var(--muted)}.common-details code{white-space:normal}
+@media(max-width:520px){.common-details{padding:14px 12px}.common-details table,.common-details tbody,.common-details tr,.common-details td{display:block}.common-details thead{display:none}.common-details tr{border-top:1px solid var(--line)}.common-details td{border:0;padding:6px 0}.common-details td::before{content:attr(data-label);display:block;color:var(--muted);font-size:11px}}
+.grid{grid-template-columns:minmax(0,1fr);gap:24px}
+.card{border-width:1px;border-top-width:4px;padding:24px}
+.result-columns{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:24px;align-items:start}
+.result-columns>div{min-width:0}.result-columns aside{border-left:1px solid var(--line);padding-left:20px;min-width:0}
+.fields{gap:0 14px;margin-top:8px;grid-template-columns:minmax(100px,26%) minmax(0,1fr)}
+.fields dt,.fields dd{padding:10px 0;border-bottom:1px solid var(--line)}
+.fields dt{font-weight:600}.field-title{color:var(--accent)}
+.repository-list{display:flex;flex-direction:column;gap:7px;font-size:12px}
+.repository{overflow-wrap:anywhere}.coverage-check{color:var(--accent)}
+.review-action{border-left:3px solid var(--warn);background:var(--warn-bg);color:var(--warn);padding:10px 14px}
+.command-menu td{border:1px solid var(--line)}
+@media(max-width:700px){.masthead{align-items:flex-start;flex-direction:column}.result-columns{grid-template-columns:minmax(0,1fr);gap:12px}.result-columns aside{border-left:0;border-top:1px solid var(--line);padding-left:0}.repository-list{flex-direction:row;flex-wrap:wrap;gap:8px 16px}}
+@media(max-width:520px){.fields{grid-template-columns:minmax(0,1fr);gap:0}.fields dt{padding-bottom:0;border-bottom:0}.fields dd{padding-top:3px;margin-bottom:0}.card{padding:16px}.command-menu td{min-width:0}}
+@media print{.society-lockup{print-color-adjust:exact;-webkit-print-color-adjust:exact}.result-columns{grid-template-columns:minmax(0,1fr) 170px}.initial-empty[hidden]{display:block!important}}
+.masthead{align-items:flex-start;justify-content:space-between;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.masthead>div:first-child{flex:1;min-width:0}.masthead .brand{font-size:24px;letter-spacing:.16em}
+.masthead h1{margin-top:24px;font-size:25px}.masthead .brand-description{max-width:80ch}
+.update-note{max-width:80ch;border-left:3px solid var(--accent);padding-left:14px;line-height:1.6}
+.society-lockup{align-self:flex-start;border:1px solid #35363a;padding:18px 22px}
+.society-byline{display:block;font-size:10px;letter-spacing:.17em;color:#a7abb2;margin-bottom:12px}
+.society-logo{width:224px}.query{border-top:3px solid var(--accent);padding-top:26px;margin-top:48px}
+.query-head{background:var(--panel);padding:18px;border-radius:10px}.query-head h2::before{content:"Search query";display:block;color:var(--muted);font-size:11px;letter-spacing:.05em;margin-bottom:6px}
+.source-note{padding:10px 14px;background:var(--soft);border-radius:6px;font-size:12px}.information[open]>summary{margin-bottom:12px}
+@media(max-width:850px){.masthead{flex-direction:column;gap:20px}.masthead .society-lockup{align-self:flex-start}}
+</style>
+<style>
+.tool-logo{display:inline-block;width:30px;height:30px;flex:none;background-size:contain;background-repeat:no-repeat;background-position:center;vertical-align:middle;border-radius:4px;background-color:#f4f4f4}.logo-notices pre{white-space:pre-wrap;font-size:11px}
+.breach-table{table-layout:fixed}.breach-table th:first-child{width:22%}.breach-table th:nth-child(2){width:30%}.breach-table td:nth-child(2){min-width:0}.fields.breach-evidence{display:block;margin-top:0}.breach-evidence dt{margin-top:10px}.breach-evidence dd{padding:4px 0 8px;border-bottom:1px solid var(--line)}
+@media(max-width:650px){.breach-table thead{display:none}.breach-table,.breach-table tbody,.breach-table tr,.breach-table td{display:block;width:100%;min-width:0}.breach-table tr{margin-bottom:14px;border:1px solid var(--line)}.breach-table td:before{content:attr(data-label);display:block;font-weight:600;color:var(--muted);margin-bottom:8px}.breach-table th{width:auto}}
+{% for source, logo in tool_logos.items() %}.tool-{{ source }}{background-image:url("{{ logo.uri }}")}
+{% endfor %}
+.community{margin:24px 0;padding:20px 24px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.community h2{font-size:18px;margin:0 0 4px}.community p{margin:0 0 16px;color:var(--muted)}
+.community-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.community-links a{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:8px;padding:12px;color:var(--text)}
+.community-links a:hover{border-color:var(--accent);background:var(--soft);text-decoration:none}
+.community-links svg{width:24px;height:24px;flex:none;color:var(--accent);fill:none;stroke:currentColor;stroke-width:1.7}
+.community-links strong,.community-links small{display:block}.community-links small{font-size:11px;color:var(--muted)}
+.community-links .contribute{border-color:var(--accent)}
+@media(max-width:850px){.community-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.community{padding:16px}.community-links{grid-template-columns:1fr}}
+@media print{.community{break-inside:avoid}.community-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+{% macro community() %}
+<section class="community" aria-label="Join the community">
+  <h2>Join the community</h2><p>Connect with the {{ identity.name }}. Help improve Consensus by reporting issues, suggesting sites or contributing code.</p>
+  <nav class="community-links" aria-label="Community and project links">
+    {% for label,url in identity.links %}<a href="{{ url }}" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">{% if loop.first %}<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>{% elif loop.index == 2 %}<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 10v7m0-11v1m5 10v-7m0 3c0-4 5-4 5 0v4"/>{% else %}<path d="M4 4h16v12H10l-6 4zM8 8h8M8 12h5"/>{% endif %}</svg>
+      <span><strong>{{ 'Visit our website' if loop.first else 'Join us on ' ~ label }}</strong><small>{{ url }}</small></span>
+    </a>{% endfor %}
+    <a class="contribute" href="{{ identity.repository }}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="6" r="2"/><path d="M6 7v10m12-9c0 7-12 2-12 7"/></svg><span><strong>Contribute on GitHub</strong><small>{{ identity.repository }}</small></span></a>
+  </nav>
+</section>
+{% endmacro %}
+<a class="skip" href="#results">Skip to results</a>
+<div class="wrap">
+<header>
+  <div class="masthead"><div><div class="brand project-brand"><span class="project-mark" role="img" aria-label="Consensus logo"></span>CONSENSUS</div><p class="slogan">{{ identity.slogan }}</p><p class="brand-description">{{ identity.description }}</p><p class="update-note">{{ identity.update_note }}</p><h1>Search report</h1><div class="meta">By {{ identity.name }}<br>{{ facts.generated }} · {{ facts.generator }}{% if facts.duration %} · {{ facts.duration }}{% endif %}</div></div><div class="society-lockup"><span class="society-byline">CREATED BY</span><img class="society-logo" src="{{ identity.logo }}" alt="{{ identity.name }} logo"></div></div>
+  {{ community() }}
+  <p class="notice"><strong>Health &amp; lawful use.</strong> {{ identity.warning }}</p>
+  {% if facts.interrupted %}<p class="notice"><strong>Partial scan.</strong> The scan was interrupted. These are the results collected before it stopped.</p>{% endif %}
+  {% if facts.omitted %}<p class="notice"><strong>Filtered input.</strong> The saved input omitted {{ facts.omitted }} result(s). Re-rendering cannot recover them; totals here describe the available rows.</p>{% endif %}
+  <div class="stats" aria-label="Scan totals">
+    <div class="stat"><b>{{ facts.matches }}</b><span>matches reported</span></div>
+    <div class="stat"><b>{{ facts.details }}</b><span>with additional information</span></div>
+    <div class="stat"><b>{{ facts.review }}</b><span>need review</span></div>
+    <div class="stat"><b>{{ facts.inconclusive }}</b><span>inconclusive checks</span></div>
+    <div class="stat"><b>{{ facts.checks }}</b><span>total results</span></div>
+  </div>
+  <p class="legend"><strong>Found</strong> means the selected check returned a positive signal for this query. Ticks beside tool names show catalogue coverage, not independent successful checks. <strong>Needs review</strong> marks limited evidence or decoding problems. These labels describe the recorded evidence, not the probability that an account belongs to a person. Returned details may include generic page metadata; verify their relationship to the query.</p>
+  <p class="legend">{{ coverage_legend }}</p>
+  <p class="legend">The additional-information count excludes exact query echoes, redacted placeholders, identified page metadata and checking flags. All returned fields remain available for inspection.</p>
+  {% if facts.review != '0' %}<p class="legend"><strong>Needs review rows are included in the match total.</strong> Treat them as unconfirmed; each flagged result explains what to check.</p>{% endif %}
+  <nav class="qchips" aria-label="Queries">{% for q in queries %}<a class="chip" href="#q{{ loop.index }}">{{ q.query }} · {{ q.query_type }}</a>{% endfor %}</nav>
+</header>
+<div class="toolbar" id="tools" hidden>
+  <div class="controls">
+    <div class="control"><label for="search">Search services, fields and evidence</label><input id="search" type="search" placeholder="Search this report…" autocomplete="off"></div>
+    <div class="control"><label for="filter">Show</label><select id="filter"><option value="all">All included results</option><option value="found">Positive results</option><option value="details">Positive results with details</option><option value="review">Needs review</option><option value="inconclusive">Inconclusive checks</option><option value="not_found">No match</option><option value="info">Background details</option><option value="skipped">Skipped</option></select></div>
+    <div class="control"><label for="category">Category</label><select id="category"><option value="all">All categories</option>{% for cat in categories %}<option value="{{ cat }}">{{ cat }}</option>{% endfor %}</select></div>
+    <div class="control"><label for="sort">Order within each query</label><select id="sort"><option value="details">Most details first</option><option value="name">Service A–Z</option><option value="review">Needs review first</option></select></div>
+    <button id="clear" type="button">Reset</button>
+  </div>
+  <div class="toolbar-foot"><span id="visible-count" role="status" aria-live="polite"></span><button class="text-button" id="print" type="button">Print full report / save PDF</button></div>
+</div>
+<noscript><p class="notice">All included results are shown. Enable JavaScript for local search, filters and sorting.</p></noscript>
+{% if not include_all %}<p class="meta">This report contains positive lookup signals and background details, such as email-domain or phone analysis. Background details are separate from enriched account results. Totals also count other outcomes. To include their individual results, save with <code>-a</code>.</p>{% endif %}
+<main id="results">
+<p class="empty" id="empty-search" hidden>No included results match these filters. Use Reset to show everything in this report.</p>
+{% macro field_list(fields) %}<dl class="fields">{% for f in fields %}<dt>{{ f.label }}</dt><dd>{% if f.urls %}{% for u in f.urls %}<a href="{{ u }}" target="_blank" rel="noopener noreferrer nofollow" referrerpolicy="no-referrer">{{ u }}</a>{% if not loop.last %}, {% endif %}{% endfor %}{% else %}{{ f.value }}{% endif %}</dd>{% endfor %}</dl>{% endmacro %}
+{% macro coverage(c) %}<div class="repository-list">{% for repo in c.repositories %}<span class="repository"><span class="coverage-check" role="img" aria-label="Recorded coverage">☑</span> {% if repo.id in tool_logos %}<span class="tool-logo tool-{{ repo.id }}" aria-hidden="true"></span> {% endif %}<a href="{{ repo.url }}" target="_blank" rel="noopener noreferrer" title="{{ 'Imported origin' if repo.relationship == 'origin' else 'Another definition for the same recorded provider or app and identifier type; scope may differ' }}">{{ repo.name }}</a></span>{% else %}<span class="muted">{{ c.coverage_text }}</span>{% endfor %}</div>{% endmacro %}
+{% macro technical(c) %}
+<details class="technical"><summary>Evidence and diagnostics · {{ c.site_id }}</summary>
+<p>{{ c.reason }}</p><p>Module: <code>{{ c.site_id }}</code>{% if c.source %} · source: {{ c.source }}{% endif %}{% if c.method %} · method: {{ c.method }}{% endif %}{% if c.elapsed %} · {{ c.elapsed }}{% endif %}{% if c.http_status %} · HTTP {{ c.http_status }}{% endif %}</p>
+{% if c.error %}<p>{{ c.error }}</p>{% endif %}
+{% if c.status != 'found' and c.url %}<p>Check URL: <a href="{{ c.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ c.url }}</a></p>{% endif %}
+{{ field_list(c.diagnostics) }}
+{% if c.diagnostics %}<p>Source-list overlap is not independent confirmation. Internal detection fields describe the check, not the person.</p>{% endif %}
+</details>
+{% endmacro %}
+{% macro comparison_evidence(item, across) %}
+<details><summary>Show {{ item.evidence|length }} source fields{% if item.omitted_evidence %} ({{ item.omitted_evidence }} more omitted){% endif %}</summary>
+<ul class="comparison-evidence">{% for e in item.evidence %}<li>
+<strong>{% if e.url %}<a href="{{ e.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ e.site }}</a>{% else %}{{ e.site }}{% endif %}</strong>
+{% if across %}<span class="source-query">Query: {{ e.query }} ({{ e.query_type }})</span>{% endif %}<span class="source-field">Field: <code>{{ e.field }}</code></span>
+{% if e.needs_review %}<span class="chip warn">Needs review</span>{% endif %}
+<div class="original">{{ e.value }}</div></li>{% endfor %}</ul></details>
+{% endmacro %}
+{% macro common_table(items, across) %}
+<div class="tablewrap"><table><thead><tr><th>Information found on multiple sites</th><th>Seen on</th><th>Evidence</th></tr></thead><tbody>
+{% for item in items %}<tr><td data-label="Information found on multiple sites"><strong>{{ item.value }}</strong><br><span class="muted">{{ item.field }}</span>{% if item.needs_review %}<br><span class="chip warn">Includes needs-review results</span>{% endif %}</td>
+<td data-label="Seen on">{{ item.site_count }} {{ "site" if item.site_count == 1 else "sites" }}{% if across %}<br>{{ item.query_count }} queries{% endif %}</td>
+<td data-label="Evidence">{{ comparison_evidence(item, across) }}</td></tr>{% endfor %}
+</tbody></table></div>
+{% endmacro %}
+{% macro common_details(comp, heading) %}
+<section class="common-details" aria-label="{{ heading }}"><h3>{{ heading }}</h3>
+<p class="meta">Computed from all saved matches for this comparison; filters do not recalculate it. {{ comp.compared_sites }} sites supplied comparable fields.</p>
+{% if comp.common %}<p class="meta">{{ comparisons.explanation }}</p>
+{{ common_table(comp.common[:8], comp.across_queries) }}
+{% if comp.common|length > 8 %}<details><summary>{{ comp.common|length - 8 }} more values found on multiple sites</summary>{{ common_table(comp.common[8:], comp.across_queries) }}</details>{% endif %}
+{% else %}<p class="muted">{% if comp.compared_sites < 2 %}Fewer than two sites returned information that can be compared.{% else %}No matching values or words were found across different sites.{% endif %}</p>{% endif %}
+{% if comp.variations %}<details class="detail-variations"><summary>Different values to review ({{ comp.variations|length }} fields)</summary>
+<p class="meta">Different names or locations can reflect aliases, outdated profiles or different people. Review the source fields before drawing a conclusion.</p>
+{% for variation in comp.variations %}<h4>{{ variation.field }}</h4>{{ common_table(variation["values"], comp.across_queries) }}
+{% if variation.omitted_values %}<p class="meta">{{ variation.omitted_values }} additional values omitted.</p>{% endif %}{% endfor %}</details>{% endif %}
+<details><summary>What is compared?</summary><p class="meta">{{ comparisons.scope }}</p></details>
+{% if comp.truncated_input or comp.omitted_patterns %}<p class="notice">Comparison limits were reached{% if comp.omitted_patterns %}; {{ comp.omitted_patterns }} additional patterns are omitted{% endif %}. Consult the original returned fields for the full data.</p>{% endif %}
+</section>
+{% endmacro %}
+{% for q in queries %}
+<section class="query" id="q{{ loop.index }}">
+  <div class="query-head"><h2>{{ q.query }} <span class="chip muted">{{ q.query_type }}</span></h2><span class="meta">{{ q.found_count }} matches · {{ q.total }} results{% if q.parent %} · discovered via {{ q.parent }} (depth {{ q.depth }}){% endif %}</span></div>
+  {% if q.information %}<details class="information" open><summary>Background details: email/phone analysis and search links ({{ q.information|length }})</summary>
+  {% for c in q.information %}<div class="info-row result" data-status="info" data-assessment="{{ c.assessment }}" data-category="{{ c.category }}" data-name="{{ c.site }}" data-details="0"><h3>{{ c.site }}</h3><p class="reason">{{ c.reason }}</p>{% if c.information_source %}<p class="source-note"><strong>Source:</strong> {{ c.information_source }}</p>{% endif %}<div class="result-columns"><div>{{ field_list(c.fields) }}</div><aside><div class="field-title">Tools with this lookup</div>{{ coverage(c) }}</aside></div>{{ technical(c) }}</div>{% endfor %}
+  </details>{% endif %}
+  {{ common_details(q.comparison, "Information shared by sites for this query") }}
+  {% if not q.cards %}<p class="empty initial-empty">No matches reported. Review the outcome totals{% if q.others %} and other results below{% endif %}; inconclusive checks do not establish absence.</p>{% endif %}
+  <div class="grid sortable">
+  {% for c in q.cards %}
+    <article class="card result" data-status="found" data-assessment="{{ c.assessment }}" data-category="{{ c.category }}" data-name="{{ c.site }}" data-details="{{ c.detail_count }}">
+      <div class="card-head"><div><div class="category">{{ c.category }}</div><h3>{% if c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ c.site }}</a>{% else %}{{ c.site }}{% endif %}</h3></div>{% if c.avatar %}<a class="avatar" href="{{ c.avatar }}" target="_blank" rel="noopener noreferrer nofollow" referrerpolicy="no-referrer" aria-label="Open returned image">{{ c.site[:1]|upper }}</a>{% else %}<span class="avatar" aria-hidden="true">{{ c.site[:1]|upper }}</span>{% endif %}</div>
+      <div class="chips"><span class="chip {{ c.tone }}">{{ c.assessment }}</span>{% if c.nsfw %}<span class="chip warn">NSFW</span>{% endif %}{% if c.loud %}<span class="chip warn">May notify</span>{% endif %}</div>
+      <p class="reason{% if c.assessment == 'Needs review' %} review-action{% endif %}">{% if c.assessment == 'Needs review' %}<strong>What to review:</strong> {% endif %}{{ c.reason }}</p>
+      <div class="url"><strong>Profile / result link:</strong> {{ c.link_label }}{% if c.result_url %}<br><a href="{{ c.result_url }}" target="_blank" rel="noopener noreferrer nofollow">{{ c.result_url }}</a>{% endif %}</div>
+      <div class="result-columns"><div>
+      {% if c.fields %}<div class="field-title">Returned details · {{ c.fields|length }} fields</div>{{ field_list(c.fields) }}
+      {% elif c.avatar %}<p class="no-details">An image URL was returned. Open the initial above to view it.</p>
+      {% else %}<p class="no-details">No additional fields returned. This result provides a checking signal.</p>{% endif %}
+      </div><aside><div class="field-title">Tools with this lookup</div>{{ coverage(c) }}</aside></div>
+      {{ technical(c) }}
+    </article>
+  {% endfor %}
+  </div>
+  {% if q.others %}<details class="other-results"><summary>Other results ({{ q.others|length }}) · no match, inconclusive or skipped</summary>
+  <div class="tablewrap"><table><thead><tr><th>Result</th><th>Service</th><th>Category</th><th>Explanation and diagnostics</th><th>Tools with this lookup</th></tr></thead><tbody class="sortable">
+  {% for c in q.others %}<tr class="result" data-status="{{ c.status }}" data-assessment="{{ c.assessment }}" data-category="{{ c.category }}" data-name="{{ c.site }}" data-details="0"><td data-label="Result"><span class="chip {{ c.tone }}">{{ c.assessment }}</span></td><td data-label="Service">{{ c.site }}<br><code>{{ c.site_id }}</code></td><td data-label="Category">{{ c.category }}</td><td data-label="Explanation">{{ c.reason }}{% if c.error %}<br>{{ c.error }}{% endif %}{% if c.http_status %}<br>HTTP {{ c.http_status }}{% endif %}{{ technical(c) }}
+{% if c.fields %}<details class="unconfirmed-fields"><summary>{{ c.field_heading }} ({{ c.fields|length }})</summary>
+<p class="meta">These fields were returned, but this check did not confirm a match. Verify their source and connection to the exact query before using them.</p>
+{{ field_list(c.fields) }}</details>{% endif %}</td><td data-label="Tools with this lookup">{{ coverage(c) }}</td></tr>{% endfor %}
+  </tbody></table></div></details>{% endif %}
+</section>
+{% endfor %}
+{% if comparisons.across_queries is not none %}
+{{ common_details(comparisons.across_queries, "Compare across queries (enabled)") }}
+{% if comparisons.shared_sites %}<section class="common-details" aria-label="Shared sites across queries"><h3>Shared sites across queries</h3><p class="meta">These sites reported matches for more than one query. This is coverage overlap, not an identity link.</p>
+<div class="tablewrap"><table><thead><tr><th>Site</th><th>Queries reporting a match</th></tr></thead><tbody>
+{% for row in comparisons.shared_sites %}<tr><td data-label="Site">{{ row.site }}</td><td data-label="Queries">{% for q in row.queries %}{{ q.query }} ({{ q.query_type }}){% if not loop.last %}<br>{% endif %}{% endfor %}</td></tr>{% endfor %}
+</tbody></table></div></section>{% endif %}
+{% elif queries|length > 1 %}<p class="meta">Queries are compared separately. For related identifiers, add <code>--compare-queries</code> when scanning or re-rendering saved JSON to compare across queries.</p>{% endif %}
+{% if not queries %}<p class="empty">No results were recorded in this scan.</p>{% endif %}
+<section class="information" aria-label="Breach lookup coverage"><h2>Breach lookup coverage</h2>
+<p>{{ breaches.explanation }}</p>
+{% if breaches.rows %}<div class="tablewrap"><table class="breach-table"><thead><tr><th>Provider / query</th><th>Outcome</th><th>Returned evidence</th></tr></thead><tbody>
+{% for row in breaches.rows %}<tr><td data-label="Provider / query"><strong>{{ row.site }}</strong><br>{{ row.query }}</td><td data-label="Outcome"><strong>{{ row.outcome }}</strong><p>{{ row.explanation }}</p></td><td data-label="Returned evidence">{% if row.evidence %}<dl class="fields breach-evidence">{% for field in row.evidence %}<dt title="Original field: {{ field.name }}">{{ field.label }}</dt><dd>{{ field.value }}</dd>{% endfor %}</dl>{% else %}No supporting fields were returned or saved.{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% endif %}
+{% if breaches.held %}<details><summary>Unavailable breach checks</summary><dl class="fields">{% for row in breaches.held %}<dt>{{ row.site }}</dt><dd>{{ row.reason }}</dd>{% endfor %}</dl></details>{% endif %}
+</section>
+</main>
+<footer>{% if tool_logos %}<details class="logo-notices"><summary>Source-tool logos and licence notices</summary><p>Original project marks identify credited tools; they do not imply endorsement. Images are bundled unchanged, and no remote logo service is contacted.</p>{% for source, logo in tool_logos.items() %}<h3><a href="{{ logo.source }}" target="_blank" rel="noopener noreferrer">{{ source }} — original asset</a></h3><a href="{{ logo.license_source }}" target="_blank" rel="noopener noreferrer">Original licence notice</a><pre>{{ logo.notice }}</pre>{% endfor %}</details>{% endif %}<p>Recorded outcomes: {{ facts.counts_line }}. Summary totals cover the saved scan and do not change when you filter this page.</p>
+<p>Results are automated signals within each adapter’s scope. A returned URL may be constructed, and identical usernames may belong to different people. An “enricher” classification does not guarantee additional fields. Verify a result before relying on it.</p>
+<p>This report works offline. Search and filtering stay in your browser. Links and image initials open external pages only when you select them.</p>
+<div class="society-lockup"><img class="society-logo" src="{{ identity.logo }}" alt="{{ identity.name }} logo"></div>
+<p class="project-brand"><span class="project-mark" role="img" aria-label="Consensus logo"></span><strong>Consensus by {{ identity.name }}</strong></p>
+<p class="slogan">{{ identity.slogan }}</p><p class="brand-description">{{ identity.description }}</p><p class="update-note">{{ identity.update_note }}</p>
+{{ community() }}
+<p class="notice"><strong>Health &amp; lawful use.</strong> {{ identity.warning }}</p>
+<h2>What would you like to do next?</h2><p>Run one of these commands in your terminal. {{ identity.query_guidance }} {{ identity.phone_guidance }}</p>
+<div class="tablewrap"><table class="command-menu"><thead><tr><th>Action</th><th>Command to run</th></tr></thead><tbody>{% for label,command in identity.menu %}<tr><td>{{ label }}</td><td><code>{{ command }}</code></td></tr>{% endfor %}</tbody></table></div>
+{% if options %}<details><summary>Scan options</summary><dl class="fields">{% for k,v in options %}<dt>{{ k }}</dt><dd>{{ v }}</dd>{% endfor %}</dl></details>{% endif %}
+</footer>
+</div>
+<script>
+(() => {
+  'use strict';
+  const byId = id => document.getElementById(id);
+  const search = byId('search'), filter = byId('filter'), category = byId('category'), sort = byId('sort');
+  const rows = Array.from(document.querySelectorAll('.result'));
+  const text = new Map(rows.map(row => [row, row.textContent.toLocaleLowerCase()]));
+  const groups = Array.from(document.querySelectorAll('.query, .information, .other-results'));
+  const isReview = row => row.dataset.assessment === 'Needs review';
+  function update() {
+    const term = search.value.trim().toLocaleLowerCase(), mode = filter.value;
+    const active = Boolean(term || mode !== 'all' || category.value !== 'all');
+    let visible = 0;
+    for (const row of rows) {
+      const kind = row.dataset.status;
+      const matches = mode === 'all' || mode === kind || (mode === 'details' && Number(row.dataset.details) > 0)
+        || (mode === 'review' && isReview(row))
+        || (mode === 'inconclusive' && ['unknown','blocked','rate_limited','error'].includes(kind));
+      row.hidden = !(matches && (!term || text.get(row).includes(term)) && (category.value === 'all' || category.value === row.dataset.category));
+      if (!row.hidden) visible++;
+      if (!row.hidden && term) {
+        row.querySelectorAll('details').forEach(detail => {
+          if (detail.textContent.toLocaleLowerCase().includes(term)) detail.open = true;
+        });
+      }
+    }
+    for (const group of groups) {
+      const any = Array.from(group.querySelectorAll('.result')).some(row => !row.hidden);
+      group.hidden = active && !any;
+      if (active && any && group.tagName === 'DETAILS') group.open = true;
+    }
+    document.querySelectorAll('.initial-empty').forEach(el => { el.hidden = active; });
+    byId('visible-count').textContent = visible + ' of ' + rows.length + ' included results match · collapsed sections may contain results';
+    byId('empty-search').hidden = !active || visible !== 0;
+  }
+  function reorder() {
+    for (const group of document.querySelectorAll('.sortable')) {
+      const ordered = Array.from(group.children).sort((a,b) => {
+        const rank = sort.value === 'details' ? Number(b.dataset.details) - Number(a.dataset.details)
+          : sort.value === 'review' ? Number(isReview(b)) - Number(isReview(a)) : 0;
+        return rank || a.dataset.name.localeCompare(b.dataset.name);
+      });
+      ordered.forEach(row => group.appendChild(row));
+    }
+  }
+  search.addEventListener('input', update);
+  filter.addEventListener('change', update);
+  category.addEventListener('change', update);
+  sort.addEventListener('change', reorder);
+  function reset() {
+    search.value = ''; filter.value = 'all'; category.value = 'all'; sort.value = 'details';
+    update(); reorder();
+  }
+  byId('clear').addEventListener('click', () => {
+    reset(); search.focus();
+  });
+  document.querySelectorAll('.qchips a').forEach(link => link.addEventListener('click', reset));
+  let printState = null;
+  window.addEventListener('beforeprint', () => {
+    if (printState !== null) return;
+    printState = Array.from(document.querySelectorAll('details')).map(el => [el, el.open]);
+    printState.forEach(([el]) => { el.open = true; });
+  });
+  window.addEventListener('afterprint', () => {
+    if (printState === null) return;
+    printState.forEach(([el, open]) => { el.open = open; });
+    printState = null;
+  });
+  byId('print').addEventListener('click', () => window.print());
+  byId('tools').hidden = false;
+  update(); reorder();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "consensus-osint"
+version = "2026.10.2"
+description = "Unified username, email and phone reverse-lookup OSINT tool: the merged modules and best features of Sherlock, Maigret, WhatsMyName, user-scanner, holehe, socialscan, ignorant, numint, linkook, mailcat, marple and more."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.txt", "licenses/*.txt", "consensus_osint/vendor/*/LICENSE"]
+authors = [{name = "Consensus contributors"}]
+keywords = ["osint", "username", "email", "phone", "reverse-lookup", "sherlock", "maigret", "holehe", "whatsmyname"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Environment :: Console",
+  "Topic :: Security",
+]
+# Lean core: no native build toolchain required on supported wheel platforms, no telemetry.
+# Managed interactive installations check release versions; installing updates is explicit.
+# The default install scans the 5,700+ site database, does e-mail and phone analysis,
+# keyless breach / Gravatar checks, and every report format except PDF.
+dependencies = [
+  "httpx[http2,socks]>=0.28,<1",   # includes socks5h support; h2 and socksio are pure-Python
+  "rich>=13.0",                  # terminal output (degrades to plain text if absent)
+  "prompt-toolkit>=3.0.51,<4",    # pinned session footer, input editing and terminal restoration
+  "phonenumbers>=8.13",          # offline phone parsing - bundled data, no network
+  "dnspython>=2.6.1",              # e-mail MX / SPF / DMARC lookups
+  "jinja2>=3.1.6",                 # HTML report template
+  "PyYAML>=6.0",                 # config file + phone dork lists
+  "beautifulsoup4>=4.12",        # core catalogue profile-evidence parsing
+]
+
+[project.optional-dependencies]
+# The vendored code-module families (holehe, user-scanner, socialscan, ignorant, numint),
+# profile-metadata extraction, and browser TLS impersonation. This is where the few
+# larger compiled packages live, keeping the default installation small.
+modules = [
+  "aiohttp>=3.14.3",         # socialscan
+  "trio>=0.27",           # holehe, ignorant
+  "lxml>=6.1.0",            # faster HTML parsing
+  "curl_cffi>=0.15.0",       # TLS-fingerprint impersonation for protected sites
+  "socid-extractor>=0.0.27", # scrape structured metadata from a found profile
+  "requests>=2.33.0",       # a couple of vendored modules
+  "termcolor>=2.0",
+  "colorama>=0.4",
+]
+pdf = ["reportlab>=4.0", "pillow>=12.3.0"]          # PDF reports
+browser = ["playwright>=1.40"]                    # headless-browser challenge bypass
+mcp = ["mcp>=1.28.1,<2", "PyJWT[crypto]>=2.15.0"]  # FastMCP v1; patched JWT dependency
+all = ["consensus-osint[modules,pdf,browser,mcp]"]
+
+[project.scripts]
+consensus = "consensus_osint.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/OSINT-Experts-Society/Consensus-OSINT"
+Repository = "https://github.com/OSINT-Experts-Society/Consensus-OSINT"
+Issues = "https://github.com/OSINT-Experts-Society/Consensus-OSINT/issues"
+
+[tool.setuptools]
+include-package-data = false  # ship only the explicitly declared assets below
+
+[tool.setuptools.packages.find]
+include = ["consensus_osint*"]
+
+[tool.setuptools.package-data]
+consensus_osint = [
+  "data/*.json", "data/**/*.json", "data/*.txt", "data/*.yaml", "templates/*",
+]
+"consensus_osint.vendor.holehe" = ["LICENSE", "*.json", "**/*.json"]
+"consensus_osint.vendor.ignorant" = ["LICENSE", "*.json", "**/*.json"]
+"consensus_osint.vendor.numint" = ["LICENSE", "*.json", "**/*.json"]
+"consensus_osint.vendor.socialscan" = ["LICENSE", "*.json", "**/*.json"]
+"consensus_osint.vendor.user_scanner" = ["LICENSE", "*.json", "**/*.json"]
