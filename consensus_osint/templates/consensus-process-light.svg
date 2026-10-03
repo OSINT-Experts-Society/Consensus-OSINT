@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="590" viewBox="0 0 920 590" role="img" aria-labelledby="title desc">
+<title id="title">How Consensus is built and how your query runs</title>
+<desc id="desc">Nineteen source projects feed expert testing, improvement, standardisation and deduplication into Consensus. Weekly reviews add new modules and retire broken ones. Your query uses Consensus for one search per site in the default deduplicated scan, producing unified results.</desc>
+<rect width="920" height="590" rx="18" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#c65316" stroke-width="1.5"/></marker></defs>
+<g font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<text x="24" y="34" font-size="14" fill="#c65316" font-weight="700" text-anchor="start">HOW WE BUILD CONSENSUS</text>
+<rect x="24" y="58" width="280" height="252" rx="14" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="42" y="88" font-size="19" fill="#18212b" font-weight="600" text-anchor="start">19 open-source projects</text>
+<text x="42" y="115" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Sherlock</text>
+<text x="42" y="133" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Maigret</text>
+<text x="42" y="151" font-size="13" fill="#526171" font-weight="400" text-anchor="start">WhatsMyName</text>
+<text x="42" y="169" font-size="13" fill="#526171" font-weight="400" text-anchor="start">User Scanner</text>
+<text x="42" y="187" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Holehe</text>
+<text x="42" y="205" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Ignorant</text>
+<text x="42" y="223" font-size="13" fill="#526171" font-weight="400" text-anchor="start">SherlockV2</text>
+<text x="42" y="241" font-size="13" fill="#526171" font-weight="400" text-anchor="start">DetectDee</text>
+<text x="42" y="259" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Aliens Eye</text>
+<text x="42" y="277" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Nexfil</text>
+<text x="182" y="115" font-size="13" fill="#526171" font-weight="400" text-anchor="start">GoSearch</text>
+<text x="182" y="133" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Vesper</text>
+<text x="182" y="151" font-size="13" fill="#526171" font-weight="400" text-anchor="start">FindMe</text>
+<text x="182" y="169" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Linkook</text>
+<text x="182" y="187" font-size="13" fill="#526171" font-weight="400" text-anchor="start">UserJoo</text>
+<text x="182" y="205" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Sreg</text>
+<text x="182" y="223" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Socialscan</text>
+<text x="182" y="241" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Numint</text>
+<text x="182" y="259" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Mailcat</text>
+<rect x="344" y="58" width="254" height="252" rx="14" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="362" y="90" font-size="21" fill="#18212b" font-weight="600" text-anchor="start">Expert review</text>
+<text x="362" y="131" font-size="13" fill="#c65316" font-weight="700" text-anchor="start">01</text>
+<text x="393" y="131" font-size="16" fill="#18212b" font-weight="400" text-anchor="start">Test &amp; improve</text>
+<text x="362" y="164" font-size="13" fill="#c65316" font-weight="700" text-anchor="start">02</text>
+<text x="393" y="164" font-size="16" fill="#18212b" font-weight="400" text-anchor="start">Standardise results</text>
+<text x="362" y="197" font-size="13" fill="#c65316" font-weight="700" text-anchor="start">03</text>
+<text x="393" y="197" font-size="16" fill="#18212b" font-weight="400" text-anchor="start">Remove duplicates</text>
+<text x="362" y="230" font-size="13" fill="#c65316" font-weight="700" text-anchor="start">04</text>
+<text x="393" y="230" font-size="16" fill="#18212b" font-weight="400" text-anchor="start">Integrate modules</text>
+<rect x="638" y="58" width="258" height="252" rx="14" fill="#f6f8fa" stroke="#c65316" stroke-width="2"/>
+<g transform="translate(725 80) scale(0.75)">  <g fill="none" stroke="#c65316" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 25h17c18 0 18 31 36 31M22 56h53M22 87h17c18 0 18-31 36-31"/>
+    <circle cx="85" cy="56" r="10"/>
+  </g>  <g fill="#c65316">
+    <circle cx="19" cy="25" r="5"/>
+    <circle cx="19" cy="56" r="5"/>
+    <circle cx="19" cy="87" r="5"/>
+  </g></g>
+<text x="767.0" y="190" font-size="29" fill="#18212b" font-weight="600" text-anchor="middle">Consensus</text>
+<text x="767.0" y="224" font-size="17" fill="#526171" font-weight="400" text-anchor="middle">Unified modules</text>
+<text x="767.0" y="273" font-size="15" fill="#c65316" font-weight="600" text-anchor="middle">Ready for your search</text>
+<path d="M313 181L333 181" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M607 181L627 181" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M767 320v22H164v-22" fill="none" stroke="#c65316" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="460" y="370" font-size="14" fill="#526171" font-weight="400" text-anchor="middle">Reviewed &amp; updated weekly: new modules added, broken modules retired</text>
+<text x="24" y="420" font-size="14" fill="#c65316" font-weight="700" text-anchor="start">HOW YOUR QUERY RUNS</text>
+<text x="896" y="420" font-size="14" fill="#526171" font-weight="400" text-anchor="end">Default deduplicated search</text>
+<rect x="24" y="442" width="194" height="92" rx="14" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="121" y="480" font-size="18" fill="#18212b" font-weight="600" text-anchor="middle">Your query</text>
+<text x="121" y="507" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">Username / email / phone</text>
+<path d="M225 489L241 489" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="250" y="442" width="194" height="92" rx="14" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="347" y="480" font-size="18" fill="#18212b" font-weight="600" text-anchor="middle">Consensus</text>
+<text x="347" y="507" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">Relevant modules selected</text>
+<path d="M451 489L467 489" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="476" y="442" width="194" height="92" rx="14" fill="#f6f8fa" stroke="#c65316" stroke-width="2"/>
+<text x="573" y="480" font-size="18" fill="#c65316" font-weight="600" text-anchor="middle">One search per site</text>
+<text x="573" y="507" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">Duplicate routes removed</text>
+<path d="M677 489L693 489" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="702" y="442" width="194" height="92" rx="14" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="799" y="480" font-size="18" fill="#18212b" font-weight="600" text-anchor="middle">Unified results</text>
+<text x="799" y="507" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">One consistent view</text>
+<text x="460" y="571" font-size="17" fill="#c65316" font-weight="600" text-anchor="middle">Combined expertise. Duplicates removed. Each site searched once.</text>
+</g>
+</svg>

@@ -12,6 +12,18 @@
 
 <p align="center">Expert-maintained username, email and phone intelligence, standardised into one tool. Each week, our experts review major open-source projects for new modules—deduplicating, testing, improving and integrating suitable additions, while retiring modules that no longer work.</p>
 
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark-mobile.svg">
+    <source media="(max-width: 600px)" srcset="consensus_osint/templates/consensus-process-light-mobile.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark.svg">
+    <img src="consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus is built: 19 projects feed expert testing, improvement, standardisation and deduplication. How you search: your query goes through Consensus for one search per site and unified results.">
+  </picture>
+</p>
+
+<details>
+<summary>Compare module coverage across all 19 projects</summary>
+
 <div align="center">
 <table align="center">
   <thead>
@@ -48,6 +60,8 @@
 Counts cover catalogue rules and modules as of 3 October 2026, excluding explicitly disabled entries. Overlapping implementations are not unique websites; results depend on scan options and service requirements. Phone counts exclude number analysis and search links. An em dash means no comparable definitions.
 
 *DetectDee: declared rules in a catalogue with malformed regex escapes. Sreg: configured routes, often repeated across input types. Neither is a live reliability claim. Mailcat: nickname-to-mailbox discovery, shown separately. SherlockV2: public repository returned 404; current counts unverified.*
+
+</details>
 
 </details>
 
