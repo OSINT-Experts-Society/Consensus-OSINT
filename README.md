@@ -65,18 +65,6 @@ Counts cover catalogue rules and modules as of 3 October 2026, excluding explici
 
 </details>
 
-<p align="center">One platform. The strength of many.</p>
-
-**One search. Clear results. See which source tools cover each match.**
-
-Consensus brings together selected lookup modules and site lists from **15+ open-source projects**, including:
-
-**[Sherlock](https://github.com/sherlock-project/sherlock) | [Maigret](https://github.com/soxoj/maigret) | [WhatsMyName](https://github.com/WebBreacher/WhatsMyName) | [Holehe](https://github.com/megadose/holehe) | [User Scanner](https://github.com/kaifcodec/user-scanner)**
-
-**Bulk search &middot; Proxy support &middot; Reports &middot; Interactive graphs &middot; Advanced search options**
-
-Built by the **OSINT Experts Society**. Our maintenance target is weekly expert reviews of new community lookup modules, evaluating suitable additions for Consensus.
-
 ## Key features
 
 - **Username, email and phone lookups** in one tool.
