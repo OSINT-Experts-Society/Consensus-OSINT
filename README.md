@@ -17,12 +17,25 @@
   </thead>
   <tbody>
     <tr><td align="left"><strong>Consensus</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td></tr>
-    <tr><td align="left"><a href="https://github.com/soxoj/maigret/blob/b6642744988e7e6c2d21f75db60ec3093019ba25/maigret/resources/data.json">Maigret</a></td><td align="center">5,483</td><td align="center">—</td><td align="center">—</td></tr>
-    <tr><td align="left"><a href="https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b/user_scanner">User Scanner</a></td><td align="center">2,511</td><td align="center">211</td><td align="center">—</td></tr>
-    <tr><td align="left"><a href="https://github.com/WebBreacher/WhatsMyName/blob/062bcfe48df79fa618e96edc79dc9673f3fe5643/wmn-data.json">WhatsMyName</a></td><td align="center">716</td><td align="center">—</td><td align="center">—</td></tr>
-    <tr><td align="left"><a href="https://github.com/sherlock-project/sherlock/blob/e40a45ec2a074b90703b3b4b842c8a3adbd6ada3/sherlock_project/resources/data.json">Sherlock</a></td><td align="center">481</td><td align="center">—</td><td align="center">—</td></tr>
-    <tr><td align="left"><a href="https://github.com/megadose/holehe/tree/14da70f588538936b20d238783c5e28a0772a2b3/holehe/modules">Holehe</a></td><td align="center">—</td><td align="center">123</td><td align="center">—</td></tr>
-    <tr><td align="left"><a href="https://github.com/megadose/ignorant/tree/40b3eb734ef3d55e6d16eb314e49dbf520fa1f64/ignorant/modules">Ignorant</a></td><td align="center">—</td><td align="center">—</td><td align="center">3</td></tr>
+    <tr><td align="left"><a href="https://github.com/soxoj/maigret/tree/b6642744988e7e6c2d21f75db60ec3093019ba25">Maigret</a></td><td align="center">5,483</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b">User Scanner</a></td><td align="center">2,511</td><td align="center">211</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/arxhr007/Aliens_eye/tree/b1316648fe0e648469d30512bb0535ebc8c4bbc7">Aliens Eye</a></td><td align="center">840</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/WebBreacher/WhatsMyName/tree/062bcfe48df79fa618e96edc79dc9673f3fe5643">WhatsMyName</a></td><td align="center">716</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/sherlock-project/sherlock/tree/e40a45ec2a074b90703b3b4b842c8a3adbd6ada3">Sherlock</a></td><td align="center">481</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/0xSaikat/findme/tree/85a860357f9b6a0df2dfb16ccd495fef93a5dfa1">FindMe</a></td><td align="center">412</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/Yvesssn/DetectDee/tree/551817c911ddf3a25eba9d4addb56df1e15b8f2b">DetectDee</a></td><td align="center">375*</td><td align="center">3*</td><td align="center">4*</td></tr>
+    <tr><td align="left"><a href="https://github.com/thewhiteh4t/nexfil/tree/c540238dd510b865daac1eb59a328f8fa68b1ce5">Nexfil</a></td><td align="center">328</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/ibnaleem/gosearch/tree/8c41d1e7f0fad9cb4bf9fb11f5bb096c90ac9027">GoSearch</a></td><td align="center">306</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/krishpranav/vesper/tree/6f861692d7a37b5d001ce188477fc65854566043">Vesper</a></td><td align="center">299</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/n0tr00t/Sreg/tree/ed11d094d490b4732239ad8715f3734bfd7e91a7">Sreg</a></td><td align="center">51*</td><td align="center">50*</td><td align="center">50*</td></tr>
+    <tr><td align="left"><a href="https://github.com/megadose/holehe/tree/14da70f588538936b20d238783c5e28a0772a2b3">Holehe</a></td><td align="center">—</td><td align="center">123</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/JackJuly/linkook/tree/1c893599886656c17bf4fe0dadfc1e2deb5c6b28">Linkook</a></td><td align="center">64</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/ar33s0/UserJoo/tree/01036cff670e5ddd197bc6fbcf25d45a810a2503">UserJoo</a></td><td align="center">29</td><td align="center">—</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/iojw/socialscan/tree/5ae42d0f82b0ebd717b3ae52b693b4ececa902b1">Socialscan</a></td><td align="center">6</td><td align="center">6</td><td align="center">—</td></tr>
+    <tr><td align="left"><a href="https://github.com/whoamitang/numint/tree/9186c35ad0836e8094bfa1a0e264fe6e01a82823">Numint</a></td><td align="center">—</td><td align="center">—</td><td align="center">5</td></tr>
+    <tr><td align="left"><a href="https://github.com/megadose/ignorant/tree/40b3eb734ef3d55e6d16eb314e49dbf520fa1f64">Ignorant</a></td><td align="center">—</td><td align="center">—</td><td align="center">3</td></tr>
+    <tr><td align="left"><a href="https://github.com/hanyxd/sherlockV2">SherlockV2</a></td><td align="center" colspan="3">Unverified (repository unavailable)</td></tr>
+    <tr><td align="left"><a href="https://github.com/sharsil/mailcat/tree/7f61a59b68c594ea894bfc364517f08d23b07752">Mailcat</a></td><td align="center" colspan="3">26 mailbox-provider checks*</td></tr>
   </tbody>
 </table>
 </div>
@@ -30,7 +43,9 @@
 <details>
 <summary align="center">About these counts (3 October 2026)</summary>
 
-Catalogue snapshot: 3 October 2026. Counts site rules/module files, excluding explicitly disabled/invalid entries and package helpers. Overlapping implementations can cover the same service; these are not unique-site counts or a live reliability benchmark. Phone counts cover account lookups, excluding number analysis and search links. Actual checks depend on scan options and service requirements. — = no definitions in these catalogues.
+Counts cover catalogue rules and modules as of 3 October 2026, excluding explicitly disabled entries. Overlapping implementations are not unique websites; results depend on scan options and service requirements. Phone counts exclude number analysis and search links. An em dash means no comparable definitions.
+
+*DetectDee: declared rules in a catalogue with malformed regex escapes. Sreg: configured routes, often repeated across input types. Neither is a live reliability claim. Mailcat: nickname-to-mailbox discovery, shown separately. SherlockV2: public repository returned 404; current counts unverified.*
 
 </details>
 
@@ -45,6 +60,15 @@ Consensus brings together selected lookup modules and site lists from **15+ open
 **Bulk search &middot; Proxy support &middot; Reports &middot; Interactive graphs &middot; Advanced search options**
 
 Built by the **OSINT Experts Society**. Our maintenance target is weekly expert reviews of new community lookup modules, evaluating suitable additions for Consensus.
+
+## Key features
+
+- **Username, email and phone lookups** in one tool.
+- **Source coverage**: see which imported tools list each lookup.
+- **Bulk and advanced search**: process lists, expand username patterns and apply filters.
+- **Proxy support** for your lookup workflow.
+- **Reports and interactive graphs** to explore findings; optional PDF export.
+- **Interactive menu or command line** for guided or repeatable searches.
 
 ## Install
 
