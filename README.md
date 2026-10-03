@@ -8,7 +8,9 @@
 
 <p align="center">By the <a href="https://osint.ngo">OSINT Experts Society</a></p>
 
-<p align="center"><strong>Search usernames, email addresses and phone numbers with the combined capabilities of leading open-source OSINT tools.</strong></p>
+<p align="center"><strong>7,900+ lookup modules. 19 open-source projects. One tool.</strong></p>
+
+<p align="center">Expert-maintained username, email and phone intelligence, standardised into one tool. Each week, our experts review major open-source projects for new modules—deduplicating, testing, improving and integrating suitable additions, while retiring modules that no longer work.</p>
 
 <div align="center">
 <table align="center">
