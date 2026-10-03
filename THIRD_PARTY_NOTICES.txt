@@ -251,3 +251,9 @@ Live-verified selective User Scanner intake, 2 October 2026
   Source: kaifcodec/user-scanner at 780d077a468035c6afd6b4a0f987317db651528b (MIT).
   Selected new module files retain upstream logic with namespaced imports.
   Existing guarded adaptations and other earlier provider repairs are retained.
+
+Project identity and marks
+--------------------------
+The Consensus logo expresses independent contributions meeting around a shared centre. The OSINT Experts Society logo is the Society's own asset from [osint.ngo](https://osint.ngo/src/assets/images/osint-experts-society-logo.png), included unchanged. Third-party logos identify credited source tools; they remain their owners' marks and do not imply endorsement. Bundled source-logo origins and notices are recorded with the assets.
+
+*Consensus* names this project and the signed weekly builds its maintainers publish. The code is available under the GPL; the name is reserved. A fork or derived distribution must use a different name and must not present itself as an official Consensus build. A catalogue signature identifies a maintainer-issued catalogue, not blanket approval of surrounding code.
