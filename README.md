@@ -25,10 +25,7 @@
   <a href="#key-features"><img src="consensus_osint/templates/consensus-badge-projects.svg" alt="19 source projects" height="24"></a>
   <a href="#key-features"><img src="consensus_osint/templates/consensus-badge-modules.svg" alt="7,900+ lookup modules" height="24"></a>
   <a href="LICENSE"><img src="consensus_osint/templates/consensus-badge-license.svg" alt="Licence: GPL-3.0-or-later" height="24"></a>
-  <br>
-  <a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/graphs/contributors"><img src="consensus_osint/templates/consensus-badge-contributors.svg" alt="1 contributor as of 3 October 2026" title="Snapshot: 3 October 2026" height="24"></a>
   <a href="CONTRIBUTING.md"><img src="consensus_osint/templates/consensus-badge-prs.svg" alt="PRs welcome" height="24"></a>
-  <a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/stargazers"><img src="consensus_osint/templates/consensus-badge-stars.svg" alt="0 GitHub stars as of 3 October 2026" title="Snapshot: 3 October 2026" height="24"></a>
 </p>
 
 <details>
