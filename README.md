@@ -38,9 +38,9 @@
   <a href="https://www.reddit.com/r/OSINTExperts/"><img src="consensus_osint/templates/consensus-badge-reddit.svg" alt="Join our Reddit community" height="24"></a>
 </p>
 
-<a id="compare"></a>
 <details>
 <summary>Compare Consensus with its 19 source projects</summary>
+<a id="compare"></a>
 
 <p align="center"><strong>Overlapping sources. Separate update schedules. One combined solution.</strong></p>
 <p align="center">Consensus brings these sources together, with expert review and updates every week. Default searches select one lookup per site and bring the results into one report.</p>
@@ -105,6 +105,17 @@ Counts cover catalogue rules and modules as of 3 October 2026, excluding explici
 - **Bulk searches, advanced controls and proxies.** Process lists, generate username variations, filter by site or category, and use a guided menu or repeatable CLI commands.
 
 ## See Consensus in action
+
+**Watch a command-line search:** enter a username, follow the scan progress, then inspect returned details and source coverage.
+
+<a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-demo-terminal.mp4">
+  <picture>
+    <source media="(prefers-reduced-motion: reduce)" srcset="consensus_osint/templates/consensus-demo-terminal.png">
+    <img src="consensus_osint/templates/consensus-demo-terminal.gif" width="920" alt="35-second Consensus CLI demonstration: entering a query, scan progress and detailed results using fictional data">
+  </picture>
+</a>
+
+<a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-demo-terminal.mp4">Open / download the 35-second video (MP4)</a>. Actual CLI output with simulated provider responses; no live searches. Playback is paced for readability, not a speed benchmark.
 
 Actual Consensus report screens using **fictional demonstration data**. No live searches were performed. Click either image to view it full size.
 
