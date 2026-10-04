@@ -68,6 +68,7 @@ class Session:
         self.read = read or input
         self.preferences = dict(_DEFAULTS)
         self.latest = None
+        self._saved_report = None
 
     def active_settings(self):
         p = self.preferences
@@ -198,10 +199,7 @@ class Session:
         info = self.printer.terminal_ui.info if self.printer.terminal_ui else SessionInfo.current()
         default = str(info.report_folder / ("consensus-" + datetime.now().strftime("%Y%m%d-%H%M%S-%f") + ".html"))
         if not arguments:
-            self.printer.message("Press Enter to save an HTML report at the suggested location below. "
-                                 "Or type a different filename/full path. Ctrl+C cancels.")
-            self.printer.message("The ending chooses the format: .html report, .graph.html evidence graph, "
-                                 ".json to keep results for later reports; also .csv .md .txt .pdf.", "dim")
+            self.printer.message("Enter saves HTML. Or choose a path ending in .html, .graph.html, .json, .csv, .md, .txt or .pdf. Ctrl+C cancels.")
             self.printer.message("Suggested file: " + default)
         path = arguments[0] if arguments else _unquote(self.read("Save here? Press Enter, or type a different path: ")) or default
         from .reports import save_report
@@ -211,8 +209,10 @@ class Session:
         if self.printer.terminal_ui:
             self.printer.terminal_ui.update("Saving report")
         saved = save_report(self.latest, Path(path).expanduser(), include_all=True)
-        self.printer.report_saved(saved)
-        self.printer.message("Saved all collected outcomes. Use .json to retain a scan for later reporting.", "dim")
+        if self.printer.terminal_ui:
+            self._saved_report = saved
+        else:
+            self.printer.report_saved(saved)
 
     def change_setting(self, name, value):
         from ..cli import _positive_float
@@ -412,6 +412,10 @@ class Session:
                     tokens = tokens[1:]
                 if tokens and not self.dispatch(tokens):
                     break
+                if self._saved_report is not None:
+                    self.printer.home(__version__, has_results=self.latest is not None, saved_report=self._saved_report)
+                    self._saved_report = None
+                    continue
                 if tokens and tokens[0].lower() == "menu":
                     continue
             except EOFError:

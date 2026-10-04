@@ -14,6 +14,7 @@ import functools
 import inspect
 import logging
 import re
+from collections import deque
 from collections.abc import Callable, Iterable
 from urllib.parse import urlparse
 
@@ -44,8 +45,7 @@ def host_of(url: str | None) -> str:
 
 async def _gather_stream(coros: list, hosts: list, concurrency: int, on_result: Callable | None,
                          delay: float = 0.0, per_host: int = DEFAULT_PER_HOST) -> list:
-    sem = asyncio.Semaphore(max(1, concurrency))
-    host_sems: dict = {}
+    limit = max(1, concurrency)
     results: list = []
     start_lock = asyncio.Lock()
     last_start: float | None = None
@@ -66,19 +66,10 @@ async def _gather_stream(coros: list, hosts: list, concurrency: int, on_result: 
             await checkpoint()
             last_start = loop.time()
 
-    async def wrapped(coro, host: str):
+    async def wrapped(coro):
         try:
-            if host:
-                hs = host_sems.get(host)
-                if hs is None:
-                    hs = host_sems[host] = asyncio.Semaphore(max(1, per_host))
-                async with hs:
-                    async with sem:
-                        await wait_for_start()
-                        return await coro
-            async with sem:
-                await wait_for_start()
-                return await coro
+            await wait_for_start()
+            return await coro
         finally:
             if inspect.iscoroutine(coro):
                 coro.close()
@@ -88,28 +79,71 @@ async def _gather_stream(coros: list, hosts: list, concurrency: int, on_result: 
             if inspect.iscoroutine(coro):
                 coro.close()
         raise ValueError("each check must have a corresponding host")
-    tasks = [asyncio.create_task(wrapped(c, h)) for c, h in zip(coros, hosts, strict=True)]
+    # Schedule only runnable work, rather than thousands of tasks waiting on
+    # semaphores. Rotate eligible hosts so a busy host cannot block other sites.
+    queues = {}
+    for coro, host in zip(coros, hosts, strict=True):
+        queues.setdefault(host, deque()).append(coro)
+    ready = deque(queues)
+    queued = set(queues)
+    active = dict.fromkeys(queues, 0)
+    tasks = {}
+    completed = asyncio.Queue()
+
+    def offer(host):
+        host_limit = max(1, per_host) if host else limit
+        if queues[host] and active[host] < host_limit and host not in queued:
+            ready.append(host)
+            queued.add(host)
+
+    def fill():
+        while ready and len(tasks) < limit:
+            host = ready.popleft()
+            queued.remove(host)
+            coro = queues[host].popleft()
+            active[host] += 1
+            task = asyncio.create_task(wrapped(coro))
+            tasks[task] = host
+            task.add_done_callback(completed.put_nowait)
+            offer(host)
+
     try:
-        for fut in asyncio.as_completed(tasks):
+        fill()
+        while tasks:
+            fut = await completed.get()
+            host = tasks.pop(fut)
+            active[host] -= 1
+            offer(host)
             try:
-                f = await fut
+                f = fut.result()
             except Exception:  # noqa: BLE001
                 log.debug("task failed", exc_info=True)
-                continue
-            results.append(f)
-            if on_result:
-                try:
-                    on_result(f)
-                except Exception:  # noqa: BLE001
-                    log.debug("on_result callback failed", exc_info=True)
-    except (KeyboardInterrupt, asyncio.CancelledError):
+            else:
+                results.append(f)
+                if on_result:
+                    try:
+                        on_result(f)
+                    except Exception:  # noqa: BLE001
+                        log.debug("on_result callback failed", exc_info=True)
+            fill()
+    finally:
         for t in tasks:
             t.cancel()
-        await asyncio.gather(*tasks, return_exceptions=True)
+        cancelled = False
+        if tasks:
+            cleanup = asyncio.gather(*tasks, return_exceptions=True)
+            while not cleanup.done():
+                try:
+                    await asyncio.shield(cleanup)
+                except asyncio.CancelledError:
+                    # Repeated Stop/Ctrl-C must not interrupt client cleanup
+                    # or strand the unscheduled coroutine objects below.
+                    cancelled = True
         for coro in coros:
             if inspect.iscoroutine(coro):
                 coro.close()
-        raise
+        if cancelled:
+            raise asyncio.CancelledError
     return results
 
 

@@ -16,7 +16,7 @@
 @media print{:root{color-scheme:light;--bg:#fff;--panel:#fff;--text:#000;--muted:#444;--line:#bbb;--accent:#a94300;--soft:#f5f5f5;--shadow:none}.wrap{padding:0}.toolbar,.qchips,.skip{display:none!important}.query[hidden],.result[hidden],.information[hidden],.other-results[hidden]{display:block!important}tr.result[hidden]{display:table-row!important}#empty-search{display:none!important}.grid{display:block}.card{break-inside:avoid;box-shadow:none;margin:12px 0}.stats{grid-template-columns:repeat(5,1fr)}.stat{padding:10px}.stat b{font-size:23px}details>*{display:block!important}details>summary{display:list-item!important}a{color:inherit}.query{break-before:auto}.query-head{break-after:avoid}.tablewrap{overflow:visible}thead{display:table-header-group}tr{break-inside:avoid}}
 
 .society-lockup{background:#0e0f11;border-radius:10px;padding:14px 18px;max-width:300px;flex:none}
-.project-brand{display:flex;align-items:center;gap:10px}.project-mark{display:inline-block;flex:none;width:36px;height:36px;border-radius:7px;background:#0e0f11 url("{{ identity.project_mark }}") center/contain no-repeat}
+.project-brand{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.project-mark{display:inline-block;flex:none;width:280px;max-width:100%;height:70px;border-radius:7px;background:#0e0f11 url("{{ identity.project_mark }}") center/contain no-repeat}
 .society-logo{display:block;width:240px;max-width:100%;height:auto}
 .society-links{display:flex;gap:8px 24px;flex-wrap:wrap;margin:16px 0;font-size:12px}
 .slogan{font-size:19px;font-weight:700;line-height:1.4;margin:5px 0;color:var(--accent)}
@@ -87,7 +87,7 @@
 <a class="skip" href="#results">Skip to results</a>
 <div class="wrap">
 <header>
-  <div class="masthead"><div><div class="brand project-brand"><span class="project-mark" role="img" aria-label="Consensus logo"></span>CONSENSUS</div><p class="slogan">{{ identity.slogan }}</p><p class="brand-description">{{ identity.description }}</p><p class="update-note">{{ identity.update_note }}</p><h1>Search report</h1><div class="meta">By {{ identity.name }}<br>{{ facts.generated }} · {{ facts.generator }}{% if facts.duration %} · {{ facts.duration }}{% endif %}</div></div><div class="society-lockup"><span class="society-byline">CREATED BY</span><img class="society-logo" src="{{ identity.logo }}" alt="{{ identity.name }} logo"></div></div>
+  <div class="masthead"><div><div class="brand project-brand"><span class="project-mark" role="img" aria-label="Consensus logo"></span></div><p>By the <a href="{{ identity.links[0][1] }}" target="_blank" rel="noopener noreferrer">{{ identity.name }}</a></p><p class="slogan">{{ identity.slogan }}</p><p class="brand-description">{{ identity.description }}</p><p class="update-note">{{ identity.update_note }}</p><h1>Search report</h1><div class="meta">{{ facts.generated }} · {{ facts.generator }}{% if facts.duration %} · {{ facts.duration }}{% endif %}</div></div></div>
   {{ community() }}
   <p class="notice"><strong>Health &amp; lawful use.</strong> {{ identity.warning }}</p>
   {% if facts.interrupted %}<p class="notice"><strong>Partial scan.</strong> The scan was interrupted. These are the results collected before it stopped.</p>{% endif %}
@@ -212,8 +212,7 @@
 <footer>{% if tool_logos %}<details class="logo-notices"><summary>Source-tool logos and licence notices</summary><p>Original project marks identify credited tools; they do not imply endorsement. Images are bundled unchanged, and no remote logo service is contacted.</p>{% for source, logo in tool_logos.items() %}<h3><a href="{{ logo.source }}" target="_blank" rel="noopener noreferrer">{{ source }} — original asset</a></h3><a href="{{ logo.license_source }}" target="_blank" rel="noopener noreferrer">Original licence notice</a><pre>{{ logo.notice }}</pre>{% endfor %}</details>{% endif %}<p>Recorded outcomes: {{ facts.counts_line }}. Summary totals cover the saved scan and do not change when you filter this page.</p>
 <p>Results are automated signals within each adapter’s scope. A returned URL may be constructed, and identical usernames may belong to different people. An “enricher” classification does not guarantee additional fields. Verify a result before relying on it.</p>
 <p>This report works offline. Search and filtering stay in your browser. Links and image initials open external pages only when you select them.</p>
-<div class="society-lockup"><img class="society-logo" src="{{ identity.logo }}" alt="{{ identity.name }} logo"></div>
-<p class="project-brand"><span class="project-mark" role="img" aria-label="Consensus logo"></span><strong>Consensus by {{ identity.name }}</strong></p>
+<div class="project-brand"><span class="project-mark" role="img" aria-label="Consensus logo"></span><p>By the <a href="{{ identity.links[0][1] }}" target="_blank" rel="noopener noreferrer">{{ identity.name }}</a></p></div>
 <p class="slogan">{{ identity.slogan }}</p><p class="brand-description">{{ identity.description }}</p><p class="update-note">{{ identity.update_note }}</p>
 {{ community() }}
 <p class="notice"><strong>Health &amp; lawful use.</strong> {{ identity.warning }}</p>

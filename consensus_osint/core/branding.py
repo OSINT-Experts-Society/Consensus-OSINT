@@ -67,16 +67,15 @@ EXAMPLES = (
 
 @lru_cache(maxsize=1)
 def logo_data_uri() -> str:
-    """Embed the shipped, owner-supplied logo; reports never fetch it remotely."""
-    path = Path(__file__).resolve().parents[1] / "templates" / "society-logo.png"
-    return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+    """Embed the current README wordmark; reports never fetch it remotely."""
+    path = Path(__file__).resolve().parents[1] / "templates" / "consensus-wordmark-dark.svg"
+    return "data:image/svg+xml;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
 
 
 @lru_cache(maxsize=1)
 def project_mark_data_uri() -> str:
-    """Reuse the installed Consensus tab mark without a remote image request."""
-    path = Path(__file__).resolve().parents[1] / "templates" / "consensus-icon.png"
-    return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+    """Keep report branding aligned with the current product wordmark."""
+    return logo_data_uri()
 
 
 def report_identity() -> dict:

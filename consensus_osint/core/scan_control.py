@@ -6,6 +6,26 @@ import contextlib
 import contextvars
 import os
 import sys
+import time
+from collections import deque
+
+from prompt_toolkit.input.vt100_parser import Vt100Parser
+
+
+class _ScanKeys:
+    """Distinguish a standalone Escape from arrow/function escape sequences."""
+    def __init__(self):
+        self.pending = deque()
+        self.deadline = 0
+        self.parser = Vt100Parser(lambda key: self.pending.append(key.data) if len(key.data) == 1 else None)
+
+    def read(self, data):
+        if data:
+            self.parser.feed(data)
+            self.deadline = time.monotonic() + .05
+        elif time.monotonic() >= self.deadline:
+            self.parser.flush()
+        return self.pending.popleft() if self.pending else ""
 
 _active = contextvars.ContextVar("consensus_scan_control", default=None)
 
@@ -72,11 +92,11 @@ def _key_reader():
     before = termios.tcgetattr(descriptor)
     try:
         tty.setcbreak(descriptor)
+        keys = _ScanKeys()
 
         def read():
-            if select.select([descriptor], [], [], 0)[0]:
-                return os.read(descriptor, 1).decode("ascii", errors="ignore")
-            return ""
+            data = os.read(descriptor, 4096).decode("ascii", errors="ignore") if select.select([descriptor], [], [], 0)[0] else ""
+            return keys.read(data)
         yield read
     finally:
         termios.tcsetattr(descriptor, termios.TCSADRAIN, before)
@@ -92,7 +112,7 @@ def handle_key(key, control, owner, printer):
     elif key in ("r", "c") and control.paused:
         control.resume()
         printer.scan_state("Scanning", "Continuing scan. P pauses, S stops.")
-    elif key in ("s", "\x03") and not control.stopping:
+    elif key in ("s", "\x03", "\x1b") and not control.stopping:
         control.stop()
         printer.scan_state("Stopping", "Stopping; keeping collected results while active checks clean up.")
         owner.cancel()
@@ -126,7 +146,7 @@ async def scan_controls(printer):
                 if read is not None:
                     owner = asyncio.current_task()
                     preview = "V show/hide hit preview · " if printer.console and printer.console.is_interactive else ""
-                    printer.message("Keys during scan: " + preview + "P pause · R continue · S stop · Ctrl+C stop.", "dim")
+                    printer.message("Keys during scan: " + preview + "P pause · R continue · S / Esc stop · Ctrl+C stop.", "dim")
 
                     async def listen():
                         while not control.stopping:

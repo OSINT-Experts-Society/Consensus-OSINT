@@ -10,6 +10,7 @@ import contextlib
 import contextvars
 import os
 import queue
+import random
 import re
 import threading
 import time
@@ -18,6 +19,20 @@ from .session_info import SessionInfo
 
 _current = contextvars.ContextVar("consensus_terminal_ui", default=None)
 _controls = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+_SCAN_TIPS = (
+    "A shared username is a lead, not proof that accounts share an owner.",
+    "Compare names, biographies and linked websites before joining identities.",
+    "Blocked or timed-out lookups are inconclusive, not proof of no account.",
+    "Check when a profile was last active; old information can mislead.",
+    "A signup or availability signal may not mean a public profile exists.",
+    "Open enriched fields to see what a site actually returned.",
+    "Save JSON to keep results for later reports without another search.",
+    "Project coverage shows where a lookup is listed, not extra confirmations.",
+    "Use known test accounts to check a tool's positive and negative results.",
+    "Keep unrelated people separate when comparing bulk-search results.",
+    "A profile's linked website can provide context for checking a match.",
+    "Keep source links and collection dates with notes you plan to share.",
+)
 
 
 def current_ui():
@@ -109,6 +124,8 @@ class TerminalUI:
         self.network_route = None
         self.network_checked = 0.0
         self.results_view = None
+        self.scan_tips = list(_SCAN_TIPS)
+        self.tip_started = None
 
     def refresh_network(self, proxy=None):
         if not self.network_enabled or self.loop is None:
@@ -187,6 +204,8 @@ class TerminalUI:
         self.update("Scanning", total=total, completed=0)
 
     def begin_scan(self):
+        random.shuffle(self.scan_tips)
+        self.tip_started = time.monotonic()
         self.update("Preparing search", preparing=True, found=0, enriched=0,
                     completed=0, total=0, sources=(), preview=None, last_hit=0.0)
 
@@ -199,6 +218,9 @@ class TerminalUI:
     def attach_scan(self, control, owner, printer):
         from .scan_preview import HitPreview
 
+        if self.tip_started is None:
+            random.shuffle(self.scan_tips)
+            self.tip_started = time.monotonic()
         self.update("Preparing search" if self.preparing else "Scanning", preparing=False,
                     controller=(asyncio.get_running_loop(), control, owner, printer),
                     found=0, enriched=0, completed=0, total=0, sources=(), preview=HitPreview(), last_hit=0.0)
@@ -206,6 +228,7 @@ class TerminalUI:
             self.key("s")
 
     def detach_scan(self):
+        self.tip_started = None
         self.update("Preparing results", controller=None, preparing=False, stop_requested=False, preview=None, last_hit=0.0)
 
     def toggle_preview(self):
@@ -227,7 +250,7 @@ class TerminalUI:
                 except RuntimeError:
                     if not loop.is_closed():
                         raise
-        elif key in ("s", "\x03"):
+        elif key in ("s", "\x03", "\x1b"):
             self.stop_requested = True
 
     def footer_text(self, width):
@@ -284,14 +307,20 @@ class TerminalUI:
             credit = ""
             if self.controller and self.sources:
                 index = int(time.monotonic() / 2) if moving else 0
-                credit = "Plan includes: " + self.sources[index % len(self.sources)]
+                credit = "Projects combined: " + self.sources[index % len(self.sources)]
         width = max(1, width - 2)
         side = max(26, (width - 4) // 3)
         if width >= 76 and (not scanning or cell_len(counts) <= side):
             centre = width - 2 * side - 4
             if scanning:
                 progress = gauge(centre)[-1] if total else "Preparing site checks"
-                lines = [row(status, progress, counts), row(credit, path_text(centre), version)]
+                credit_width = min(max(side, cell_len(credit)), width - len(version) - 12)
+                path_width = width - credit_width - len(version) - 4
+                credit_text = fit(credit, credit_width)
+                location = path_text(path_width)
+                lines = [row(status, progress, counts),
+                         credit_text + " " * (credit_width - cell_len(credit_text) + 2)
+                         + location + " " * (path_width - cell_len(location) + 2) + version]
             else:
                 lines = [row(status, path_text(centre), version)]
         elif scanning:
@@ -376,7 +405,7 @@ class TerminalUI:
             prefix.append(("class:loading", "\n" + body.plain + "\n"))
         if scan_preview is not None:
             footer_rows = len(self.footer_text(width).splitlines())
-            limit = min(5, max(1, (height - footer_rows - 7) // 2))
+            limit = min(5, max(1, (height - footer_rows - 9) // 2))
             preview = scan_preview.text(max(1, width - 2), limit)
             if preview:
                 prefix.append(("class:preview", preview + "\n"))
@@ -390,7 +419,14 @@ class TerminalUI:
             label = " › " if self.question == "consensus> " else " " + clean(self.question)
             return prefix + [("class:prompt", label)]
         if self.controller is not None:
-            return prefix + [("class:hint", "V preview · P pause · R continue · S stop")]
+            controls = [("class:hint", "V preview · P pause · R continue · S / Esc stop")]
+            if height >= 20 and width >= 40 and self.tip_started is not None:
+                import textwrap
+
+                index = int(max(0, time.monotonic() - self.tip_started) // 15) % len(self.scan_tips)
+                tip = textwrap.fill("OSINT tip: " + self.scan_tips[index], width=max(1, width - 2), max_lines=2, placeholder="...")
+                controls.append(("class:hint", "\n\n" + tip))
+            return prefix + controls
         return prefix + [("class:hint", "Please wait…")]
 
     def read(self, question):
@@ -529,6 +565,11 @@ class TerminalUI:
         def dismiss_completion(event):
             event.current_buffer.cancel_completion()
 
+        @keys.add("escape", eager=True, filter=Condition(
+            lambda: not self.reading and (self.controller is not None or self.preparing)))
+        def stop_scan(event):
+            self.key("\x1b")
+
         for key in ("p", "P", "r", "R", "c", "C", "s", "S", "v", "V"):
             def control(event, key=key):
                 self.key(key.lower())
@@ -553,6 +594,9 @@ class TerminalUI:
                                   "loading": "#ff6a00",
                                   "hint": "#888888"}))
         self.session.default_buffer.read_only = Condition(lambda: not self.reading)
+        # A burst of finished checks must not trigger a full terminal redraw per
+        # result. Counters still update immediately; rendering stays responsive.
+        self.session.app.min_redraw_interval = 1 / 15
         # PromptSession's built-in Frame otherwise fills every spare row above
         # the toolbar. Bound that frame, while keeping its native input/completions.
         self.session.layout.container.children[0].content.height = self.input_height

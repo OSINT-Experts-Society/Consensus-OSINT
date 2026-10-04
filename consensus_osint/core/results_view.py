@@ -30,6 +30,7 @@ class ResultsView:
         self.fragments = []
         self.scrollbar_height = 1
         self.scrollbar_drag = None
+        self._footer_cache = None
         keys = KeyBindings()
         view = self
 
@@ -83,7 +84,7 @@ class ResultsView:
         for key, delta in (("up", -1), ("down", 1), ("k", -1), ("j", 1)):
             keys.add(key)(lambda event, delta=delta: self.move(delta))
         for key, direction in (("pageup", -1), ("pagedown", 1), (" ", 1)):
-            keys.add(key)(lambda event, direction=direction: self.move(direction * max(1, self.app.output.get_size().rows - len(self.footer().splitlines()) - 1)))
+            keys.add(key)(lambda event, direction=direction: self.move(direction * max(1, self.visible_height() - 1)))
 
         @keys.add("home")
         def top(event):
@@ -102,19 +103,36 @@ class ResultsView:
         def enter(event):
             if self.selected is not None:
                 self.activate(self.links[self.selected][0])
-            else:
-                self.back()
 
-        for key in ("escape", "q", "c-c", "c-d"):
+        # Escape only navigates back within results. Repeated Escape must not
+        # dismiss the table; leaving it is a separate, labelled action.
+        keys.add("escape")(lambda event: self.back(close=False))
+        keys.add("b")(lambda event: self.back(close=False))
+        for key in ("q", "c-c", "c-d"):
             keys.add(key)(lambda event: self.back())
+        self.header = Window(FormattedTextControl(self.navigation), height=1, style="class:footer")
         self.app = Application(layout=Layout(HSplit([
+            self.header,
             VSplit([self.window, self.scrollbar]),
             Window(FormattedTextControl(self.footer), height=lambda: len(self.footer().splitlines()), style="class:footer")
         ])), key_bindings=keys, full_screen=True, mouse_support=True, input=input, output=output,
-            min_redraw_interval=1 / 30,
+            min_redraw_interval=1 / 30, before_render=lambda app: self._clear_footer(),
             style=Style.from_dict({"footer": "bg:#252525 #ff6a00", "selected-link": "reverse",
                                   "scrollbar.arrow": "#ff6a00 bold", "scrollbar.thumb": "#ff6a00",
                                   "scrollbar.track": "#777777"}))
+
+    def _clear_footer(self):
+        self._footer_cache = None
+
+    def navigation(self):
+        def click(event):
+            if event.event_type == MouseEventType.MOUSE_UP:
+                self.back()
+                return None
+            return NotImplemented
+
+        label = " Back to results [Esc / B] " if self.history else " Back to menu [Q] "
+        return [("bold underline", label, click)]
 
     def move(self, delta):
         self.selected = None
@@ -151,9 +169,13 @@ class ResultsView:
         self.app.invalidate()
         return None
 
+    def visible_height(self):
+        # Footer state is sampled once per frame, not for every queued wheel
+        # event. Fast input can advance the viewport without reformatting it.
+        return max(1, self.app.output.get_size().rows - len(self.footer().splitlines()) - 1)
+
     def last_page(self):
-        visible = max(1, self.app.output.get_size().rows - len(self.footer().splitlines()))
-        return max(0, len(self.lines) - visible)
+        return max(0, len(self.lines) - self.visible_height())
 
     def select_link(self, delta):
         if not self.links:
@@ -165,9 +187,11 @@ class ResultsView:
     def activate(self, url):
         if url.startswith("consensus-detail:") and self.detail:
             key = url.partition(":")[2]
-            self.history.append((self.render, self.line, self.selected))
+            self.history.append((self.render, self.line, self.selected, self.width,
+                                 self.lines, self.fragments, self.links))
             self.render = lambda width: self.detail(key, width)
             self.width, self.line, self.selected = None, 0, None
+            self._clear_footer()
         else:
             from .reports import _safe_http_url
 
@@ -178,12 +202,13 @@ class ResultsView:
                 webbrowser.open(safe)
         self.app.invalidate()
 
-    def back(self):
+    def back(self, *, close=True):
         if self.history:
-            self.render, self.line, self.selected = self.history.pop()
-            self.width = None
+            (self.render, self.line, self.selected, self.width,
+             self.lines, self.fragments, self.links) = self.history.pop()
+            self._clear_footer()
             self.app.invalidate()
-        else:
+        elif close:
             self.app.exit()
 
     def _linked_fragments(self, rendered):
@@ -234,17 +259,21 @@ class ResultsView:
         return compact
 
     def prepare(self, width):
+        previous_line = self.line
         width = max(1, width)
         if width != self.width:
             self.width = width
             self.fragments = self._linked_fragments(self.render(width))
             self.lines = list(split_lines(self.fragments))
+            self._clear_footer()
             if self.selected is not None and self.selected < len(self.links):
                 self.line = min(self.links[self.selected][1], self.last_page())
         if self.follow_end:
             self.line = self.last_page()
             self.follow_end = False
         self.line = min(self.line, self.last_page())
+        if self.line != previous_line:
+            self._clear_footer()
         if self.selected is None or self.selected >= len(self.links):
             self.selected = None
             return
@@ -263,13 +292,18 @@ class ResultsView:
         import textwrap
 
         width = self.app.output.get_size().columns
-        destination = "table" if self.history else "menu"
-        controls = (f" ↑↓ / PgUp/PgDn · Home/End · Tab selects link · Enter opens · Esc: {destination}" if width >= 90 else
-                    f" ↑↓ / PgUp/PgDn · Home/End\n Tab: link · Enter: open/back · Esc: {destination}")
-        text = f" Results · line {self.line + 1} of {len(self.lines)}\n" + controls
+        if self._footer_cache is not None and self._footer_cache[0] == width:
+            return self._footer_cache[1]
+        destination = "Esc: back to results" if self.history else "Q: back to menu"
+        controls = (f" ↑↓ / PgUp/PgDn · Home/End · Tab: link · Enter: open · {destination}" if width >= 100 else
+                    f" ↑↓ / PgUp/PgDn · Home/End\n Tab: link · Enter: open · {destination}")
+        title = "Details" if self.history else "Results"
+        text = f" {title} · line {self.line + 1} of {len(self.lines)}\n" + controls
         text += "\n" + self.context(width) if self.context else ""
-        return "\n".join(wrapped for line in text.splitlines()
-                         for wrapped in (textwrap.wrap(line, width=max(1, width - 1)) or [""]))
+        result = "\n".join(wrapped for line in text.splitlines()
+                           for wrapped in (textwrap.wrap(line, width=max(1, width - 1)) or [""]))
+        self._footer_cache = (width, result)
+        return result
 
     async def run(self):
         try:

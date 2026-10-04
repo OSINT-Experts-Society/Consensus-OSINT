@@ -133,13 +133,15 @@ class Printer:
         self.session_information()
         self.command_menu()
 
-    def home(self, version: str, *, has_results=False) -> None:
+    def home(self, version: str, *, has_results=False, saved_report=None) -> None:
         """Interactive home sized to the actual input terminal, including footer."""
         if self.quiet or self.jsonl:
             return
         from .session_info import SessionInfo
 
         info = self.terminal_ui.info if self.terminal_ui else SessionInfo.current()
+        if saved_report and self.terminal_ui:
+            self.terminal_ui.update("Report saved", last_report=Path(saved_report).resolve())
         if self.console:
             from .home import home_page
             from .terminal_ui import input_rows
@@ -147,12 +149,22 @@ class Printer:
             size = self.terminal_ui.session.app.output.get_size() if self.terminal_ui else self.console.size
             width = size.columns if self.terminal_ui else size.width
             height = size.rows if self.terminal_ui else size.height
+            if saved_report and self.terminal_ui:
+                self.console.clear()
             footer = getattr(self.terminal_ui, "footer_text", None)
-            page = home_page(info, width=width, height=height, version=version,
+            page = home_page(info, width=width, height=height - bool(saved_report), version=version,
                              history=self.terminal_ui is not None, has_results=has_results,
                              input_rows=input_rows(width, height) if self.terminal_ui else 1,
                              footer_rows=len(footer(width).splitlines()) if footer else None)
             self.console.print(page, soft_wrap=True)
+            if saved_report:
+                from rich.style import Style
+
+                path = Path(saved_report).resolve()
+                notice = Text("Report saved: " + path.name, style=f"bold {ACCENT}")
+                notice.truncate(max(1, width - 1), overflow="ellipsis")
+                notice.stylize(Style(link=path.as_uri()), 0, len(notice))
+                self.console.print(notice, soft_wrap=True)
         else:
             self.message(f"[OES] CONSENSUS {version} · By {ORGANIZATION}\n{SLOGAN}\n"
                          "Weekly catalogue updates from major lookup repositories.\n"

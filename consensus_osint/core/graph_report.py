@@ -70,6 +70,7 @@ def graph_data(summary, include_all=False):
 
 
 def render_graph(summary, include_all=False):
+    from .branding import report_identity
     from .sitesdb import DATA_DIR
 
     env = Environment(
@@ -79,4 +80,4 @@ def render_graph(summary, include_all=False):
     # and HTML metacharacters even when a provider supplies hostile metadata.
     payload = json.dumps(graph_data(summary, include_all), ensure_ascii=True, allow_nan=False)
     payload = payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
-    return env.get_template("graph.html.j2").render(graph_json=payload)
+    return env.get_template("graph.html.j2").render(graph_json=payload, identity=report_identity())

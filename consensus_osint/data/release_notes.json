@@ -2,6 +2,24 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.2.6",
+      "previous_version": "0.2.5",
+      "new_modules": [],
+      "bug_fixes": [
+        "scan-task-resources: Bound scheduled checks and finish cleanup even after repeated cancellation.",
+        "scan-console-redraws: Limit progress redraws during bursts of completed checks.",
+        "fast-scroll-footer: Avoid formatting the status footer for every wheel event.",
+        "results-return-navigation: Keep a visible Back control and prevent repeated Escape from dismissing results.",
+        "report-save-home: Restore the full home screen and a concise saved-file link after export.",
+        "report-branding-current: Use the current Consensus wordmark and Society endorsement in HTML, graph and PDF reports."
+      ],
+      "other_changes": [
+        "clear-result-evidence: Name coverage projects, explain possible matches, and separate enrichment fields from values.",
+        "escape-stops-scan: Support Escape alongside S to stop a scan and retain collected results.",
+        "scan-osint-tips: Rotate local OSINT tips during searches and label source credits Projects combined."
+      ]
+    },
+    {
       "version": "0.2.5",
       "previous_version": "0.2.4",
       "new_modules": [],

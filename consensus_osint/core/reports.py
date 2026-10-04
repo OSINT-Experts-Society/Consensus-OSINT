@@ -1143,8 +1143,8 @@ def render_pdf(summary: ScanSummary, include_all: bool = False) -> bytes:
         title="Consensus report", author=GENERATOR, subject=facts["queries"],
     )
     w = doc.width
-    logo_panel = table([[Image(str(TEMPLATES_DIR / "society-logo.png"), width=200, height=60.7)]], [w])
-    logo_panel.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#0e0f11"))]))
+    logo_panel = Image(str(TEMPLATES_DIR / "consensus-report-wordmark.png"), width=224, height=56)
+    logo_panel.hAlign = "LEFT"
     story: list = [
         logo_panel,
         P("Consensus report", h1),
