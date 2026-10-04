@@ -1,6 +1,7 @@
 """Persistent, line-based terminal session over the existing CLI commands."""
 from __future__ import annotations
 
+import os
 import re
 import shlex
 import sys
@@ -419,6 +420,18 @@ class Session:
             self.menu()
         self.printer.message("\nConsensus closed. Saved reports remain available.")
         return 0
+
+
+def prepare_screen():
+    """Start the home screen at the top of an interactive terminal viewport."""
+    if not terminal_available() or os.environ.get("TERM", "").lower() == "dumb":
+        return
+    from prompt_toolkit.output.defaults import create_output
+
+    output = create_output(stdout=sys.stdout)
+    output.erase_screen()
+    output.cursor_goto(0, 0)
+    output.flush()
 
 
 def start_session(*, color=True, footer=True, animate=True):

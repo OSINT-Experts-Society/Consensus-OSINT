@@ -1654,8 +1654,9 @@ def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_se
 
         if not in_session and not any(a in ("-h", "--help") for a in raw_argv) and terminal_available():
             from .core.app_update import startup_notice
-            from .core.interactive import start_session
+            from .core.interactive import prepare_screen, start_session
 
+            prepare_screen()
             startup_notice(disabled=no_update_check)
             options = {"footer": False} if "--no-footer" in raw_argv else {}
             if "--no-animation" in raw_argv:
@@ -1685,6 +1686,10 @@ def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_se
             pass
     cmd = args.cmd or "scan"
     try:
+        if not in_session and cmd == "shell":
+            from .core.interactive import prepare_screen
+
+            prepare_screen()
         if not in_session and cmd in ("scan", "user", "email", "phone", "shell"):
             from .core.app_update import startup_notice
 
