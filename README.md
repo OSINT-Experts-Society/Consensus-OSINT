@@ -159,6 +159,8 @@ For PDF reports or MCP support, install the extras you need: `python -m pip inst
 
 ## Join the community
 
+**Want your OSINT project evaluated for inclusion in Consensus?** [Contact the OSINT Experts Society](https://osint.ngo).
+
 Help shape Consensus: share feedback, suggest a site or [report an issue](https://github.com/OSINT-Experts-Society/Consensus-OSINT/issues).
 
 Connect with the **OSINT Experts Society** on [our website](https://osint.ngo), [LinkedIn](https://www.linkedin.com/groups/13047129/) and [Reddit](https://www.reddit.com/r/OSINTExperts/).
