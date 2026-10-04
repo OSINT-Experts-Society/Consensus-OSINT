@@ -40,6 +40,11 @@ def clean(value):
     return _controls.sub(" ", str(value))
 
 
+def input_rows(width, height):
+    """Reserve a framed input line where the viewport has room for it."""
+    return 3 if width >= 40 and height >= 18 else 1
+
+
 @contextlib.contextmanager
 def _output_proxy():
     """Preserve the active UI context when the output-flush thread schedules redraws.
@@ -323,6 +328,35 @@ class TerminalUI:
         width = self.session.app.output.get_size().columns if self.session else 80
         return [("class:footer", self.footer_text(width))]
 
+    def input_framed(self):
+        size = self.session.app.output.get_size() if self.session else None
+        if self.session and not self.session.app.renderer.height_is_known:
+            return False
+        return self.reading and input_rows(size.columns if size else 80, size.rows if size else 24) == 3
+
+    def placeholder(self):
+        if not self.reading or self.question != "consensus> ":
+            return []
+        width = self.session.app.output.get_size().columns if self.session else 80
+        hint = ("Username, email or phone · / commands" if width >= 48 else
+                "Search or / commands" if width >= 28 else "Search")
+        return [("class:placeholder", hint)]
+
+    def input_height(self):
+        """Keep the frame compact; allow a few lines for pasted identifiers."""
+        from prompt_toolkit.formatted_text import fragment_list_to_text
+        from prompt_toolkit.layout import Dimension
+        from prompt_toolkit.utils import get_cwidth
+
+        size = self.session.app.output.get_size()
+        value = fragment_list_to_text(self.prompt()) + self.session.default_buffer.text
+        width = max(1, size.columns - 2)
+        rows = sum(max(1, (get_cwidth(line) + width - 1) // width) for line in value.split("\n"))
+        completion = self.session.default_buffer.complete_state
+        if completion is not None:
+            rows += min(8, len(completion.completions))
+        return Dimension(max=min(max(1, size.rows - 4), rows + 2))
+
     def prompt(self):
         prefix = []
         size = self.session.app.output.get_size() if self.session else None
@@ -351,9 +385,10 @@ class TerminalUI:
             # below the cursor. Some terminals never provide that information.
             # Keep progress visible beside the input instead of losing it.
             width = self.session.app.output.get_size().columns
-            prefix += [("class:footer", self.footer_text(width) + "\n")]
+            prefix += [("class:footer", self.footer_text(width - 2 if self.input_framed() else width) + "\n")]
         if self.reading:
-            return prefix + [("class:prompt", clean(self.question))]
+            label = " › " if self.question == "consensus> " else " " + clean(self.question)
+            return prefix + [("class:prompt", label)]
         if self.controller is not None:
             return prefix + [("class:hint", "V preview · P pause · R continue · S stop")]
         return prefix + [("class:hint", "Please wait…")]
@@ -468,7 +503,8 @@ class TerminalUI:
                 value = event.current_buffer.text
                 from .models import redact_options
 
-                echo = redact_options({"error": self.question + value})["error"]
+                label = "› " if self.question == "consensus> " else self.question
+                echo = redact_options({"error": label + value})["error"]
                 print(clean(echo))
                 if self.question == "consensus> ":
                     self._remember_command(value)
@@ -504,15 +540,22 @@ class TerminalUI:
             return self.reading and self.question == "consensus> "
         self.session = PromptSession(
             message=self.prompt, bottom_toolbar=self.toolbar, key_bindings=keys,
+            show_frame=Condition(self.input_framed), placeholder=self.placeholder,
             completer=completer(slash_enabled), complete_while_typing=Condition(slash_enabled),
             refresh_interval=.3, erase_when_done=True, history=self.command_history,
             reserve_space_for_menu=0, input=self.input, output=self.output,
             style=Style.from_dict({"bottom-toolbar": "noreverse bg:#252525 #ff6a00",
                                   "footer": "noreverse bg:#252525 #ff6a00", "prompt": "#ff6a00 bold",
                                   "preview": "#dddddd",
+                                  "frame": "bg:#202020 #eeeeee",
+                                  "frame.border": "#666666",
+                                  "placeholder": "#888888 nobold",
                                   "loading": "#ff6a00",
                                   "hint": "#888888"}))
         self.session.default_buffer.read_only = Condition(lambda: not self.reading)
+        # PromptSession's built-in Frame otherwise fills every spare row above
+        # the toolbar. Bound that frame, while keeping its native input/completions.
+        self.session.layout.container.children[0].content.height = self.input_height
         worker = None
         token = _current.set(self)
         try:
@@ -539,7 +582,8 @@ class TerminalUI:
                     worker = asyncio.create_task(work())
 
                 try:
-                    return await self.session.prompt_async(pre_run=start, handle_sigint=False)
+                    return await self.session.prompt_async(pre_run=start, handle_sigint=False,
+                                                           show_frame=Condition(self.input_framed))
                 except EOFError:
                     return 0
                 finally:

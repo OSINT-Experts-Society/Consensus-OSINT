@@ -10,75 +10,59 @@ from .terminal_ui import clean
 
 
 def action_panels(width, *, has_results=False):
-    """Shared home/after-action menu, with optional dividers in short windows."""
-    available = min(118, width - 2)
-    panel_width = (available - 2) // 2
-    inset = " " if panel_width >= 24 else ""
-    inside = panel_width - 2 - 2 * len(inset)
-
-    def edge(title="", first="╭", last="╮"):
-        label = " " + title + " " if title else ""
-        value = Text(first, style="dim")
-        value.append(label, style="bold not dim" if title else "dim")
-        value.append("─" * max(0, panel_width - len(label) - 2) + last, style="dim")
-        return value
+    """Quiet two-column actions; spacing and typography carry the hierarchy."""
+    inset = 4 if width >= 78 else 3
+    available = min(112, width - inset * 2)
+    gap = 8 if width >= 100 else 6 if width >= 70 else 2
+    columns = max(1, (available - gap) // 2)
 
     def item(number, label, description, short, *, inactive=False):
         content = Text(number + "  " + label, style="dim" if inactive else "default not dim")
         if not inactive:
             content.stylize(f"bold {ACCENT}", 0, 1)
-        hint_start = 19 if inside >= 38 else 16
-        room = inside - hint_start
+        hint_start = 20 if columns >= 42 else 16
+        room = columns - hint_start
         hint = description if len(description) <= room else short
-        if room >= len(hint):
+        if hint and room >= len(hint):
             content.append(" " * max(1, hint_start - content.cell_len))
             content.append(hint, style="dim")
-        content.truncate(max(1, inside), overflow="ellipsis")
         return content
 
-    def body(content):
-        content = content.copy()
-        content.truncate(max(1, inside), overflow="ellipsis")
-        value = Text("│" + inset, style="dim")
-        value.append(content)
-        value.append(" " * max(0, inside - content.cell_len) + inset + "│", style="dim")
-        return value
-
     def pair(left, right, optional=0):
-        value = Text(" ")
+        left, right = left.copy(), right.copy()
+        left.truncate(columns, overflow="ellipsis")
+        right.truncate(columns, overflow="ellipsis")
+        value = Text(" " * inset)
         value.append(left)
-        value.append("  ")
+        value.append(" " * max(gap, columns - left.cell_len + gap))
         value.append(right)
         return value, optional
 
     search = [item("1", "Username", "Find matching profiles", "Matching profiles"),
               item("2", "Email", "Find linked accounts", "Linked accounts"),
               item("3", "Phone", "Check number details", "Number details"),
-              item("4", "Bulk search", "Search a list of identifiers", "Search a list")]
-    hint = "Run a search first"
-    results = [item("5", "View results", "Reopen your latest search" if has_results else hint,
-                    "Latest search" if has_results else hint, inactive=not has_results),
-               item("6", "Save report", "Export your latest results" if has_results else hint,
-                    "Export results" if has_results else hint, inactive=not has_results),
+              item("4", "Bulk search", "Search a list of identifiers", "Search a list"),
+              item("8", "Examples", "See example searches", "Sample searches")]
+    results = [item("5", "View results", "Reopen your latest search" if has_results else "",
+                    "Latest search" if has_results else "", inactive=not has_results),
+               item("6", "Save report", "Export your latest results" if has_results else "",
+                    "Export results" if has_results else "", inactive=not has_results),
                item("7", "Settings", "Adjust search preferences", "Preferences"),
-               Text("" if has_results or inside >= 34 else "Search first", style="dim")]
-    rows = [pair(edge("Start a search"), edge("Results & settings" if panel_width >= 24 else "Results/setup"))]
-    for index, (left, right) in enumerate(zip(search, results, strict=True)):
-        if index:
-            rows.append(pair(edge(first="├", last="┤"), edge(first="├", last="┤"), 2))
-        rows.append(pair(body(left), body(right)))
-    rows.append(pair(edge(first="╰", last="╯"), edge(first="╰", last="╯")))
-    tools = Text(" ")
-    for number, label in (("8", "Show Examples"), ("9", "Help"), ("0", "Exit")):
-        if len(tools) > 1:
-            tools.append("   ")
-        tools.append(number, style=f"bold {ACCENT}")
-        tools.append("  " + label)
-    rows.append((tools, 0))
+               item("9", "Help", "Browse commands", "Commands"),
+               item("0", "Exit", "End session", "Close")]
+    rows = [pair(Text("Start a search", style="bold"),
+                 Text("Results & settings" if columns >= 18 else "Results/setup", style="bold")),
+            pair(Text("─" * min(columns, 24), style="dim"), Text("─" * min(columns, 24), style="dim"), 2),
+            (Text(""), 1)]
+    rows.extend(pair(left, right) for left, right in zip(search, results, strict=True))
+    rows.append((Text(""), 1))
+    if not has_results:
+        hint = "Results: Run a search first" if columns >= 26 else "Run a search first" if columns >= 18 else "Search first"
+        rows.append(pair(Text(""), Text(hint, style="dim")))
     return rows
 
 
-def home_page(info, *, width, height, version, history=False, footer_rows=None, has_results=False):
+def home_page(info, *, width, height, version, history=False, footer_rows=None, has_results=False, input_rows=1):
     """Framed identity, aligned actions and one clear input invitation.
 
     Reserve the actual responsive footer, input and cursor. Full metadata and
@@ -90,7 +74,7 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None, 
     padding = 2 if wide else 1
     content_width = frame_width - 2 - 2 * padding
     footer_rows = footer_rows if footer_rows is not None else (2 if terminal_width >= 78 else 3)
-    budget = max(1, height - footer_rows - 2)
+    budget = max(1, height - footer_rows - input_rows - 1)
     rows = []
     metadata = dict(info.rows())
 
@@ -128,7 +112,7 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None, 
             value = "…" + tail
         row = Text(f"{label:<{label_width}}", style="dim")
         row.append(value, style=Style(link=path.as_uri(), dim=False))
-        add(row, framed=True)
+        add(row, optional=3, framed=True)
 
     title = Text("Consensus", style="bold default")
     title.append(" v" + clean(version), style="dim")
@@ -193,7 +177,8 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None, 
                       "Auto-detect input · / commands", style="dim")
     if history and invitation.cell_len + 22 <= content_width:
         invitation.append("  ↑↓ previous commands", style="dim not bold")
-    add(invitation, optional=4)
+    if input_rows == 1:
+        add(invitation, optional=4)
 
     # Remove spacing first, then supplementary copy in short windows. Frame
     # edges, actions and safety text are never selected here.
@@ -202,7 +187,7 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None, 
             break
         if rows[index][1] == 1:
             rows.pop(index)
-    for priority in (2, 4):
+    for priority in (2, 4, 3):
         if len(rows) > budget:
             rows = [(row, rank) for row, rank in rows if rank != priority]
     if len(rows) > budget or any(row.cell_len > terminal_width for row, _ in rows):
@@ -223,7 +208,7 @@ def _small_home(info, *, width, budget, version, has_results=False):
         column_width = (width - 2) // 2
         for first, second in (("1  Username", "5  View results"), ("2  Email", "6  Save report"),
                               ("3  Phone", "7  Settings"), ("4  Bulk search", "9  Help"),
-                              ("8  Show Examples", "0  Exit")):
+                              ("8  Examples", "0  Exit")):
             row = Text(first.ljust(column_width) + "  " + second)
             row.stylize(f"bold {ACCENT}", 0, 1)
             row.stylize(f"bold {ACCENT}", column_width + 2, column_width + 3)

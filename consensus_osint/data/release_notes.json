@@ -2,6 +2,15 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.2.3",
+      "previous_version": "0.2.2",
+      "new_modules": [],
+      "bug_fixes": [],
+      "other_changes": [
+        "calmer-actions: Space the action columns, group Examples with search and add a framed input field with placeholder guidance."
+      ]
+    },
+    {
       "version": "0.2.2",
       "previous_version": "0.2.1",
       "new_modules": [],

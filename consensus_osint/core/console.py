@@ -142,6 +142,7 @@ class Printer:
         info = self.terminal_ui.info if self.terminal_ui else SessionInfo.current()
         if self.console:
             from .home import home_page
+            from .terminal_ui import input_rows
 
             size = self.terminal_ui.session.app.output.get_size() if self.terminal_ui else self.console.size
             width = size.columns if self.terminal_ui else size.width
@@ -149,6 +150,7 @@ class Printer:
             footer = getattr(self.terminal_ui, "footer_text", None)
             page = home_page(info, width=width, height=height, version=version,
                              history=self.terminal_ui is not None, has_results=has_results,
+                             input_rows=input_rows(width, height) if self.terminal_ui else 1,
                              footer_rows=len(footer(width).splitlines()) if footer else None)
             self.console.print(page, soft_wrap=True)
         else:
@@ -156,7 +158,7 @@ class Printer:
                          "Weekly catalogue updates from major lookup repositories.\n"
                          "1 Username   2 Email   3 Phone   4 Bulk search\n"
                          "5 View results   6 Save report   7 Settings\n"
-                         "8 Show Examples   9 Help   0 Exit\n"
+                         "8 Examples   9 Help   0 Exit\n"
                          "Paste a username, email or phone below.\n"
                          "/ commands · /config settings · info: full paths\n"
                          "Bugs can occur. Use test accounts and verify findings.\n"
@@ -177,7 +179,7 @@ class Printer:
                 return
         self.message("1 Username · 2 Email · 3 Phone · 4 Bulk search")
         self.message("5 View results · 6 Save report · 7 Settings")
-        self.message("8 Show Examples · 9 Help · 0 Exit")
+        self.message("8 Examples · 9 Help · 0 Exit")
         if not has_results:
             self.message("5/6: Run a search first.", "dim")
 
@@ -257,7 +259,7 @@ class Printer:
         self.message("Ctrl+C stops a scan and keeps collected results.", "dim")
 
     def examples(self) -> None:
-        self.message("Consensus · Show Examples", f"bold {ACCENT}")
+        self.message("Consensus · Examples", f"bold {ACCENT}")
         self.message("These are commands to copy and edit; displaying this page does not run a search.")
         self.message(QUERY_GUIDANCE + "\n" + PHONE_GUIDANCE, "dim")
         if self.console:

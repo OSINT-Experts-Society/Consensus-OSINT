@@ -18,7 +18,7 @@ CHOICES = (
     ("1", "Username", "user"), ("2", "Email", "email"), ("3", "Phone", "phone"),
     ("4", "Bulk search", "bulk"), ("5", "View latest results", "last"),
     ("6", "Save latest report", "save"), ("7", "Settings", "settings"),
-    ("8", "Show Examples", "examples"), ("9", "Help", "help"), ("0", "Exit", "exit"),
+    ("8", "Examples", "examples"), ("9", "Help", "help"), ("0", "Exit", "exit"),
 )
 _DEFAULTS = {"details": False, "all": False, "fast": False, "no_breach": False, "timeout": None}
 _SETTINGS = (
