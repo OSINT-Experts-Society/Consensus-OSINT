@@ -4,6 +4,7 @@ from __future__ import annotations
 import io
 
 from rich import box
+from rich.cells import cell_len
 from rich.console import Console
 from rich.style import Style
 from rich.table import Table
@@ -53,26 +54,23 @@ def result_pages(summary, *, show_all=False, limit=0):
             coverage = {id(f): repository_coverage(f) for f in shown}
             projects = {p["id"]: p["name"] for values in coverage.values() for p in values}
             keys = sorted(projects)
-            site_width = min(26, max(12, max(len(clean(f.site)) for f in shown)))
-            # Use named matrix columns when they fit, otherwise a named list.
-            # Never repeat every result in multiple panels just to fit sources.
-            matrix = width >= 60 and site_width + 32 + sum(len(projects[k]) + 2 for k in keys) <= width
-            narrow = width < 60
-            table = Table(box=box.SIMPLE_HEAD, header_style=f"bold {ACCENT}", expand=True,
-                          padding=(0, 1), collapse_padding=True)
-            table.add_column("Site / result" if narrow else "Site", width=None if narrow else site_width,
-                             ratio=1 if narrow else None, overflow="fold")
-            if not narrow:
-                table.add_column("Result", width=18, overflow="fold")
-            if width >= 40:
-                table.add_column("Enriched", width=11)
-            if matrix:
-                for key in keys:
-                    table.add_column(projects[key], justify="center", min_width=len(projects[key]))
-            else:
-                table.add_column("Enriched / tools" if width < 40 else "Tools with this lookup", ratio=2, overflow="fold")
+            verdicts = {id(f): assessment(f) for f in shown}
+            result_width = max(6, min(20, max(cell_len("Possible match" if verdicts[id(f)][0] == "Needs review"
+                                                     else verdicts[id(f)][0]) for f in shown)))
+            # One separator cell, no expanding padding and no stacked coverage.
+            # Small windows pan across the same single-row matrix.
+            fixed_width = result_width + 8 + sum(cell_len(projects[k]) for k in keys) + len(keys) + 2
+            site_width = max(8, min(28, max(12, max(cell_len(clean(f.site)) for f in shown)), width - fixed_width))
+            table_width = site_width + fixed_width
+            table = Table(box=None, header_style=f"bold {ACCENT}", expand=False,
+                          padding=(0, 1, 0, 0), pad_edge=False)
+            table.add_column("Site", width=site_width, no_wrap=True, overflow="ellipsis")
+            table.add_column("Result", width=result_width, no_wrap=True, overflow="ellipsis")
+            table.add_column("Enriched", width=8, no_wrap=True)
+            for key in keys:
+                table.add_column(projects[key], width=cell_len(projects[key]), justify="center", no_wrap=True)
             for f in shown:
-                label, _, tone = assessment(f)
+                label, _, tone = verdicts[id(f)]
                 verdict = "Possible match" if label == "Needs review" else label
                 key = identifiers[id(f)]
                 profile, _ = result_link(f)
@@ -81,27 +79,13 @@ def result_pages(summary, *, show_all=False, limit=0):
                     site.stylize(Style(link=profile, underline=True), 0, len(site))
                 result = link(verdict, key) if label == "Needs review" else Text(verdict)
                 result.stylize("yellow" if tone == "warn" else "green" if f.status is Status.FOUND else "dim")
-                if narrow:
-                    site.append("\n")
-                    site.append(result)
-                cells = [site]
-                if not narrow:
-                    cells.append(result)
-                enriched = link("Yes · View" if width >= 40 else "View", key) if has_details(f) else Text("-", style="dim")
-                if width >= 40:
-                    cells.append(enriched)
+                cells = [site, result, link("View", key) if has_details(f) else Text("-", style="dim")]
                 sources = {p["id"] for p in coverage[id(f)]}
-                if matrix:
-                    cells.extend(Text("X" if k in sources else "-", style=ACCENT if k in sources else "dim") for k in keys)
-                else:
-                    tools = Text("\n".join("X " + projects[k] for k in keys if k in sources) or "Not recorded")
-                    if width < 40:
-                        enriched.append("\n")
-                        enriched.append(tools)
-                        tools = enriched
-                    cells.append(tools)
+                cells.extend(Text("X" if k in sources else "-", style=ACCENT if k in sources else "dim") for k in keys)
                 table.add_row(*cells)
-            out.print(table)
+            table_out, table_stream = console(max(width, table_width))
+            table_out.print(table)
+            stream.write(table_stream.getvalue())
             if any(not coverage[id(f)] for f in shown):
                 out.print(Text("Some rows have no saved project attribution; missing coverage is unknown.", style="dim"))
             if len(shown) < len(rows):

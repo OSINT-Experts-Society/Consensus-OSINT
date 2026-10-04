@@ -2,6 +2,19 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.2.7",
+      "previous_version": "0.2.6",
+      "new_modules": [],
+      "bug_fixes": [
+        "scrollbar-drag-capture: Keep thumb dragging responsive when the pointer leaves the narrow track.",
+        "results-home-restoration: Reset terminal geometry and redraw the full home after reviewing results."
+      ],
+      "other_changes": [
+        "single-row-project-matrix: Keep one row per hit with compact named project columns and horizontal navigation when needed.",
+        "results-navigation-toolbar: Provide prominent menu/back buttons and a compact two-line controls bar."
+      ]
+    },
+    {
       "version": "0.2.6",
       "previous_version": "0.2.5",
       "new_modules": [],

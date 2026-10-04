@@ -412,6 +412,12 @@ class Session:
                     tokens = tokens[1:]
                 if tokens and not self.dispatch(tokens):
                     break
+                ui = self.printer.terminal_ui
+                if ui is not None and ui.returned_from_results:
+                    ui.returned_from_results = False
+                    ui.update("Ready")
+                    self.printer.home(__version__, has_results=self.latest is not None, reset_screen=True)
+                    continue
                 if self._saved_report is not None:
                     self.printer.home(__version__, has_results=self.latest is not None, saved_report=self._saved_report)
                     self._saved_report = None

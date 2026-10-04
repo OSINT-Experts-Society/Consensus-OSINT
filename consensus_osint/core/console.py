@@ -133,7 +133,7 @@ class Printer:
         self.session_information()
         self.command_menu()
 
-    def home(self, version: str, *, has_results=False, saved_report=None) -> None:
+    def home(self, version: str, *, has_results=False, saved_report=None, reset_screen=False) -> None:
         """Interactive home sized to the actual input terminal, including footer."""
         if self.quiet or self.jsonl:
             return
@@ -149,7 +149,7 @@ class Printer:
             size = self.terminal_ui.session.app.output.get_size() if self.terminal_ui else self.console.size
             width = size.columns if self.terminal_ui else size.width
             height = size.rows if self.terminal_ui else size.height
-            if saved_report and self.terminal_ui:
+            if (saved_report or reset_screen) and self.terminal_ui:
                 self.console.clear()
             footer = getattr(self.terminal_ui, "footer_text", None)
             page = home_page(info, width=width, height=height - bool(saved_report), version=version,

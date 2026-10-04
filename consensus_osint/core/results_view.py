@@ -8,9 +8,9 @@ from prompt_toolkit.data_structures import Point
 from prompt_toolkit.formatted_text import ANSI, to_formatted_text
 from prompt_toolkit.formatted_text.utils import split_lines
 from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
+from prompt_toolkit.layout import HSplit, Layout, ScrollOffsets, VSplit, Window
 from prompt_toolkit.layout.controls import FormattedTextControl, UIContent, UIControl
-from prompt_toolkit.mouse_events import MouseEventType
+from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
 from prompt_toolkit.styles import Style
 from prompt_toolkit.utils import get_cwidth
 
@@ -25,6 +25,8 @@ class ResultsView:
         self.links = []
         self.selected = None
         self.line = 0
+        self.column = 0
+        self.document_width = 0
         self.width = None
         self.lines = [[]]
         self.fragments = []
@@ -41,9 +43,13 @@ class ResultsView:
             def create_content(self, width, height):
                 view.prepare(width)
                 return UIContent(get_line=view.display_line, line_count=len(view.lines),
-                                 cursor_position=Point(0, view.line), show_cursor=False)
+                                 cursor_position=Point(view.cursor_x(), view.line), show_cursor=False)
 
             def mouse_handler(self, event):
+                if view.scrollbar_drag is not None and event.event_type == MouseEventType.MOUSE_MOVE:
+                    # A held thumb keeps following when the pointer drifts
+                    # left off the one-cell track into the results document.
+                    return view.drag_at(event, event.position.y - view.window.vertical_scroll)
                 if event.event_type in (MouseEventType.SCROLL_UP, MouseEventType.SCROLL_DOWN):
                     view.move(-3 if event.event_type == MouseEventType.SCROLL_UP else 3)
                     view.app.invalidate()
@@ -57,10 +63,26 @@ class ResultsView:
                 if 0 <= event.position.y < len(view.lines):
                     x = 0
                     for fragment in view.lines[event.position.y]:
-                        x += get_cwidth(fragment[1])
+                        # Window already maps screen cells (including wide
+                        # glyphs and horizontal scroll) to character indices.
+                        x += len(fragment[1])
                         if event.position.x < x:
                             return fragment[2](event) if len(fragment) == 3 else NotImplemented
                 return NotImplemented
+
+        class BarControl(FormattedTextControl):
+            def __init__(self, text, *, above=False):
+                super().__init__(text)
+                self.above = above
+
+            def mouse_handler(self, event):
+                if view.scrollbar_drag is not None:
+                    if event.event_type == MouseEventType.MOUSE_MOVE:
+                        return view.drag_at(event, 0 if self.above else view.scrollbar_height)
+                    if event.event_type == MouseEventType.MOUSE_UP:
+                        view.scrollbar_drag = None
+                        return None
+                return super().mouse_handler(event)
 
         class ScrollControl(UIControl):
             def create_content(self, width, height):
@@ -78,11 +100,14 @@ class ResultsView:
                 return view.scrollbar_mouse(event)
 
         self.window = Window(ResultsControl(),
-                             wrap_lines=False, always_hide_cursor=True, get_vertical_scroll=lambda window: self.line)
+                             wrap_lines=False, always_hide_cursor=True, get_vertical_scroll=lambda window: self.line,
+                             get_horizontal_scroll=lambda window: self.column, scroll_offsets=ScrollOffsets())
         self.scrollbar = Window(ScrollControl(), width=1, always_hide_cursor=True)
 
         for key, delta in (("up", -1), ("down", 1), ("k", -1), ("j", 1)):
             keys.add(key)(lambda event, delta=delta: self.move(delta))
+        for key, delta in (("left", -12), ("right", 12)):
+            keys.add(key)(lambda event, delta=delta: self.pan(delta))
         for key, direction in (("pageup", -1), ("pagedown", 1), (" ", 1)):
             keys.add(key)(lambda event, direction=direction: self.move(direction * max(1, self.visible_height() - 1)))
 
@@ -110,14 +135,17 @@ class ResultsView:
         keys.add("b")(lambda event: self.back(close=False))
         for key in ("q", "c-c", "c-d"):
             keys.add(key)(lambda event: self.back())
-        self.header = Window(FormattedTextControl(self.navigation), height=1, style="class:footer")
+        self.header = Window(BarControl(self.navigation, above=True), height=3, style="class:toolbar")
+        self.footer_window = Window(BarControl(self.footer), height=2, style="class:footer")
         self.app = Application(layout=Layout(HSplit([
             self.header,
             VSplit([self.window, self.scrollbar]),
-            Window(FormattedTextControl(self.footer), height=lambda: len(self.footer().splitlines()), style="class:footer")
+            self.footer_window
         ])), key_bindings=keys, full_screen=True, mouse_support=True, input=input, output=output,
-            min_redraw_interval=1 / 30, before_render=lambda app: self._clear_footer(),
-            style=Style.from_dict({"footer": "bg:#252525 #ff6a00", "selected-link": "reverse",
+            min_redraw_interval=1 / 60, max_render_postpone_time=0, before_render=lambda app: self._clear_footer(),
+            style=Style.from_dict({"footer": "bg:#202226 #b9bdc5", "toolbar": "bg:#16181c #d8dbe2",
+                                  "nav-button": "bg:#ff6a00 #101114 bold", "nav-border": "#ff6a00",
+                                  "selected-link": "reverse",
                                   "scrollbar.arrow": "#ff6a00 bold", "scrollbar.thumb": "#ff6a00",
                                   "scrollbar.track": "#777777"}))
 
@@ -131,8 +159,34 @@ class ResultsView:
                 return None
             return NotImplemented
 
-        label = " Back to results [Esc / B] " if self.history else " Back to menu [Q] "
-        return [("bold underline", label, click)]
+        width = self.app.output.get_size().columns
+        label = "  ← Back to results  Esc  " if self.history else "  ← Main menu  Q  "
+        if width < len(label) + 2:
+            label = " ← Results " if self.history else " ← Menu "
+        title = "Result details" if self.history else "Search results"
+        return [("class:nav-border", "╭" + "─" * len(label) + "╮\n", click),
+                ("class:nav-border", "│", click), ("class:nav-button", label, click),
+                ("class:nav-border", "│", click), ("bold", "   " + title if width >= len(label) + len(title) + 6 else ""),
+                ("", "\n"), ("class:nav-border", "╰" + "─" * len(label) + "╯", click)]
+
+    def pan(self, delta):
+        self.column = max(0, min(max(0, self.document_width - (self.width or 1)), self.column + delta))
+
+    def cursor_x(self):
+        if not self.column:
+            return 0
+        # prompt-toolkit's cursor is a character index, but horizontal scroll
+        # is measured in cells. Preserve wide-character hit testing.
+        text = "".join(f[1] for f in self.lines[self.line])
+        cells = 0
+        for index, char in enumerate(text):
+            if cells >= self.column:
+                return index
+            cells += get_cwidth(char)
+        return len(text) + max(0, self.column - cells)
+
+    def drag_at(self, event, y):
+        return self.scrollbar_mouse(MouseEvent(Point(0, y), event.event_type, event.button, event.modifiers))
 
     def move(self, delta):
         self.selected = None
@@ -170,9 +224,7 @@ class ResultsView:
         return None
 
     def visible_height(self):
-        # Footer state is sampled once per frame, not for every queued wheel
-        # event. Fast input can advance the viewport without reformatting it.
-        return max(1, self.app.output.get_size().rows - len(self.footer().splitlines()) - 1)
+        return max(1, self.app.output.get_size().rows - 5)
 
     def last_page(self):
         return max(0, len(self.lines) - self.visible_height())
@@ -183,14 +235,24 @@ class ResultsView:
         self.selected = ((self.selected + delta) % len(self.links) if self.selected is not None else
                          0 if delta > 0 else len(self.links) - 1)
         self.line = min(self.links[self.selected][1], self.last_page())
+        self.column = 0
+        # Bring a selected link into view even in the horizontally panned grid.
+        x = 0
+        for style, text, *_ in self.lines[self.links[self.selected][1]]:
+            if f"class:result-link-{self.selected}" in style.split():
+                if x + get_cwidth(text) > (self.width or 1):
+                    self.column = max(0, x + get_cwidth(text) - (self.width or 1))
+                break
+            x += get_cwidth(text)
 
     def activate(self, url):
         if url.startswith("consensus-detail:") and self.detail:
             key = url.partition(":")[2]
             self.history.append((self.render, self.line, self.selected, self.width,
-                                 self.lines, self.fragments, self.links))
+                                 self.lines, self.fragments, self.links, self.column, self.document_width))
             self.render = lambda width: self.detail(key, width)
             self.width, self.line, self.selected = None, 0, None
+            self.column = 0
             self._clear_footer()
         else:
             from .reports import _safe_http_url
@@ -205,7 +267,7 @@ class ResultsView:
     def back(self, *, close=True):
         if self.history:
             (self.render, self.line, self.selected, self.width,
-             self.lines, self.fragments, self.links) = self.history.pop()
+             self.lines, self.fragments, self.links, self.column, self.document_width) = self.history.pop()
             self._clear_footer()
             self.app.invalidate()
         elif close:
@@ -265,6 +327,8 @@ class ResultsView:
             self.width = width
             self.fragments = self._linked_fragments(self.render(width))
             self.lines = list(split_lines(self.fragments))
+            self.document_width = max(sum(get_cwidth(f[1]) for f in line) for line in self.lines)
+            self.pan(0)
             self._clear_footer()
             if self.selected is not None and self.selected < len(self.links):
                 self.line = min(self.links[self.selected][1], self.last_page())
@@ -281,6 +345,10 @@ class ResultsView:
     def display_line(self, index):
         """Only visible lines need selection styling or renderer processing."""
         fragments = self.lines[index]
+        if index == self.line and self.column:
+            cells = sum(get_cwidth(f[1]) for f in fragments)
+            if cells < self.column:
+                fragments = [*fragments, ("", " " * (self.column - cells))]
         if self.selected is None:
             return fragments
         # Mouse handlers belong only to explicit link text, never its neighbours.
@@ -289,19 +357,24 @@ class ResultsView:
                 for style, text, *rest in fragments]
 
     def footer(self):
-        import textwrap
-
         width = self.app.output.get_size().columns
         if self._footer_cache is not None and self._footer_cache[0] == width:
             return self._footer_cache[1]
-        destination = "Esc: back to results" if self.history else "Q: back to menu"
-        controls = (f" ↑↓ / PgUp/PgDn · Home/End · Tab: link · Enter: open · {destination}" if width >= 100 else
-                    f" ↑↓ / PgUp/PgDn · Home/End\n Tab: link · Enter: open · {destination}")
-        title = "Details" if self.history else "Results"
-        text = f" {title} · line {self.line + 1} of {len(self.lines)}\n" + controls
-        text += "\n" + self.context(width) if self.context else ""
-        result = "\n".join(wrapped for line in text.splitlines()
-                           for wrapped in (textwrap.wrap(line, width=max(1, width - 1)) or [""]))
+        from rich.text import Text
+
+        def fit(text):
+            value = Text(text)
+            value.truncate(max(1, width - 1), overflow="ellipsis")
+            return value.plain
+
+        controls = " ↑↓ Scroll   PgUp/PgDn Page   Home/End   Tab Links   Enter Open"
+        if width < 65:
+            controls = " ↑↓ Scroll   Tab Links   Enter Open"
+        end = min(len(self.lines), self.line + self.visible_height())
+        position = f" {self.line + 1:,}–{end:,} / {len(self.lines):,} lines"
+        if self.document_width > (self.width or 1):
+            position += "    ← → More columns"
+        result = fit(controls) + "\n" + fit(position)
         self._footer_cache = (width, result)
         return result
 

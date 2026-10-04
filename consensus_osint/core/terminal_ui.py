@@ -124,6 +124,7 @@ class TerminalUI:
         self.network_route = None
         self.network_checked = 0.0
         self.results_view = None
+        self.returned_from_results = False
         self.scan_tips = list(_SCAN_TIPS)
         self.tip_started = None
 
@@ -177,6 +178,12 @@ class TerminalUI:
                     self.results_view = ResultsView(render, input=original_input, output=app.output,
                                                     context=self.footer_text, detail=detail, follow_end=follow_end)
                     await self.results_view.run()
+                    self.returned_from_results = True
+                    # The alternate screen has gone. Reset its cursor geometry
+                    # before the suspended prompt measures its available height.
+                    app.output.erase_screen()
+                    app.output.cursor_goto(0, 0)
+                    app.output.flush()
                 finally:
                     self.results_view = None
                     app.input = original_input
