@@ -5,7 +5,7 @@ from rich.cells import cell_len
 from rich.style import Style
 from rich.text import Text
 
-from .branding import ACCENT, LINKS, ORGANIZATION, SLOGAN
+from .branding import ACCENT, LINKS, ORGANIZATION, SLOGAN, TERMINAL_MARK
 from .terminal_ui import clean
 
 
@@ -20,6 +20,8 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
     wide = frame_width >= 76
     padding = 2 if wide else 1
     content_width = frame_width - 2 - 2 * padding
+    footer_rows = footer_rows if footer_rows is not None else (2 if terminal_width >= 78 else 3)
+    budget = max(1, height - footer_rows - 2)
     rows = []
     metadata = dict(info.rows())
 
@@ -78,25 +80,23 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
         row.append(value, style=Style(link=path.as_uri(), dim=False))
         add(row, framed=True)
 
-    header = Text()
-    header.append(" ╭─ ", style="dim")
-    header.append("◈ ", style=ACCENT)
-    header.append("Consensus", style="bold default")
-    version_text = fit("v" + clean(version), max(5, frame_width - 22))
-    header.append(" " + "─" * max(1, frame_width - 19 - version_text.cell_len) + " ", style="dim")
-    header.append(version_text.plain, style="dim")
-    header.append(" ─╮", style="dim")
-    rows.append((header, 0))
-    organization = Text("OSINT", style=ACCENT)
-    organization.append(ORGANIZATION.removeprefix("OSINT"), style="default")
-    add(organization, framed=True)
-    slogan_lines = [SLOGAN] if cell_len(SLOGAN) <= content_width else [
-        clause.strip() + "." for clause in SLOGAN.split(".") if clause.strip()]
-    for line in slogan_lines:
-        add(line, optional=4, framed=True)
-    if wide:
-        add(text("Major lookup tools, brought together.", "dim"), optional=2, framed=True)
-        add(optional=1, framed=True)
+    title = Text("Consensus", style="bold default")
+    title.append(" v" + clean(version), style="dim")
+    if wide and budget < 16:
+        # A shallow window keeps a compact mark without sacrificing the menu.
+        header = Text(" ╭─ ", style="dim")
+        header.append("●─◎ ", style=ACCENT)
+        header.append(title)
+        header.append(" " + "─" * max(1, frame_width - header.cell_len - 1) + "╮", style="dim")
+        rows.append((header, 0))
+        add(ORGANIZATION, framed=True)
+    else:
+        rows.append((Text(" ╭" + "─" * (frame_width - 2) + "╮", style="dim"), 0))
+        labels = [title, text(ORGANIZATION), text(SLOGAN if wide else "Many sources. One tool.", "dim")]
+        for mark, label in zip(TERMINAL_MARK.splitlines(), labels, strict=True):
+            row = Text(mark + "  ", style=ACCENT)
+            row.append(label)
+            add(row, framed=True)
     location("Working", info.working_folder)
     location("Reports", info.report_folder)
     catalogue = metadata["Installed catalogue"]
@@ -155,8 +155,6 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
         invitation.append("  ↑↓ previous commands", style="dim not bold")
     add(invitation)
 
-    footer_rows = footer_rows if footer_rows is not None else (2 if terminal_width >= 78 else 3)
-    budget = max(1, height - footer_rows - 2)
     # Remove spacing first, then supplementary copy in short windows. Frame
     # edges, actions, input guidance and safety text are never selected here.
     for index in range(len(rows) - 1, -1, -1):
@@ -175,7 +173,8 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
 def _small_home(info, *, width, budget, version):
     """Keep entry usable when a framed menu cannot fit above input and footer."""
     width, budget = max(1, width), max(1, budget)
-    title = Text("Consensus", style="bold default")
+    title = Text("●─◎ ", style=ACCENT)
+    title.append("Consensus", style="bold default")
     title.append(" v" + clean(version), style="dim")
     if width >= 36 and budget >= 10:
         rows = [title]

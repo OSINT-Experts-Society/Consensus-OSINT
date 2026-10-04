@@ -31,8 +31,8 @@ HEALTH_WARNING = (
     "Use Consensus only for lawful, authorized purposes; respect privacy and service terms. "
     "Verify findings before acting on them."
 )
-# Text adaptation of the owner's orange microchip logo for ordinary terminals.
-TERMINAL_MARK = "  ╷ ╷  \n╶╔═══╗╴\n ║ ▣ ║ \n╶╚═══╝╴\n  ╵ ╵  "
+# Terminal adaptation of the README mark: three source paths, one result.
+TERMINAL_MARK = "●──╮   \n●──┼──◎\n●──╯   "
 MENU = (
     ("Username", 'consensus user "YOUR_USERNAME"'),
     ("Email", 'consensus email "YOUR_EMAIL"'),
