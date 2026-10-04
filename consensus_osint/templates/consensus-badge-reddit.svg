@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="141" height="24" viewBox="0 0 141 24" role="img" aria-label="Reddit: community">
+  <title>Reddit: community</title>
+  <clipPath id="rounded"><rect width="141" height="24" rx="4"/></clipPath>
+  <g clip-path="url(#rounded)"><rect width="54" height="24" fill="#30363d"/><rect x="54" width="87" height="24" fill="#f09a45"/></g>
+  <g font-family="Verdana,Arial,sans-serif" font-size="11" text-anchor="middle">
+    <text x="27.0" y="16" fill="#fff">Reddit</text>
+    <text x="97.5" y="16" fill="#18212b" font-weight="bold">community</text>
+  </g>
+</svg>

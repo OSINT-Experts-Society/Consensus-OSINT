@@ -10,7 +10,11 @@
 
 <p align="center"><strong>7,900+ lookup modules. 19 open-source projects. One tool.</strong></p>
 
+<p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a> &middot; <a href="#see-consensus-in-action">See it in action</a></p>
+
 <p align="center">Expert-maintained username, email and phone intelligence, standardised into one tool. Each week, our experts review major open-source projects for new modules—deduplicating, testing, improving and integrating suitable additions, while retiring modules that no longer work.</p>
+
+<p align="center"><strong>One installation. One search workflow. One consistent report across 19 source projects.</strong></p>
 
 <p align="center">
   <picture>
@@ -22,12 +26,19 @@
 </p>
 
 <p align="center">
-  <a href="#key-features"><img src="consensus_osint/templates/consensus-badge-projects.svg" alt="19 source projects" height="24"></a>
+  <a href="#compare"><img src="consensus_osint/templates/consensus-badge-projects.svg" alt="19 projects combined" height="24"></a>
   <a href="#key-features"><img src="consensus_osint/templates/consensus-badge-modules.svg" alt="7,900+ lookup modules" height="24"></a>
   <a href="LICENSE"><img src="consensus_osint/templates/consensus-badge-license.svg" alt="Licence: GPL-3.0-or-later" height="24"></a>
   <a href="CONTRIBUTING.md"><img src="consensus_osint/templates/consensus-badge-prs.svg" alt="PRs welcome" height="24"></a>
 </p>
 
+<p align="center">
+  <a href="https://osint.ngo"><img src="consensus_osint/templates/consensus-badge-website.svg" alt="Visit the OSINT Experts Society website" height="24"></a>
+  <a href="https://www.linkedin.com/groups/13047129/"><img src="consensus_osint/templates/consensus-badge-linkedin.svg" alt="Join our LinkedIn community" height="24"></a>
+  <a href="https://www.reddit.com/r/OSINTExperts/"><img src="consensus_osint/templates/consensus-badge-reddit.svg" alt="Join our Reddit community" height="24"></a>
+</p>
+
+<a id="compare"></a>
 <details>
 <summary>Compare Consensus with its 19 source projects</summary>
 
@@ -83,13 +94,27 @@ Counts cover catalogue rules and modules as of 3 October 2026, excluding explici
 
 ## Key features
 
-- **7,900+ lookup modules. 19 projects. One tool.** Search usernames, email addresses and phone numbers using combined open-source capabilities, standardised into one workflow.
-- **One search per site by default.** Consensus reconciles overlapping sources and selects a lookup for each site, reducing duplicate searches and repeated results.
-- **Reviewed & updated weekly by our experts.** New modules evaluated, tested, improved and integrated; broken modules retired.
+- **7,900+ lookup modules from 19 projects.** Combined username, email and phone capabilities in one installation, one search workflow and one consistent report.
+- **One search per site by default.** Overlapping sources reconciled, with one lookup selected per site to reduce duplicate searches and repeated results.
+- **Reviewed & updated weekly by our experts.** Changes across source projects evaluated, tested, improved and integrated; broken modules retired.
+- **Follow new leads automatically.** Optional recursive searches follow usernames, email addresses and linked profiles discovered in results.
+- **Spot connections across results.** Compare returned names, biographies, contact details and organisations, then inspect the supporting evidence. Shared details are leads, not proof of identity.
 - **See which sources cover a lookup.** Source attribution shows which imported projects list each lookup, making their overlap visible.
-- **Bulk search and advanced controls.** Work through lists, use username patterns and filters, and choose specific modules when you need more control.
-- **Reports and interactive graphs.** Explore connections and export findings to share or investigate further, with optional PDF support.
-- **Proxy support, menu or command line.** Use a guided interface or repeatable CLI commands, with proxy options for your workflow.
+- **Take your findings further.** Export HTML, PDF, CSV and JSON reports, explore interactive evidence graphs, or use XMind and Neo4j exports. PDF requires the optional extra.
+- **Connect compatible AI assistants.** Optional MCP support lets AI tools run Consensus lookups and retrieve results through a standard interface.
+- **Bulk searches, advanced controls and proxies.** Process lists, generate username variations, filter by site or category, and use a guided menu or repeatable CLI commands.
+
+## See Consensus in action
+
+Actual Consensus report screens using **fictional demonstration data**. No live searches were performed. Click either image to view it full size.
+
+**HTML report:** searchable findings, returned profile details and source coverage in one view.
+
+<a href="consensus_osint/templates/consensus-demo-report.png"><img src="consensus_osint/templates/consensus-demo-report.png" width="920" alt="Actual Consensus HTML report showing fictional profile findings, filters and returned details"></a>
+
+**Interactive evidence graph:** explore the connections between a query, its results and source sites, and select a result to inspect its evidence.
+
+<a href="consensus_osint/templates/consensus-demo-graph.png"><img src="consensus_osint/templates/consensus-demo-graph.png" width="920" alt="Actual Consensus interactive graph showing fictional query, result and source-site nodes with an evidence panel"></a>
 
 ## Install
 
