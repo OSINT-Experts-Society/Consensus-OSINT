@@ -8,10 +8,11 @@ from prompt_toolkit.data_structures import Point
 from prompt_toolkit.formatted_text import ANSI, to_formatted_text
 from prompt_toolkit.formatted_text.utils import split_lines
 from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.layout import HSplit, Layout, Window
-from prompt_toolkit.layout.controls import FormattedTextControl
+from prompt_toolkit.layout import HSplit, Layout, VSplit, Window
+from prompt_toolkit.layout.controls import FormattedTextControl, UIContent, UIControl
 from prompt_toolkit.mouse_events import MouseEventType
 from prompt_toolkit.styles import Style
+from prompt_toolkit.utils import get_cwidth
 
 
 class ResultsView:
@@ -27,29 +28,62 @@ class ResultsView:
         self.width = None
         self.lines = [[]]
         self.fragments = []
+        self.scrollbar_height = 1
+        self.scrollbar_drag = None
         keys = KeyBindings()
         view = self
 
-        class ResultsControl(FormattedTextControl):
+        class ResultsControl(UIControl):
+            def is_focusable(self):
+                return True
+
+            def create_content(self, width, height):
+                view.prepare(width)
+                return UIContent(get_line=view.display_line, line_count=len(view.lines),
+                                 cursor_position=Point(0, view.line), show_cursor=False)
+
             def mouse_handler(self, event):
                 if event.event_type in (MouseEventType.SCROLL_UP, MouseEventType.SCROLL_DOWN):
-                    move(-3 if event.event_type == MouseEventType.SCROLL_UP else 3)
+                    view.move(-3 if event.event_type == MouseEventType.SCROLL_UP else 3)
                     view.app.invalidate()
                     return None
-                return super().mouse_handler(event)
+                if event.event_type == MouseEventType.MOUSE_UP:
+                    was_dragging = view.scrollbar_drag is not None
+                    view.scrollbar_drag = None
+                    if was_dragging:
+                        return None  # Releasing a drag over a link must not open it.
+                # Window maps this position to document rows, including scroll.
+                if 0 <= event.position.y < len(view.lines):
+                    x = 0
+                    for fragment in view.lines[event.position.y]:
+                        x += get_cwidth(fragment[1])
+                        if event.position.x < x:
+                            return fragment[2](event) if len(fragment) == 3 else NotImplemented
+                return NotImplemented
 
-        self.window = Window(ResultsControl(self.content, focusable=True, show_cursor=False,
-                                                 get_cursor_position=lambda: Point(0, self.line)),
+        class ScrollControl(UIControl):
+            def create_content(self, width, height):
+                view.scrollbar_height = height
+                top, size, track = view.scrollbar_thumb()
+                rows = [[("class:scrollbar.arrow", "▲")]]
+                for row in range(track):
+                    rows.append([("class:scrollbar.thumb", "█")] if top <= row < top + size else
+                                [("class:scrollbar.track", "│")])
+                if height >= 2:
+                    rows.append([("class:scrollbar.arrow", "▼")])
+                return UIContent(get_line=lambda index: rows[index], line_count=len(rows), show_cursor=False)
+
+            def mouse_handler(self, event):
+                return view.scrollbar_mouse(event)
+
+        self.window = Window(ResultsControl(),
                              wrap_lines=False, always_hide_cursor=True, get_vertical_scroll=lambda window: self.line)
-
-        def move(delta):
-            self.selected = None
-            self.line = max(0, min(self.last_page(), self.line + delta))
+        self.scrollbar = Window(ScrollControl(), width=1, always_hide_cursor=True)
 
         for key, delta in (("up", -1), ("down", 1), ("k", -1), ("j", 1)):
-            keys.add(key)(lambda event, delta=delta: move(delta))
+            keys.add(key)(lambda event, delta=delta: self.move(delta))
         for key, direction in (("pageup", -1), ("pagedown", 1), (" ", 1)):
-            keys.add(key)(lambda event, direction=direction: move(direction * max(1, self.app.output.get_size().rows - len(self.footer().splitlines()) - 1)))
+            keys.add(key)(lambda event, direction=direction: self.move(direction * max(1, self.app.output.get_size().rows - len(self.footer().splitlines()) - 1)))
 
         @keys.add("home")
         def top(event):
@@ -74,9 +108,48 @@ class ResultsView:
         for key in ("escape", "q", "c-c", "c-d"):
             keys.add(key)(lambda event: self.back())
         self.app = Application(layout=Layout(HSplit([
-            self.window, Window(FormattedTextControl(self.footer), height=lambda: len(self.footer().splitlines()), style="class:footer")
+            VSplit([self.window, self.scrollbar]),
+            Window(FormattedTextControl(self.footer), height=lambda: len(self.footer().splitlines()), style="class:footer")
         ])), key_bindings=keys, full_screen=True, mouse_support=True, input=input, output=output,
-            style=Style.from_dict({"footer": "bg:#252525 #ff6a00", "selected-link": "reverse"}))
+            min_redraw_interval=1 / 30,
+            style=Style.from_dict({"footer": "bg:#252525 #ff6a00", "selected-link": "reverse",
+                                  "scrollbar.arrow": "#ff6a00 bold", "scrollbar.thumb": "#ff6a00",
+                                  "scrollbar.track": "#777777"}))
+
+    def move(self, delta):
+        self.selected = None
+        self.line = max(0, min(self.last_page(), self.line + delta))
+
+    def scrollbar_thumb(self):
+        track = max(0, self.scrollbar_height - 2)
+        size = min(track, max(1, round(track * self.scrollbar_height / max(1, len(self.lines)))))
+        top = round((track - size) * self.line / max(1, self.last_page()))
+        return top, size, track
+
+    def scrollbar_mouse(self, event):
+        y = event.position.y
+        top, size, track = self.scrollbar_thumb()
+        if event.event_type in (MouseEventType.SCROLL_UP, MouseEventType.SCROLL_DOWN):
+            self.move(-3 if event.event_type == MouseEventType.SCROLL_UP else 3)
+        elif event.event_type == MouseEventType.MOUSE_DOWN:
+            self.selected = None
+            if y == 0:
+                self.move(-1)
+            elif y >= self.scrollbar_height - 1:
+                self.move(1)
+            elif top <= y - 1 < top + size:
+                self.scrollbar_drag = y - 1 - top
+            else:
+                self.move((1 if y - 1 > top else -1) * max(1, self.scrollbar_height - 1))
+        elif event.event_type == MouseEventType.MOUSE_MOVE and self.scrollbar_drag is not None:
+            position = max(0, min(track - size, y - 1 - self.scrollbar_drag))
+            self.line = round(self.last_page() * position / max(1, track - size))
+        elif event.event_type == MouseEventType.MOUSE_UP:
+            self.scrollbar_drag = None
+        else:
+            return NotImplemented
+        self.app.invalidate()
+        return None
 
     def last_page(self):
         visible = max(1, self.app.output.get_size().rows - len(self.footer().splitlines()))
@@ -144,10 +217,24 @@ class ResultsView:
             else:
                 fragments.append((style, text))
             line += text.count("\n")
-        return fragments
+        # ANSI emits individual characters. Keep runs with the same style/action
+        # together so the persistent document isn't one tuple per character.
+        compact = []
+        parts = []
+        previous = None
+        for style, text, *handler in fragments:
+            key = (style, *handler)
+            if previous is not None and key != previous:
+                compact.append((previous[0], "".join(parts), *previous[1:]))
+                parts = []
+            previous = key
+            parts.append(text)
+        if previous is not None:
+            compact.append((previous[0], "".join(parts), *previous[1:]))
+        return compact
 
-    def content(self):
-        width = max(10, self.app.output.get_size().columns - 1)
+    def prepare(self, width):
+        width = max(1, width)
         if width != self.width:
             self.width = width
             self.fragments = self._linked_fragments(self.render(width))
@@ -160,11 +247,17 @@ class ResultsView:
         self.line = min(self.line, self.last_page())
         if self.selected is None or self.selected >= len(self.links):
             self.selected = None
-            return self.fragments
+            return
+
+    def display_line(self, index):
+        """Only visible lines need selection styling or renderer processing."""
+        fragments = self.lines[index]
+        if self.selected is None:
+            return fragments
         # Mouse handlers belong only to explicit link text, never its neighbours.
         selected_style = f"class:result-link-{self.selected}"
         return [(style + (" class:selected-link" if selected_style in style.split() else ""), text, *rest)
-                for style, text, *rest in self.fragments]
+                for style, text, *rest in fragments]
 
     def footer(self):
         import textwrap

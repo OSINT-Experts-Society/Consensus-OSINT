@@ -2,6 +2,16 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.2.5",
+      "previous_version": "0.2.4",
+      "new_modules": [],
+      "bug_fixes": [
+        "results-scroll-resources: Render visible result rows without rebuilding and caching the entire document on every scroll.",
+        "results-scrollbar: Keep a visible scrollbar with arrows, paging and thumb dragging in the results viewport."
+      ],
+      "other_changes": []
+    },
+    {
       "version": "0.2.4",
       "previous_version": "0.2.3",
       "new_modules": [],
