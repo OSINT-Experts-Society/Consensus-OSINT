@@ -243,7 +243,7 @@ class Printer:
     def command_menu(self) -> None:
         if self.quiet or self.jsonl:
             return
-        self.message("\nWhat would you like to do? Run a command below:", f"bold {ACCENT}")
+        self.message("What would you like to do? Run a command below:", f"bold {ACCENT}")
         if self.console:
             table = Table(box=None, show_header=False, padding=(0, 1))
             table.add_column(style=ACCENT)
@@ -448,6 +448,9 @@ class Printer:
             return
         if self.terminal_ui:
             self.terminal_ui.result(self.match_count, self.detail_count, f)
+            # The pinned counters and optional V preview own live output.
+            # Full cards can flood scrollback and compete with prompt redraws.
+            return
         else:
             if self.preview.add(f):
                 self._last_hit = time.monotonic()
@@ -586,24 +589,15 @@ class Printer:
         else:
             self.message(f"Report saved: {resolved}", always=True)
 
-    def finish(self, summary, *, review=False) -> None:
+    def finish(self, summary, *, review=False, follow_end=False) -> None:
         """Closing review uses final, deduplicated findings rather than streamed counts."""
         if self.jsonl:
             return
         if review and self.terminal_ui and not self.quiet:
-            import io
+            from .console_results import result_pages
 
-            def render(width):
-                stream = io.StringIO()
-                printer = Printer(stream=stream, show_all=self.show_all, details=self.details,
-                                  summary_limit=self.summary_limit, verbose=self.verbose)
-                printer.terminal_ui = None
-                printer.console = Console(file=stream, width=width, force_terminal=True,
-                                          color_system="truecolor", legacy_windows=False)
-                printer.finish(summary)
-                return stream.getvalue()
-
-            self.terminal_ui.review(render)
+            render, detail = result_pages(summary, show_all=self.show_all, limit=self.summary_limit)
+            self.terminal_ui.review(render, detail=detail, follow_end=follow_end)
             return
         if self.terminal_ui:
             self.terminal_ui.update("Displaying results")

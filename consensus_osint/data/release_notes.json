@@ -2,6 +2,18 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.2.4",
+      "previous_version": "0.2.3",
+      "new_modules": [],
+      "bug_fixes": [
+        "console-link-boundaries: Keep links scoped to explicit labels across results scrolling and redraws.",
+        "console-completion-scroll: Follow completed results to the bottom and support bounded keyboard and wheel navigation."
+      ],
+      "other_changes": [
+        "console-results-matrix: Show compact project coverage and open enrichment evidence on demand."
+      ]
+    },
+    {
       "version": "0.2.3",
       "previous_version": "0.2.2",
       "new_modules": [],

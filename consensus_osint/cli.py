@@ -1278,7 +1278,7 @@ def cmd_scan(args: argparse.Namespace, *, on_summary=None, in_session=False) -> 
     if not in_session:
         printer.command_menu()
     if review_results:
-        printer.finish(summary, review=True)
+        printer.finish(summary, review=True, follow_end=True)
     if interrupted:
         return 130
     if save_failed:

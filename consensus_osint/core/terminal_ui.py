@@ -135,7 +135,7 @@ class TerminalUI:
 
         self.loop.call_soon_threadsafe(start)
 
-    def review(self, render):
+    def review(self, render, *, detail=None, follow_end=False):
         """Suspend input ownership cleanly while a full-screen viewer is active."""
         async def show():
             from prompt_toolkit.application import in_terminal
@@ -158,7 +158,7 @@ class TerminalUI:
                 app.input = SuspendedInput()
                 try:
                     self.results_view = ResultsView(render, input=original_input, output=app.output,
-                                                    context=self.footer_text)
+                                                    context=self.footer_text, detail=detail, follow_end=follow_end)
                     await self.results_view.run()
                 finally:
                     self.results_view = None
