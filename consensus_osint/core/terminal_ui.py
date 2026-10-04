@@ -270,7 +270,7 @@ class TerminalUI:
             mark = ("[▣]", "[◈]", "[▢]", "[◈]")[frame % 4] if self.controller or self.preparing else "[▣]"
             if self.controller and self.last_hit and time.monotonic() - self.last_hit < 1.8:
                 mark = "[+]"
-            status = mark + " " + status
+            status = mark + " Status: " + status
             scanning = self.controller is not None or self.preparing
             counts = f"Found {self.found} · Enriched {self.enriched}"
             completed, total = self.completed, self.total
@@ -308,6 +308,15 @@ class TerminalUI:
             lines.append(left + " " * (width - cell_len(left + right)) + right)
         else:
             lines.extend([fit(left, width), fit(right, width)])
+        from .auto_update import notification
+
+        notice = notification()
+        if notice:
+            # Wrap the restart instruction instead of truncating it on phones
+            # or narrow terminal windows. Home budgeting includes these rows.
+            import textwrap
+
+            lines.extend(textwrap.wrap(notice, width=width))
         return "\n".join(" " + line for line in lines)
 
     def toolbar(self):

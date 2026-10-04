@@ -1657,7 +1657,7 @@ def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_se
             from .core.interactive import prepare_screen, start_session
 
             prepare_screen()
-            startup_notice(disabled=no_update_check)
+            startup_notice(disabled=no_update_check, auto_install=True)
             options = {"footer": False} if "--no-footer" in raw_argv else {}
             if "--no-animation" in raw_argv:
                 options["animate"] = False
@@ -1693,9 +1693,10 @@ def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_se
         if not in_session and cmd in ("scan", "user", "email", "phone", "shell"):
             from .core.app_update import startup_notice
 
+            update_options = {"auto_install": True} if cmd == "shell" else {}
             startup_notice(disabled=no_update_check or bool(getattr(args, "json", False))
                            or bool(getattr(args, "jsonl", False)) or bool(getattr(args, "quiet", False))
-                           or bool(getattr(args, "proxy", None)) or bool(getattr(args, "tor", False)))
+                           or bool(getattr(args, "proxy", None)) or bool(getattr(args, "tor", False)), **update_options)
         if cmd in ("scan", "user", "email", "phone"):
             return cmd_scan(args, on_summary=on_summary, in_session=in_session)
         if cmd == "shell":

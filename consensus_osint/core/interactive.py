@@ -389,8 +389,16 @@ class Session:
 
     def run(self):
         self.printer.home(__version__)
+        last_update_notice = ""
         while True:
             try:
+                if not self.printer.terminal_ui:
+                    from .auto_update import notification
+
+                    notice = notification()
+                    if notice and notice != last_update_notice:
+                        self.printer.message(notice, ACCENT)
+                        last_update_notice = notice
                 line = self.read("consensus> ").strip()
             except (EOFError, KeyboardInterrupt):
                 break

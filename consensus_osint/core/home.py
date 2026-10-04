@@ -99,42 +99,33 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
             add(row, framed=True)
     location("Working", info.working_folder)
     location("Reports", info.report_folder)
-    catalogue = metadata["Installed catalogue"]
+    catalogue = metadata["Lookup database updated"]
     if "not verified" in catalogue:
-        catalogue = "Catalogue unverified · info for details"
+        catalogue = "Lookup database unverified · info" if wide else "Database unverified · info"
     elif "days old" in catalogue:
-        catalogue = "Catalogue " + catalogue.rsplit(" · ", 1)[-1] + " · info for details"
+        catalogue = "Database " + catalogue.rsplit(" · ", 1)[-1] + " · info for details"
     else:
-        catalogue = ("Catalogue  " + catalogue + "  ·  Weekly updates" if wide else
-                     "Weekly catalogue " + catalogue)
+        if wide:
+            catalogue = "Lookup database updated: " + catalogue + " · Weekly review"
+        else:
+            parts = catalogue.split()
+            if len(parts) == 3:
+                catalogue = f"{parts[0]} {parts[1][:3]} {parts[2]}"
+            catalogue = "Database updated: " + catalogue
     if not wide and "info for details" in catalogue:
         catalogue = catalogue.replace(" · info for details", " · info")
     add(text(catalogue, "yellow" if "unverified" in catalogue or "days old" in catalogue else "dim"), framed=True)
     rows.append((Text(" ╰" + "─" * (frame_width - 2) + "╯", style="dim"), 0))
     add(optional=1)
-    if wide:
-        headings = text("Start a search", "bold")
-        group_stride = 2 * ((content_width - 6) // 4 + 2)
-        headings.append(" " * (group_stride - headings.cell_len))
-        headings.append("Results & settings", style="bold")
-        add(headings)
-        columns(key("1", "Username"), key("2", "Email"), key("5", "View results"), key("6", "Save report"))
-        columns(key("3", "Phone"), key("4", "Bulk search"), key("7", "Settings"), key("0", "Exit"))
-        add(optional=1)
-        tools = key("8", "Show Examples")
-        tools.append("    ")
-        tools.append(key("9", "Help"))
-        tools.append("    info: paths    about: project", style="dim")
-        add(tools)
-    else:
-        add(text("Choose a number", "bold"))
-        for left, right in [(key("1", "Username"), key("2", "Email")),
-                            (key("3", "Phone"), key("4", "Bulk search")),
-                            (key("5", "View results"), key("6", "Save report")),
-                            (key("7", "Settings"), key("8", "Show Examples")),
-                            (key("9", "Help"), key("0", "Exit"))]:
-            columns(left, right)
-        add(text("info: full paths · about: project", "dim"))
+    columns(text("Start a search", "bold"), text("Results & settings" if wide else "Results / setup", "bold"))
+    column_width = (content_width - 2) // 2
+    columns(text("─" * column_width, "dim"), text("─" * column_width, "dim"))
+    for left, right in [(key("1", "Username"), key("5", "View results")),
+                        (key("2", "Email"), key("6", "Save report")),
+                        (key("3", "Phone"), key("7", "Settings")),
+                        (key("4", "Bulk search"), key("9", "Help")),
+                        (key("8", "Show Examples"), key("0", "Exit"))]:
+        columns(left, right)
     links = Text()
     for label, url in [("osint.ngo", LINKS[0][1]), ("LinkedIn", LINKS[1][1]),
                        ("Reddit", LINKS[2][1]), ("GitHub", info.repository)]:
@@ -181,14 +172,14 @@ def _small_home(info, *, width, budget, version):
         if budget >= 11:
             rows.append(Text(ORGANIZATION, style=ACCENT))
         column_width = (width - 2) // 2
-        for first, second in (("1  Username", "2  Email"), ("3  Phone", "4  Bulk search"),
-                              ("5  View results", "6  Save report"), ("7  Settings", "8  Show Examples"),
-                              ("9  Help", "0  Exit")):
+        for first, second in (("1  Username", "5  View results"), ("2  Email", "6  Save report"),
+                              ("3  Phone", "7  Settings"), ("4  Bulk search", "9  Help"),
+                              ("8  Show Examples", "0  Exit")):
             row = Text(first.ljust(column_width) + "  " + second)
             row.stylize(f"bold {ACCENT}", 0, 1)
             row.stylize(f"bold {ACCENT}", column_width + 2, column_width + 3)
             rows.append(row)
-        rows.append(Text("Resize for full home; info: paths", style="dim"))
+        rows.append(Text("Resize for full home.", style="dim"))
         if budget >= 12:
             links = Text()
             for label, url in (("osint.ngo", LINKS[0][1]), ("LinkedIn", LINKS[1][1]),

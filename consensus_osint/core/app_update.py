@@ -79,11 +79,12 @@ def _cached(root, now):
     return None
 
 
-def startup_notice(*, disabled=False) -> None:
+def startup_notice(*, disabled=False, auto_install=False) -> None:
     """Only interactive, managed runs check. Never print from the worker thread.
 
-    At most 150ms of startup is spent waiting; a slow result is cached for the
-    next launch. No query or application configuration enters the request.
+    Interactive home launches use an isolated automatic updater; direct commands
+    only check. At most 150ms is spent waiting for a check-only notice.
+    No query or application configuration enters the request.
     """
     if (disabled or os.environ.get("CONSENSUS_NO_UPDATE_CHECK", "").lower() in ("1", "true", "yes")
             or not sys.stdin.isatty() or not sys.stdout.isatty() or not sys.stderr.isatty()):
@@ -96,6 +97,11 @@ def startup_notice(*, disabled=False) -> None:
 
         defaults = get_config().get("defaults", {})
         if os.environ.get("CONSENSUS_PROXY") or defaults.get("proxy") or defaults.get("tor"):
+            return
+        if auto_install and os.environ.get("CONSENSUS_AUTO_UPDATE", "1").lower() not in ("0", "false", "no"):
+            from .auto_update import start
+
+            start()
             return
         now = time.time()
         cached = _cached(root, now)

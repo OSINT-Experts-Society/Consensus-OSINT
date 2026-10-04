@@ -129,6 +129,8 @@ consensus
 
 On macOS/Linux, use `python3` if `python` is unavailable. While this repository is private, you need GitHub access to clone it.
 
+Managed release installations check for updates on startup, install them in the background and show when to restart. Source installations above are updated with Git and pip. Use `--no-update-check` to skip startup updates, or set `CONSENSUS_AUTO_UPDATE=0` for notifications only.
+
 <details>
 <summary>Installation help</summary>
 

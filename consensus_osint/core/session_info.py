@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 from .. import __version__
@@ -27,7 +28,14 @@ class SessionInfo:
         from .signing import check_database
 
         stamp = check_database()
-        catalogue = (f"#{stamp['build']} · {stamp['date']}" if stamp["present"] else "No installed build stamp")
+        if stamp["present"]:
+            try:
+                updated = date.fromisoformat(stamp["date"])
+                catalogue = f"{updated.day} {updated.strftime('%B')} {updated.year}"
+            except (ValueError, TypeError):
+                catalogue = "Unknown"
+        else:
+            catalogue = "Unknown"
         if not stamp["verified"]:
             catalogue += " · not verified"
         if stamp.get("stale"):
@@ -37,7 +45,7 @@ class SessionInfo:
             destination = self.working_folder / destination
         return [
             ("Version", self.version),
-            ("Installed catalogue", catalogue),
+            ("Lookup database updated", catalogue),
             ("Working folder", str(self.working_folder)),
             ("Report file" if output else "Default reports", str(destination.resolve())),
             ("Application files", str(self.application_folder)),
