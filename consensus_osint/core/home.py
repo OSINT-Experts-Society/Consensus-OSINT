@@ -51,7 +51,7 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
         value.append("  " + label, style="default")
         return value
 
-    def columns(*values):
+    def columns(*values, optional=0):
         gap = 2
         column_width = (content_width - gap * (len(values) - 1)) // len(values)
         row = Text()
@@ -62,7 +62,7 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
             row.append(value)
             if i < len(values) - 1:
                 row.append(" " * (column_width - value.cell_len))
-        add(row)
+        add(row, optional=optional)
 
     def location(label, path):
         label_width = 11 if wide else 9
@@ -119,7 +119,7 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
     add(optional=1)
     columns(text("Start a search", "bold"), text("Results & settings" if wide else "Results / setup", "bold"))
     column_width = (content_width - 2) // 2
-    columns(text("─" * column_width, "dim"), text("─" * column_width, "dim"))
+    columns(text("─" * column_width, "dim"), text("─" * column_width, "dim"), optional=2)
     for left, right in [(key("1", "Username"), key("5", "View results")),
                         (key("2", "Email"), key("6", "Save report")),
                         (key("3", "Phone"), key("7", "Settings")),
@@ -131,23 +131,31 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
                        ("Reddit", LINKS[2][1]), ("GitHub", info.repository)]:
         if links.plain:
             links.append("  " if wide else " ", style="dim")
-        links.append(label, style=Style(link=url, dim=True))
-    add(links)
+        links.append(label, style=Style(link=url, color=ACCENT))
+    community_title = "╭─ Join the Community "
+    community_header = text(community_title + "─" * (content_width - cell_len(community_title) - 1) + "╮", "dim")
+    community_header.stylize(f"bold {ACCENT}", 3, 21)
+    add(community_header)
+    community_links = Text("│ " if wide else "│", style="dim")
+    community_links.append(links)
+    community_links.append(" " * max(0, content_width - community_links.cell_len - 1) + "│", style="dim")
+    add(community_links)
+    add(text("╰" + "─" * (content_width - 2) + "╯", "dim"))
     add(optional=1)
     notice = Text("Bugs can occur. ", style="yellow")
-    notice.append("Use test accounts you control; verify findings." if wide else "Use test accounts.", style="default")
+    notice.append("Verify findings. Lawful use; use test accounts." if wide else "Use test accounts.", style="default")
     add(notice)
-    add(text("Lawful, authorised use only. Respect privacy and service terms." if wide else
-             "Lawful use; respect privacy/terms.", "dim"))
+    if not wide:
+        add(text("Lawful use; respect privacy/terms.", "dim"))
     add(optional=1)
     invitation = Text("Type a username, email or phone (auto-detect). / commands" if wide else
                       "Auto-detect input · / commands", style="dim")
     if history and invitation.cell_len + 22 <= content_width:
         invitation.append("  ↑↓ previous commands", style="dim not bold")
-    add(invitation)
+    add(invitation, optional=4)
 
     # Remove spacing first, then supplementary copy in short windows. Frame
-    # edges, actions, input guidance and safety text are never selected here.
+    # edges, actions and safety text are never selected here.
     for index in range(len(rows) - 1, -1, -1):
         if len(rows) <= budget:
             break
@@ -180,14 +188,19 @@ def _small_home(info, *, width, budget, version):
             row.stylize(f"bold {ACCENT}", column_width + 2, column_width + 3)
             rows.append(row)
         rows.append(Text("Resize for full home.", style="dim"))
-        if budget >= 12:
+        if budget >= 13:
             links = Text()
             for label, url in (("osint.ngo", LINKS[0][1]), ("LinkedIn", LINKS[1][1]),
                                ("Reddit", LINKS[2][1]), ("GitHub", info.repository)):
                 if links:
                     links.append(" ")
                 links.append(label, style=Style(link=url, dim=True))
-            rows.append(links)
+            header = Text("╭─ Join the Community " + "─" * (width - 22) + "╮", style="dim")
+            header.stylize(f"bold {ACCENT}", 3, 21)
+            link_row = Text("│ ", style="dim")
+            link_row.append(links)
+            link_row.append(" " * max(0, width - link_row.cell_len - 1) + "│", style="dim")
+            rows.extend((header, link_row, Text("╰" + "─" * (width - 2) + "╯", style="dim")))
         rows.extend((Text("Bugs occur. Use test accounts.", style="yellow"),
                      Text("Lawful use; respect privacy/terms.", style="dim"),
                      Text("Type a username, email or phone.", style="dim")))

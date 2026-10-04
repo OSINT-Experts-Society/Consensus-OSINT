@@ -19,6 +19,7 @@ import tempfile
 import urllib.error
 import urllib.request
 import uuid
+import zipfile
 from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import urlparse
@@ -29,6 +30,72 @@ MAX_METADATA = 2 * 1024 * 1024
 MAX_WHEEL = 128 * 1024 * 1024
 EXTRAS = ["modules", "pdf"]
 VALIDATION_TIMEOUT = 30
+CHANGE_CATEGORIES = ("new_modules", "bug_fixes", "other_changes")
+
+
+def valid_summary(value, version):
+    """Optional release counts must describe this exact installed version."""
+    if not isinstance(value, dict) or value.get("to_version") != version:
+        return None
+    try:
+        if stable_version(value["from_version"]) >= stable_version(version):
+            return None
+        if any(type(value.get(key)) is not int or not 0 <= value[key] <= 100000 for key in CHANGE_CATEGORIES):
+            return None
+    except (ValueError, KeyError, TypeError):
+        return None
+    return {key: value[key] for key in ("from_version", "to_version", *CHANGE_CATEGORIES)}
+
+
+def summary_text(value, version):
+    summary = valid_summary(value, version)
+    if summary is None:
+        return "Change summary unavailable."
+    labels = (("new_modules", "new module"), ("bug_fixes", "bug fix"), ("other_changes", "other change"))
+    return " · ".join(f"{summary[key]} {label}" + ("" if summary[key] == 1 else "es" if key == "bug_fixes" else "s")
+                      for key, label in labels) + "."
+
+
+def release_summary(wheel, previous, version):
+    """Read reviewed change IDs from the checksum-verified wheel, not Git logs.
+
+    A complete release chain is required when skipping versions. Repeated IDs
+    count once; missing history is unknown coverage, never zero changes.
+    """
+    if previous is None:
+        return None
+    try:
+        with zipfile.ZipFile(wheel) as archive:
+            entry = archive.getinfo("consensus_osint/data/release_notes.json")
+            if entry.file_size > 256 * 1024:
+                return None
+            notes = json.loads(archive.read(entry))
+        if notes["schema"] != 1 or not isinstance(notes["releases"], list):
+            return None
+        releases = {}
+        for release in notes["releases"]:
+            target = release["version"]
+            if target in releases:
+                return None
+            if stable_version(release["previous_version"]) >= stable_version(target):
+                return None
+            releases[target] = release
+        changes = {key: set() for key in CHANGE_CATEGORIES}
+        cursor = version
+        while cursor != previous:
+            release = releases[cursor]
+            if stable_version(release["previous_version"]) < stable_version(previous):
+                return None
+            for key in CHANGE_CATEGORIES:
+                items = release[key]
+                if not isinstance(items, list) or any(not isinstance(item, str) or not item.strip() for item in items):
+                    return None
+                changes[key].update(items)
+            cursor = release["previous_version"]
+        return valid_summary({"from_version": previous, "to_version": version,
+                              **{key: len(items) for key, items in changes.items()}}, version)
+    except (OSError, ValueError, KeyError, TypeError, RecursionError, zipfile.BadZipFile):
+        return None
 
 
 def install_root() -> Path:
@@ -254,7 +321,10 @@ def install_release(root: Path, *, initial=False) -> dict:
             if intact:
                 if initial:
                     write_launcher(root, Path(sys.executable))
-                return {"version": previous["version"], "updated": False}
+                result = {"version": previous["version"], "updated": False}
+                if summary := valid_summary(previous.get("summary"), previous["version"]):
+                    result["summary"] = summary
+                return result
         uv = root / "uv" / ("uv.exe" if os.name == "nt" else "uv")
         if not uv.is_file():
             raise ValueError("The installation helper is missing; run the Consensus installer again")
@@ -264,6 +334,7 @@ def install_release(root: Path, *, initial=False) -> dict:
         runtime = Path(sys.executable) if initial else Path(sys.base_prefix) / ("python.exe" if os.name == "nt" else "bin/python3")
         with tempfile.TemporaryDirectory(prefix="download-", dir=root) as temporary:
             wheel = download_wheel(release, Path(temporary))
+            summary = release_summary(wheel, previous["version"] if previous else None, release["version"])
             run([str(uv), "--no-config", "venv", "--python", str(runtime), str(environment)], root)
             python = environment_python(environment)
             spec = str(wheel) + ("[" + ",".join(extras) + "]" if extras else "")
@@ -278,9 +349,13 @@ def install_release(root: Path, *, initial=False) -> dict:
         # Prepare the launcher before committing the only activation change.
         if initial:
             write_launcher(root, runtime)
-        atomic_json(root / "current.json", {"version": actual, "environment": name, "extras": extras,
-                                           "previous": previous["environment"] if previous else None})
-        return {"version": actual, "updated": True}
+        state = {"version": actual, "environment": name, "extras": extras,
+                 "previous": previous["environment"] if previous else None}
+        result = {"version": actual, "updated": True}
+        if summary is not None:
+            state["summary"] = result["summary"] = summary
+        atomic_json(root / "current.json", state)
+        return result
 
 
 def main() -> int:

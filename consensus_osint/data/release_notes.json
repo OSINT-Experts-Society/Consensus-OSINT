@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "releases": [
+    {
+      "version": "0.2.1",
+      "previous_version": "0.2.0",
+      "new_modules": [],
+      "bug_fixes": [],
+      "other_changes": [
+        "update-summary: Show reviewed module, bug-fix and other-change counts after updates and on restart.",
+        "community-box: Group the community links in a labelled Join the Community box."
+      ]
+    }
+  ]
+}

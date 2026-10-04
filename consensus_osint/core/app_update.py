@@ -54,10 +54,13 @@ def command(args) -> int:
         print("Checking for a Consensus update...", file=sys.stderr)
         result = manager.install_release(root)
         if result["updated"]:
-            print(f"Consensus {result['version']} installed. Restart Consensus to use it.")
+            print(f"Consensus {result['version']} installed. "
+                  + manager.summary_text(result.get("summary"), result["version"]))
+            print("Restart Consensus to use it.")
         else:
             print(f"Consensus {result['version']} is already installed.")
             if result["version"] != __version__:
+                print(manager.summary_text(result.get("summary"), result["version"]))
                 print("Restart Consensus to use the installed version.")
         return 0
     except (OSError, ValueError, KeyError, TypeError, http.client.HTTPException, subprocess.SubprocessError) as exc:

@@ -34,8 +34,9 @@ def _text(event):
         if state == "installing":
             return f"Installing Consensus {version} in the background…"
         if state == "installed":
-            return f"Consensus {version} installed. Restart Consensus to use it."
-        return f"Updated to Consensus {version}."
+            return (f"Consensus {version} installed. " + manager.summary_text(event.get("summary"), version)
+                    + " Restart Consensus to use it.")
+        return f"Updated to Consensus {version}. " + manager.summary_text(event.get("summary"), version)
     if state == "failed":
         return "Automatic update could not finish. Run consensus update to retry."
     return ""
@@ -54,7 +55,7 @@ def start():
 
         state = manager.active_install(root)
         if manager.stable_version(state["version"]) > manager.stable_version(__version__):
-            _message = _text({"state": "installed", "version": state["version"]})
+            _message = _text({"state": "installed", "version": state["version"], "summary": state.get("summary")})
             return
         options = ({"creationflags": subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP}
                    if os.name == "nt" else {"start_new_session": True})
@@ -99,7 +100,7 @@ def perform(root, emit):
         if version:
             manager.stable_version(version)
         if cached.get("state") == "installed" and version == __version__:
-            emit({"state": "ready", "version": version})
+            emit({"state": "ready", "version": version, "summary": cached.get("summary")})
             manager.atomic_json(cache_path, dict(cached, state="current"))
             return
         if 0 <= now - float(cached["checked_at"]) < CHECK_INTERVAL:
@@ -117,8 +118,12 @@ def perform(root, emit):
             emit({"state": "installing", "version": release["version"]})
             result = manager.install_release(root)
             event.update(state="installed", version=result["version"])
+            if summary := manager.valid_summary(result.get("summary"), result["version"]):
+                event["summary"] = summary
         elif manager.stable_version(active["version"]) > manager.stable_version(__version__):
             event.update(state="installed", version=active["version"])
+            if summary := manager.valid_summary(active.get("summary"), active["version"]):
+                event["summary"] = summary
         try:
             manager.atomic_json(cache_path, event)
         except OSError:
