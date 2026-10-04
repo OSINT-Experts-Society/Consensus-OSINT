@@ -9,14 +9,83 @@ from .branding import ACCENT, LINKS, ORGANIZATION, SLOGAN, TERMINAL_MARK
 from .terminal_ui import clean
 
 
-def home_page(info, *, width, height, version, history=False, footer_rows=None):
+def action_panels(width, *, has_results=False):
+    """Shared home/after-action menu, with optional dividers in short windows."""
+    available = min(118, width - 2)
+    panel_width = (available - 2) // 2
+    inset = " " if panel_width >= 24 else ""
+    inside = panel_width - 2 - 2 * len(inset)
+
+    def edge(title="", first="╭", last="╮"):
+        label = " " + title + " " if title else ""
+        value = Text(first, style="dim")
+        value.append(label, style="bold not dim" if title else "dim")
+        value.append("─" * max(0, panel_width - len(label) - 2) + last, style="dim")
+        return value
+
+    def item(number, label, description, short, *, inactive=False):
+        content = Text(number + "  " + label, style="dim" if inactive else "default not dim")
+        if not inactive:
+            content.stylize(f"bold {ACCENT}", 0, 1)
+        hint_start = 19 if inside >= 38 else 16
+        room = inside - hint_start
+        hint = description if len(description) <= room else short
+        if room >= len(hint):
+            content.append(" " * max(1, hint_start - content.cell_len))
+            content.append(hint, style="dim")
+        content.truncate(max(1, inside), overflow="ellipsis")
+        return content
+
+    def body(content):
+        content = content.copy()
+        content.truncate(max(1, inside), overflow="ellipsis")
+        value = Text("│" + inset, style="dim")
+        value.append(content)
+        value.append(" " * max(0, inside - content.cell_len) + inset + "│", style="dim")
+        return value
+
+    def pair(left, right, optional=0):
+        value = Text(" ")
+        value.append(left)
+        value.append("  ")
+        value.append(right)
+        return value, optional
+
+    search = [item("1", "Username", "Find matching profiles", "Matching profiles"),
+              item("2", "Email", "Find linked accounts", "Linked accounts"),
+              item("3", "Phone", "Check number details", "Number details"),
+              item("4", "Bulk search", "Search a list of identifiers", "Search a list")]
+    hint = "Run a search first"
+    results = [item("5", "View results", "Reopen your latest search" if has_results else hint,
+                    "Latest search" if has_results else hint, inactive=not has_results),
+               item("6", "Save report", "Export your latest results" if has_results else hint,
+                    "Export results" if has_results else hint, inactive=not has_results),
+               item("7", "Settings", "Adjust search preferences", "Preferences"),
+               Text("" if has_results or inside >= 34 else "Search first", style="dim")]
+    rows = [pair(edge("Start a search"), edge("Results & settings" if panel_width >= 24 else "Results/setup"))]
+    for index, (left, right) in enumerate(zip(search, results, strict=True)):
+        if index:
+            rows.append(pair(edge(first="├", last="┤"), edge(first="├", last="┤"), 2))
+        rows.append(pair(body(left), body(right)))
+    rows.append(pair(edge(first="╰", last="╯"), edge(first="╰", last="╯")))
+    tools = Text(" ")
+    for number, label in (("8", "Show Examples"), ("9", "Help"), ("0", "Exit")):
+        if len(tools) > 1:
+            tools.append("   ")
+        tools.append(number, style=f"bold {ACCENT}")
+        tools.append("  " + label)
+    rows.append((tools, 0))
+    return rows
+
+
+def home_page(info, *, width, height, version, history=False, footer_rows=None, has_results=False):
     """Framed identity, aligned actions and one clear input invitation.
 
     Reserve the actual responsive footer, input and cursor. Full metadata and
     branding remain under info/about. Long paths retain their full link targets.
     """
     terminal_width = width
-    frame_width = max(34, min(98, width - 2))
+    frame_width = max(34, min(118, width - 2))
     wide = frame_width >= 76
     padding = 2 if wide else 1
     content_width = frame_width - 2 - 2 * padding
@@ -44,25 +113,6 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
             row = Text(" " * (2 + padding))
             row.append(value)
         rows.append((row, optional))
-
-    def key(number, label):
-        value = Text()
-        value.append(number, style=f"bold {ACCENT}")
-        value.append("  " + label, style="default")
-        return value
-
-    def columns(*values, optional=0):
-        gap = 2
-        column_width = (content_width - gap * (len(values) - 1)) // len(values)
-        row = Text()
-        for i, value in enumerate(values):
-            value = fit(value, column_width)
-            if i:
-                row.append(" " * gap)
-            row.append(value)
-            if i < len(values) - 1:
-                row.append(" " * (column_width - value.cell_len))
-        add(row, optional=optional)
 
     def location(label, path):
         label_width = 11 if wide else 9
@@ -117,15 +167,7 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
     add(text(catalogue, "yellow" if "unverified" in catalogue or "days old" in catalogue else "dim"), framed=True)
     rows.append((Text(" ╰" + "─" * (frame_width - 2) + "╯", style="dim"), 0))
     add(optional=1)
-    columns(text("Start a search", "bold"), text("Results & settings" if wide else "Results / setup", "bold"))
-    column_width = (content_width - 2) // 2
-    columns(text("─" * column_width, "dim"), text("─" * column_width, "dim"), optional=2)
-    for left, right in [(key("1", "Username"), key("5", "View results")),
-                        (key("2", "Email"), key("6", "Save report")),
-                        (key("3", "Phone"), key("7", "Settings")),
-                        (key("4", "Bulk search"), key("9", "Help")),
-                        (key("8", "Show Examples"), key("0", "Exit"))]:
-        columns(left, right)
+    rows.extend(action_panels(terminal_width, has_results=has_results))
     links = Text()
     for label, url in [("osint.ngo", LINKS[0][1]), ("LinkedIn", LINKS[1][1]),
                        ("Reddit", LINKS[2][1]), ("GitHub", info.repository)]:
@@ -142,11 +184,10 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
     add(community_links)
     add(text("╰" + "─" * (content_width - 2) + "╯", "dim"))
     add(optional=1)
-    notice = Text("Bugs can occur. ", style="yellow")
-    notice.append("Verify findings. Lawful use; use test accounts." if wide else "Use test accounts.", style="default")
+    notice = Text("Bugs can occur. " if wide else "", style="yellow")
+    notice.append("Verify findings. Lawful use; use test accounts." if wide else
+                  "Use test accounts. Lawful use only.", style="default")
     add(notice)
-    if not wide:
-        add(text("Lawful use; respect privacy/terms.", "dim"))
     add(optional=1)
     invitation = Text("Type a username, email or phone (auto-detect). / commands" if wide else
                       "Auto-detect input · / commands", style="dim")
@@ -165,11 +206,11 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None):
         if len(rows) > budget:
             rows = [(row, rank) for row, rank in rows if rank != priority]
     if len(rows) > budget or any(row.cell_len > terminal_width for row, _ in rows):
-        return _small_home(info, width=terminal_width, budget=budget, version=version)
+        return _small_home(info, width=terminal_width, budget=budget, version=version, has_results=has_results)
     return Text("\n").join(row for row, _ in rows)
 
 
-def _small_home(info, *, width, budget, version):
+def _small_home(info, *, width, budget, version, has_results=False):
     """Keep entry usable when a framed menu cannot fit above input and footer."""
     width, budget = max(1, width), max(1, budget)
     title = Text("●─◎ ", style=ACCENT)
@@ -186,8 +227,10 @@ def _small_home(info, *, width, budget, version):
             row = Text(first.ljust(column_width) + "  " + second)
             row.stylize(f"bold {ACCENT}", 0, 1)
             row.stylize(f"bold {ACCENT}", column_width + 2, column_width + 3)
+            if not has_results and second.startswith(("5", "6")):
+                row.stylize("dim", column_width + 2)
             rows.append(row)
-        rows.append(Text("Resize for full home.", style="dim"))
+        rows.append(Text("Resize for full home." if has_results else "Resize; 5/6: Run a search first.", style="dim"))
         if budget >= 13:
             links = Text()
             for label, url in (("osint.ngo", LINKS[0][1]), ("LinkedIn", LINKS[1][1]),

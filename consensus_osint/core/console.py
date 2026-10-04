@@ -133,7 +133,7 @@ class Printer:
         self.session_information()
         self.command_menu()
 
-    def home(self, version: str) -> None:
+    def home(self, version: str, *, has_results=False) -> None:
         """Interactive home sized to the actual input terminal, including footer."""
         if self.quiet or self.jsonl:
             return
@@ -148,7 +148,7 @@ class Printer:
             height = size.rows if self.terminal_ui else size.height
             footer = getattr(self.terminal_ui, "footer_text", None)
             page = home_page(info, width=width, height=height, version=version,
-                             history=self.terminal_ui is not None,
+                             history=self.terminal_ui is not None, has_results=has_results,
                              footer_rows=len(footer(width).splitlines()) if footer else None)
             self.console.print(page, soft_wrap=True)
         else:
@@ -161,6 +161,25 @@ class Printer:
                          "/ commands · /config settings · info: full paths\n"
                          "Bugs can occur. Use test accounts and verify findings.\n"
                          "Lawful, authorised use only. Respect privacy and terms.")
+
+    def actions(self, *, has_results=False):
+        if self.quiet or self.jsonl:
+            return
+        if self.console:
+            from .home import action_panels
+
+            size = self.terminal_ui.session.app.output.get_size() if self.terminal_ui else self.console.size
+            width = size.columns if self.terminal_ui else size.width
+            height = size.rows if self.terminal_ui else size.height
+            if width >= 40:
+                rows = action_panels(width, has_results=has_results)
+                self.console.print(Text("\n").join(row for row, rank in rows if height >= 28 or not rank), soft_wrap=True)
+                return
+        self.message("1 Username · 2 Email · 3 Phone · 4 Bulk search")
+        self.message("5 View results · 6 Save report · 7 Settings")
+        self.message("8 Show Examples · 9 Help · 0 Exit")
+        if not has_results:
+            self.message("5/6: Run a search first.", "dim")
 
     def session_information(self, output=None) -> None:
         if self.quiet or self.jsonl:

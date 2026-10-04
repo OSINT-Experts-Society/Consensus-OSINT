@@ -2,6 +2,15 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.2.2",
+      "previous_version": "0.2.1",
+      "new_modules": [],
+      "bug_fixes": [],
+      "other_changes": [
+        "action-panels: Separate search and results panels with option descriptions and result availability hints."
+      ]
+    },
+    {
       "version": "0.2.1",
       "previous_version": "0.2.0",
       "new_modules": [],

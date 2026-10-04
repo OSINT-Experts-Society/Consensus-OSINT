@@ -78,8 +78,7 @@ class Session:
                 f"Timeout: {str(p['timeout']) + 's' if p['timeout'] is not None else 'configured default'}")
 
     def menu(self):
-        self.printer.message("\n1 Username · 2 Email · 3 Phone · 4 Bulk search", ACCENT)
-        self.printer.message("5 View results · 6 Save report · 7 Settings · 8 Show Examples · 9 Help · 0 Exit")
+        self.printer.actions(has_results=self.latest is not None)
         if self.latest is not None:
             self.printer.message(f"Latest search: {len(self.latest.queries)} queries · {len(self.latest.findings)} results. "
                                  "Use last to view or save to export.", "dim")
@@ -331,7 +330,7 @@ class Session:
             return False
         if command in {"menu", "help", "?"}:
             if command == "menu":
-                self.printer.home(__version__)
+                self.printer.home(__version__, has_results=self.latest is not None)
             else:
                 self.help()
         elif command == "about":
@@ -388,7 +387,7 @@ class Session:
         return True
 
     def run(self):
-        self.printer.home(__version__)
+        self.printer.home(__version__, has_results=self.latest is not None)
         last_update_notice = ""
         while True:
             try:
