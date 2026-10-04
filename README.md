@@ -21,7 +21,7 @@
     <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark-mobile.svg">
     <source media="(max-width: 600px)" srcset="consensus_osint/templates/consensus-process-light-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark.svg">
-    <img src="consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus is built: 19 projects feed expert testing, improvement, standardisation and deduplication. How you search: your query goes through Consensus for one search per site and unified results.">
+    <img src="consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus is built: 19 source projects list 12,356 modules and rules including overlaps; expert review feeds Consensus with 7,989 enabled modules and rules. Weekly process: horizon scan, identify new modules, expert review, update Consensus. Default searches select one lookup per site and produce unified results.">
   </picture>
 </p>
 
@@ -105,17 +105,6 @@ Counts cover catalogue rules and modules as of 3 October 2026, excluding explici
 - **Bulk searches, advanced controls and proxies.** Process lists, generate username variations, filter by site or category, and use a guided menu or repeatable CLI commands.
 
 ## See Consensus in action
-
-**Watch a command-line search:** enter a username, follow the scan progress, then inspect returned details and source coverage.
-
-<a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-demo-terminal.mp4">
-  <picture>
-    <source media="(prefers-reduced-motion: reduce)" srcset="consensus_osint/templates/consensus-demo-terminal.png">
-    <img src="consensus_osint/templates/consensus-demo-terminal.gif" width="920" alt="35-second Consensus CLI demonstration: entering a query, scan progress and detailed results using fictional data">
-  </picture>
-</a>
-
-<a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-demo-terminal.mp4">Open / download the 35-second video (MP4)</a>. Actual CLI output with simulated provider responses; no live searches. Playback is paced for readability, not a speed benchmark.
 
 Actual Consensus report screens using **fictional demonstration data**. No live searches were performed. Click either image to view it full size.
 
