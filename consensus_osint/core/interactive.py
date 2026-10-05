@@ -109,7 +109,8 @@ class Session:
         if command == "phone":
             self.printer.message(PHONE_GUIDANCE, "dim")
         if value is None:
-            value = _unquote(self.read(f"{command.capitalize()} to search (Enter to go back): "))
+            label = "Username" if command == "user" else command.capitalize()
+            value = _unquote(self.read(f"{label} to search (Enter to go back): "))
             if self._leaves_prompt(value, f"{command} {value}"):
                 return
         if value:

@@ -127,6 +127,7 @@ class TerminalUI:
         self.returned_from_results = False
         self.scan_tips = list(_SCAN_TIPS)
         self.tip_started = None
+        self.phase_label = ""
 
     def refresh_network(self, proxy=None):
         if not self.network_enabled or self.loop is None:
@@ -208,12 +209,13 @@ class TerminalUI:
             self.results_view.app.invalidate()
 
     def start_phase(self, total, label):
-        self.update("Scanning", total=total, completed=0)
+        label = re.sub(r"^(?:scanning|checking)\s+", "Searching: ", clean(label))
+        self.update("Scanning", total=total, completed=0, phase_label=label)
 
     def begin_scan(self):
         random.shuffle(self.scan_tips)
         self.tip_started = time.monotonic()
-        self.update("Preparing search", preparing=True, found=0, enriched=0,
+        self.update("Preparing search", preparing=True, found=0, enriched=0, phase_label="",
                     completed=0, total=0, sources=(), preview=None, last_hit=0.0)
 
     def result(self, found, enriched, finding=None):
@@ -236,7 +238,8 @@ class TerminalUI:
 
     def detach_scan(self):
         self.tip_started = None
-        self.update("Preparing results", controller=None, preparing=False, stop_requested=False, preview=None, last_hit=0.0)
+        self.update("Preparing results", controller=None, preparing=False, stop_requested=False,
+                    preview=None, last_hit=0.0, phase_label="")
 
     def toggle_preview(self):
         with self.lock:
@@ -406,7 +409,9 @@ class TerminalUI:
 
             moving = self.animate and activity not in ("Paused", "Stopping")
             mark = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"[int(time.monotonic() * 8) % 10] if moving else "•"
-            label = "Searching sites…" if activity == "Scanning" else activity
+            label = (self.phase_label or "Searching sites…") if activity == "Scanning" else activity
+            if activity in ("Paused", "Stopping") and self.phase_label:
+                label += " · " + self.phase_label
             body = Text(" " + mark + "  " + clean(label))
             body.truncate(max(1, width - 2), overflow="ellipsis")
             prefix.append(("class:loading", "\n" + body.plain + "\n"))
@@ -426,7 +431,11 @@ class TerminalUI:
             label = " › " if self.question == "consensus> " else " " + clean(self.question)
             return prefix + [("class:prompt", label)]
         if self.controller is not None:
-            controls = [("class:hint", "V preview · P pause · R continue · S / Esc stop")]
+            toggle = "V hide preview" if scan_preview is not None and scan_preview.visible else "V preview"
+            state = "R resume" if activity == "Paused" else "P pause"
+            hint = ("Stopping… Collected results will be kept." if activity == "Stopping" else
+                    f"{toggle} · {state} · S / Esc stop")
+            controls = [("class:hint", hint)]
             if height >= 20 and width >= 40 and self.tip_started is not None:
                 import textwrap
 

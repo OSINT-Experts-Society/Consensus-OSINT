@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+from bisect import bisect_right
 
 from prompt_toolkit.application import Application
 from prompt_toolkit.data_structures import Point
@@ -33,6 +34,9 @@ class ResultsView:
         self.scrollbar_height = 1
         self.scrollbar_drag = None
         self._footer_cache = None
+        self.sections = []
+        self.section_rows = []
+        self.caption = "Search results"
         keys = KeyBindings()
         view = self
 
@@ -136,13 +140,17 @@ class ResultsView:
         for key in ("q", "c-c", "c-d"):
             keys.add(key)(lambda event: self.back())
         self.header = Window(BarControl(self.navigation, above=True), height=3, style="class:toolbar")
+        self.column_header = Window(BarControl(self.pinned_heading, above=True),
+                                    height=lambda: 2 if self.pinned_enabled() else 0,
+                                    wrap_lines=False, style="class:toolbar")
         self.footer_window = Window(BarControl(self.footer), height=2, style="class:footer")
         self.app = Application(layout=Layout(HSplit([
             self.header,
+            self.column_header,
             VSplit([self.window, self.scrollbar]),
             self.footer_window
         ])), key_bindings=keys, full_screen=True, mouse_support=True, input=input, output=output,
-            min_redraw_interval=1 / 60, max_render_postpone_time=0, before_render=lambda app: self._clear_footer(),
+            min_redraw_interval=1 / 60, max_render_postpone_time=0, before_render=lambda app: self.before_render(),
             style=Style.from_dict({"footer": "bg:#202226 #b9bdc5", "toolbar": "bg:#16181c #d8dbe2",
                                   "nav-button": "bg:#ff6a00 #101114 bold", "nav-border": "#ff6a00",
                                   "selected-link": "reverse",
@@ -151,6 +159,42 @@ class ResultsView:
 
     def _clear_footer(self):
         self._footer_cache = None
+
+    def before_render(self):
+        # Prepare before layout so the pinned rows participate in the initial
+        # completion/resize geometry. No document work on ordinary scrolling.
+        self.prepare(max(1, self.app.output.get_size().columns - 1))
+        self._clear_footer()
+
+    def pinned_enabled(self):
+        return (bool(self.sections) and self.app.output.get_size().rows >= 14
+                and self.line > self.section_rows[0])
+
+    def pinned_heading(self):
+        if not self.sections:
+            return []
+        index = max(0, bisect_right(self.section_rows, self.line) - 1)
+        row, title = self.sections[index]
+        width = max(1, self.app.output.get_size().columns - 1)
+        from rich.text import Text
+
+        query = Text(title)
+        query.truncate(width, overflow="ellipsis")
+        result = [("bold", query.plain + "\n")]
+        # Crop by terminal cells, not string offsets, and never inherit links.
+        # Only a short column heading is visited, regardless of result count.
+        x = 0
+        for style, text, *_ in self.lines[row]:
+            kept = []
+            for char in text:
+                size = get_cwidth(char)
+                if self.column <= x and x + size <= self.column + width:
+                    kept.append(char)
+                elif x < self.column < x + size:
+                    kept.append(" " * (x + size - self.column))
+                x += size
+            result.append((style, "".join(kept)))
+        return result
 
     def navigation(self):
         def click(event):
@@ -163,7 +207,7 @@ class ResultsView:
         label = "  ← Back to results  Esc  " if self.history else "  ← Main menu  Q  "
         if width < len(label) + 2:
             label = " ← Results " if self.history else " ← Menu "
-        title = "Result details" if self.history else "Search results"
+        title = "Result details" if self.history else self.caption if self.line else "Search results"
         return [("class:nav-border", "╭" + "─" * len(label) + "╮\n", click),
                 ("class:nav-border", "│", click), ("class:nav-button", label, click),
                 ("class:nav-border", "│", click), ("bold", "   " + title if width >= len(label) + len(title) + 6 else ""),
@@ -224,10 +268,14 @@ class ResultsView:
         return None
 
     def visible_height(self):
-        return max(1, self.app.output.get_size().rows - 5)
+        return max(1, self.app.output.get_size().rows - 5 - (2 if self.pinned_enabled() else 0))
 
     def last_page(self):
-        return max(0, len(self.lines) - self.visible_height())
+        size = self.app.output.get_size()
+        bottom = max(0, len(self.lines) - max(1, size.rows - 5))
+        if self.sections and size.rows >= 14 and bottom > self.section_rows[0]:
+            bottom += 2
+        return bottom
 
     def select_link(self, delta):
         if not self.links:
@@ -249,7 +297,8 @@ class ResultsView:
         if url.startswith("consensus-detail:") and self.detail:
             key = url.partition(":")[2]
             self.history.append((self.render, self.line, self.selected, self.width,
-                                 self.lines, self.fragments, self.links, self.column, self.document_width))
+                                 self.lines, self.fragments, self.links, self.column, self.document_width,
+                                 self.sections, self.section_rows, self.caption))
             self.render = lambda width: self.detail(key, width)
             self.width, self.line, self.selected = None, 0, None
             self.column = 0
@@ -267,7 +316,8 @@ class ResultsView:
     def back(self, *, close=True):
         if self.history:
             (self.render, self.line, self.selected, self.width,
-             self.lines, self.fragments, self.links, self.column, self.document_width) = self.history.pop()
+             self.lines, self.fragments, self.links, self.column, self.document_width,
+             self.sections, self.section_rows, self.caption) = self.history.pop()
             self._clear_footer()
             self.app.invalidate()
         elif close:
@@ -325,7 +375,11 @@ class ResultsView:
         width = max(1, width)
         if width != self.width:
             self.width = width
-            self.fragments = self._linked_fragments(self.render(width))
+            rendered = self.render(width)
+            self.sections = getattr(rendered, "sections", [])
+            self.section_rows = [row for row, _ in self.sections]
+            self.caption = getattr(rendered, "caption", "Search results")
+            self.fragments = self._linked_fragments(rendered)
             self.lines = list(split_lines(self.fragments))
             self.document_width = max(sum(get_cwidth(f[1]) for f in line) for line in self.lines)
             self.pan(0)

@@ -601,7 +601,7 @@ class Printer:
         else:
             self.message(f"Report saved: {resolved}", always=True)
 
-    def finish(self, summary, *, review=False, follow_end=False) -> None:
+    def finish(self, summary, *, review=False, follow_end=False, include_identity=True) -> None:
         """Closing review uses final, deduplicated findings rather than streamed counts."""
         if self.jsonl:
             return
@@ -632,7 +632,8 @@ class Printer:
                  f"{len(summary.findings)} results in {elapsed}  /  {info} background checks",
                  f"No match {no_match}  |  Inconclusive {incomplete}  |  Skipped {skipped}"]
         self.separator("Search results")
-        self.identity()
+        if include_identity:
+            self.identity()
         self.message("")
         for view in group_by_query(summary):
             self.message(f"Search query: {view.title}", f"bold {ACCENT}")

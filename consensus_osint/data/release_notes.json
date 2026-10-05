@@ -2,6 +2,18 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.2.8",
+      "previous_version": "0.2.7",
+      "new_modules": [],
+      "bug_fixes": [
+        "active-query-context: Display the search phase and identifier that were previously discarded by the interactive console."
+      ],
+      "other_changes": [
+        "persistent-result-headings: Keep query context and named columns visible while scrolling, including bulk groups and horizontal navigation.",
+        "search-journey-guidance: Show relevant scan controls, explain empty and partial results, and open full analysis without repeated marketing."
+      ]
+    },
+    {
       "version": "0.2.7",
       "previous_version": "0.2.6",
       "new_modules": [],

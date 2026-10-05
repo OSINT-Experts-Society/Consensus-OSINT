@@ -17,12 +17,30 @@ from .provenance import repository_coverage
 from .terminal_ui import clean
 
 
+class ResultDocument(str):
+    """Rendered text with query/header positions for the scrollable viewer."""
+
+    def __new__(cls, value, sections, caption):
+        result = super().__new__(cls, value)
+        result.sections = sections
+        result.caption = caption
+        return result
+
+
+class _Buffer(io.StringIO):
+    lines = 0
+
+    def write(self, value):
+        self.lines += value.count("\n")
+        return super().write(value)
+
+
 def result_pages(summary, *, show_all=False, limit=0):
     """Keep detail IDs stable across resizing, query groups and coverage panels."""
     findings = list(summary.findings)
 
     def console(width):
-        stream = io.StringIO()
+        stream = _Buffer()
         return Console(file=stream, width=width, height=25, force_terminal=True, color_system="truecolor",
                        legacy_windows=False, highlight=False), stream
 
@@ -35,21 +53,43 @@ def result_pages(summary, *, show_all=False, limit=0):
         from .reports import group_by_query, result_link
 
         out, stream = console(width)
+        sections = []
         matches = [f for f in findings if f.status is Status.FOUND and f.category not in INFO_CATEGORIES]
+        inconclusive = sum(f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
+                           for f in findings if f.category not in INFO_CATEGORIES)
         title = "Search stopped · partial results" if summary.options.get("interrupted") else "Search complete"
         out.print(Text(title, style=f"bold {ACCENT}"))
         out.print(Text(f"{len(matches)} found · {sum(has_details(f) for f in matches)} enriched · {len(findings)} outcomes"))
-        out.print(Text("X = project lists this lookup; coverage does not mean separate searches.", style="dim"))
-        out.print(Text("Possible match = limited evidence. Select the result label to see why.", style="dim"))
+        if matches or show_all:
+            out.print(Text("X = project lists this lookup; coverage does not mean separate searches.", style="dim"))
+        if any(assessment(f)[0] == "Needs review" for f in matches):
+            out.print(Text("Possible match = limited evidence. Select the result label to see why.", style="dim"))
+        if summary.options.get("interrupted"):
+            out.print(Text("Only collected outcomes are shown; this is not a complete search.", style="yellow"))
         identifiers = {id(f): str(i + 1) for i, f in enumerate(findings)}
-        for group in group_by_query(summary):
+        groups = group_by_query(summary)
+        if not groups:
+            out.print(Text("No lookup outcomes were collected.", style="dim"))
+        for group in groups:
             out.print(Text("\n" + clean(group.title), style="bold"))
             rows = [f for f in group.findings if f.category not in INFO_CATEGORIES and
                     (show_all or f.status is Status.FOUND)]
             rows.sort(key=lambda f: (assessment(f)[0] == "Needs review", f.site.casefold()))
             shown = rows[:limit] if limit else rows
             if not shown:
-                out.print(Text("No matches reported. See all outcomes for inconclusive or skipped checks.", style="dim"))
+                if summary.options.get("interrupted"):
+                    message = "No matches reported before the search stopped. This search is incomplete."
+                elif any(f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
+                         for f in group.findings if f.category not in INFO_CATEGORIES):
+                    message = "No matches reported. Some sites could not be checked conclusively."
+                elif not any(f.status is Status.NOT_FOUND for f in group.findings if f.category not in INFO_CATEGORIES):
+                    message = "No matches reported. No conclusive lookup results; review skipped or unavailable lookups in all outcomes."
+                else:
+                    message = "No matches reported by the completed lookups. Try another identifier or review all outcomes."
+                # A bulk query with no rows must replace the previous query's
+                # sticky context too; its explanation takes the header's place.
+                sections.append((stream.lines, clean(group.title)))
+                out.print(Text(message, style="dim"))
                 continue
             coverage = {id(f): repository_coverage(f) for f in shown}
             projects = {p["id"]: p["name"] for values in coverage.values() for p in values}
@@ -85,18 +125,18 @@ def result_pages(summary, *, show_all=False, limit=0):
                 table.add_row(*cells)
             table_out, table_stream = console(max(width, table_width))
             table_out.print(table)
+            sections.append((stream.lines, clean(group.title)))
             stream.write(table_stream.getvalue())
             if any(not coverage[id(f)] for f in shown):
                 out.print(Text("Some rows have no saved project attribution; missing coverage is unknown.", style="dim"))
             if len(shown) < len(rows):
                 out.print(Text(f"Showing {len(shown)} of {len(rows)} rows; full analysis retains every outcome.", style="dim"))
         out.print()
-        inconclusive = sum(f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
-                           for f in findings if f.category not in INFO_CATEGORIES)
         out.print(Text(f"Found {len(matches)} · Enriched {sum(has_details(f) for f in matches)} · Inconclusive {inconclusive}", style="bold"))
         out.print(link("All outcomes & full analysis", "all"))
-        out.print(Text("Select an underlined link for details. No enrichment means no additional profile fields.", style="dim"))
-        return stream.getvalue()
+        if matches:
+            out.print(Text("Site opens the profile · View opens enriched fields · X marks project coverage.", style="dim"))
+        return ResultDocument(stream.getvalue(), sections, title)
 
     def detail(key, width):
         from .console import Printer
@@ -106,7 +146,7 @@ def result_pages(summary, *, show_all=False, limit=0):
         printer.terminal_ui = None
         printer.console = out
         if key == "all":
-            printer.finish(summary)
+            printer.finish(summary, include_identity=False)
         elif key.isdecimal() and 1 <= int(key) <= len(findings):
             f = findings[int(key) - 1]
             out.print(Text(clean(f.site) + " · returned details", style=f"bold {ACCENT}"))
