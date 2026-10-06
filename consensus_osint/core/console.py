@@ -608,7 +608,8 @@ class Printer:
         if review and self.terminal_ui and not self.quiet:
             from .console_results import result_pages
 
-            render, detail = result_pages(summary, show_all=self.show_all, limit=self.summary_limit)
+            render, detail = result_pages(summary, show_all=self.show_all, limit=self.summary_limit,
+                                          filters=getattr(self.terminal_ui, "result_filters", None))
             self.terminal_ui.review(render, detail=detail, follow_end=follow_end)
             return
         if self.terminal_ui:

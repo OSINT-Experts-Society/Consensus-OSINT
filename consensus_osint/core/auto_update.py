@@ -90,6 +90,9 @@ def perform(root, emit):
         return
     from .. import __version__
 
+    if manager.active_install(root).get("auto_update_paused"):
+        emit({"state": "paused"})
+        return
     cache_path = root / "auto-update.json"
     now = time.time()
     try:
@@ -111,13 +114,14 @@ def perform(root, emit):
     event = {"state": "current", "checked_at": now}
     installing = False
     try:
-        release = manager.latest_release(timeout=5)
+        release = manager.release_for(root, timeout=5)
+        event["version"] = release["version"]
         active = manager.active_install(root)
         if manager.stable_version(release["version"]) > manager.stable_version(active["version"]):
             installing = True
             emit({"state": "installing", "version": release["version"]})
-            result = manager.install_release(root)
-            event.update(state="installed", version=result["version"])
+            result = manager.install_release(root, automatic=True)
+            event.update(state="installed" if result["updated"] else "current", version=result["version"])
             if summary := manager.valid_summary(result.get("summary"), result["version"]):
                 event["summary"] = summary
         elif manager.stable_version(active["version"]) > manager.stable_version(__version__):

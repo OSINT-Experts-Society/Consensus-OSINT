@@ -69,6 +69,7 @@ class Session:
         self.preferences = dict(_DEFAULTS)
         self.latest = None
         self._saved_report = None
+        self.restart_requested = False
 
     def active_settings(self):
         p = self.preferences
@@ -88,6 +89,14 @@ class Session:
     def remember(self, summary):
         # Retain only the latest scan; never add findings from earlier people.
         self.latest = summary
+        if self.printer.terminal_ui:
+            self.printer.terminal_ui.result_filters = {}
+        try:
+            from .search_history import SearchHistory
+
+            SearchHistory().save(summary)
+        except (OSError, ValueError, TypeError) as exc:
+            self.printer.warn(f"Could not retain local history: {exc}. Results are still available in this session.")
 
     def execute(self, tokens, *, remember=False):
         from ..cli import main
@@ -244,13 +253,27 @@ class Session:
                  else "on" if self.preferences[name] else "off"]
                 for i, (name, label) in enumerate(_SETTINGS, 1)
             ] + [[str(len(_SETTINGS) + 1), "Loading, footer and tab animations", "on" if self.animate else "off"],
+                 ["u", "Installation & updates", "Open"],
+                 ["h", "Recent searches", "Open"],
                  ["0", "Back", ""], ["reset", "Reset session and forget latest results", ""]],
-                "Session settings · kept only until you exit")
+                "Settings · search preferences apply to this session")
             choice = self.read("Setting to change [0 = back]: ").strip().lower()
             if not choice or choice in _LEAVE_WORDS:
                 return
             if choice == "reset":
                 self.reset()
+                return
+            if choice == "u":
+                from .installation_ui import screen
+
+                screen(self)
+                if self.restart_requested:
+                    return
+                continue
+            if choice == "h":
+                from .search_history import screen
+
+                screen(self)
                 return
             if choice == str(len(_SETTINGS) + 1):
                 self.change_setting("animation", "off" if self.animate else "on")
@@ -345,6 +368,14 @@ class Session:
             self.printer.message("Inside this session, leave off the initial consensus in those examples.", "dim")
         elif command == "settings":
             self.settings()
+        elif command == "updates":
+            from .installation_ui import screen
+
+            screen(self)
+        elif command == "history":
+            from .search_history import screen
+
+            screen(self)
         elif command == "set":
             if len(arguments) != 2:
                 raise ValueError("Use set SETTING VALUE, for example: set details on.")
@@ -387,6 +418,41 @@ class Session:
             self.query("user" if kind is QueryType.USERNAME else kind.value, value=value)
         return True
 
+    def results_actions(self):
+        ui = self.printer.terminal_ui
+        while ui is not None and ui.results_action:
+            action, ui.results_action = ui.results_action, None
+            try:
+                if action == "save":
+                    ui.returned_from_results = False
+                    self.save_latest([])
+                    return
+                if action == "again":
+                    from .reports import group_by_query
+
+                    groups = [v for v in group_by_query(self.latest) if not v.parent]
+                    if groups:
+                        ui.prefill = shlex.join(["scan", "--", *[v.query_type + ":" + v.query for v in groups]])
+                    return  # Prefill only. Enter is required to issue another search.
+                if action == "filter":
+                    self.printer.message("1 Site name · 2 Enriched only · 3 Possible matches · 4 Clear all · 0 Back")
+                    choice = self.read("Filter results: ").strip()
+                    if choice == "1":
+                        value = self.read("Site name contains (Enter clears name filter): ").strip()
+                        if value:
+                            ui.result_filters["site"] = value
+                        else:
+                            ui.result_filters.pop("site", None)
+                    elif choice in ("2", "3"):
+                        ui.result_filters["kind"] = "enriched" if choice == "2" else "possible"
+                    elif choice == "4":
+                        ui.result_filters = {}
+            except KeyboardInterrupt:
+                self.printer.message("Cancelled. Returning to results.")
+            except (OSError, ValueError) as exc:
+                self.printer.warn(f"Could not complete the action: {exc}. Results are still available.")
+            self.show_latest()
+
     def run(self):
         self.printer.home(__version__, has_results=self.latest is not None)
         last_update_notice = ""
@@ -413,6 +479,9 @@ class Session:
                     tokens = tokens[1:]
                 if tokens and not self.dispatch(tokens):
                     break
+                if self.restart_requested:
+                    break
+                self.results_actions()
                 ui = self.printer.terminal_ui
                 if ui is not None and ui.returned_from_results:
                     ui.returned_from_results = False
@@ -458,6 +527,7 @@ def start_session(*, color=True, footer=True, animate=True):
         return 2
     from .terminal_ui import TerminalUI, supported
 
+    sessions = []
     if footer and supported(color=color):
         def start(read):
             import os
@@ -466,7 +536,17 @@ def start_session(*, color=True, footer=True, animate=True):
             from .terminal_ui import current_ui
 
             current_ui().refresh_network(os.environ.get("CONSENSUS_PROXY") or get_config().get("defaults", {}).get("proxy"))
-            return Session(color=color, animate=animate, read=read).run()
+            session = Session(color=color, animate=animate, read=read)
+            sessions.append(session)
+            return session.run()
 
-        return TerminalUI(animate=animate, network=True).run(start)
-    return Session(color=color, animate=animate).run()
+        result = TerminalUI(animate=animate, network=True).run(start)
+    else:
+        session = Session(color=color, animate=animate)
+        sessions.append(session)
+        result = session.run()
+    if sessions and sessions[0].restart_requested:
+        from .installation_ui import restart
+
+        restart()
+    return result

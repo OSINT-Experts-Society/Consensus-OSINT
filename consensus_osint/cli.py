@@ -369,6 +369,10 @@ def build_parser(*, full_help: bool = False, color: bool = True, scan_defaults=N
     upd.add_argument("--check", action="store_true", help="check the application version without installing")
     upd.add_argument("--catalogue", action="store_true", help="check the signed catalogue build without installing")
     upd.add_argument("--json", action="store_true", help="check only; return version information as JSON")
+    recovery = upd.add_mutually_exclusive_group()
+    recovery.add_argument("--repair", action="store_true", help="reinstall the active version using its verified cached wheel")
+    recovery.add_argument("--rollback", action="store_true", help="restore the previous validated version")
+    recovery.add_argument("--feed", help="install from a private bundle directory")
     return p
 
 

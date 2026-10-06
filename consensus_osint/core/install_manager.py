@@ -13,9 +13,11 @@ import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import urllib.error
 import urllib.request
 import uuid
@@ -157,11 +159,36 @@ def latest_release(timeout: float = 5) -> dict:
     raise ValueError("No supported, non-yanked Consensus wheel has been published")
 
 
+def bundle_release(folder) -> dict:
+    """A user-selected private folder is a channel, not a public publication."""
+    folder = Path(folder).expanduser().resolve(strict=True)
+    manifest = folder / "release.json"
+    if manifest.stat().st_size > MAX_METADATA:
+        raise ValueError("Release metadata is too large")
+    value = json.loads(manifest.read_text(encoding="utf-8"))
+    stable_version(value["version"])
+    expected = f"consensus_osint-{value['version']}-py3-none-any.whl"
+    if value.get("filename") != expected or not re.fullmatch(r"[a-f0-9]{64}", value.get("sha256", "")):
+        raise ValueError("Invalid bundle manifest")
+    wheel = (folder / expected).resolve(strict=True)
+    if wheel.parent != folder or not wheel.is_file() or wheel.stat().st_size > MAX_WHEEL:
+        raise ValueError("Invalid bundle wheel")
+    return {"version": value["version"], "filename": expected, "sha256": value["sha256"],
+            "local_path": str(wheel), "channel": str(folder)}
+
+
+def release_for(root, *, timeout=5):
+    state = active_install(root)
+    return bundle_release(state["channel"]) if state and state.get("channel") else latest_release(timeout=timeout)
+
+
 def atomic_json(path: Path, value: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + "." + uuid.uuid4().hex + ".tmp")
     try:
         temporary.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+        if os.name != "nt":
+            temporary.chmod(0o600)
         temporary.replace(path)
     finally:
         temporary.unlink(missing_ok=True)
@@ -184,6 +211,12 @@ def active_install(root: Path) -> dict | None:
         raise ValueError("Installation environment escapes its versions directory")
     if not isinstance(state.get("extras"), list) or any(x not in ("modules", "pdf", "registry", "browser", "mcp") for x in state["extras"]):
         raise ValueError("Invalid installed extras")
+    context = state.get("user_environment", {})
+    if not isinstance(context, dict) or any(k not in ("CONSENSUS_HOME", "CONSENSUS_REPORT_DIR") or
+                                          not isinstance(v, str) or not Path(v).is_absolute() for k, v in context.items()):
+        raise ValueError("Invalid saved configuration/report locations")
+    if state.get("channel") is not None and (not isinstance(state["channel"], str) or not Path(state["channel"]).is_absolute()):
+        raise ValueError("Invalid private update source")
     return state
 
 
@@ -239,7 +272,8 @@ def download_wheel(release: dict, directory: Path) -> Path:
     target = directory / release["filename"]
     digest = hashlib.sha256()
     size = 0
-    with open_url(release["url"], 30) as response, target.open("wb") as output:
+    source = Path(release["local_path"]).open("rb") if release.get("local_path") else open_url(release["url"], 30)
+    with source as response, target.open("wb") as output:
         while chunk := response.read(1024 * 1024):
             size += len(chunk)
             if size > MAX_WHEEL:
@@ -254,6 +288,9 @@ def download_wheel(release: dict, directory: Path) -> Path:
 LAUNCHER = '''import json, os, pathlib, re, subprocess, sys
 root = pathlib.Path(__file__).resolve().parent
 try:
+    os.environ["CONSENSUS_INSTALL_DIR"] = str(root)
+    if len(sys.argv) == 3 and sys.argv[1] == "update" and sys.argv[2] in ("--repair", "--rollback"):
+        raise SystemExit(subprocess.call([sys.executable, "-I", str(root / "install-manager.py"), sys.argv[2]]))
     state = json.loads((root / "current.json").read_text(encoding="utf-8"))
     name = state["environment"]
     if not isinstance(name, str) or not re.fullmatch(r"[0-9.]+-[a-f0-9]{32}", name):
@@ -263,6 +300,9 @@ try:
         raise ValueError("invalid active environment location")
     python = target / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
     os.environ["CONSENSUS_INSTALL_DIR"] = str(root)
+    for key, value in state.get("user_environment", {}).items():
+        if key in ("CONSENSUS_HOME", "CONSENSUS_REPORT_DIR") and isinstance(value, str):
+            os.environ.setdefault(key, value)
     command = [str(python), "-I", "-m", "consensus_osint.cli", *sys.argv[1:]]
     if os.name == "nt":
         raise SystemExit(subprocess.call(command))
@@ -285,6 +325,7 @@ def write_launcher(root: Path, runtime: Path) -> None:
             temporary.unlink(missing_ok=True)
 
     launcher = root / "launcher.py"
+    replace_text(root / "install-manager.py", Path(__file__).read_text(encoding="utf-8"))
     replace_text(launcher, LAUNCHER)
     directory = root / "bin"
     directory.mkdir(exist_ok=True)
@@ -303,11 +344,22 @@ def write_launcher(root: Path, runtime: Path) -> None:
         replace_text(command, "#!/bin/sh\nexec " + shlex.quote(str(runtime)) + " -I " + shlex.quote(str(launcher)) + ' "$@"\n')
 
 
-def install_release(root: Path, *, initial=False) -> dict:
+def install_release(root: Path, *, initial=False, repair=False, feed=None, user_environment=None, automatic=False, extras=None) -> dict:
     with installation_lock(root):
         previous = active_install(root)
-        release = latest_release()
-        if previous and stable_version(previous["version"]) >= stable_version(release["version"]):
+        if automatic and previous and previous.get("auto_update_paused"):
+            return {"version": previous["version"], "updated": False}
+        if repair:
+            if not previous:
+                raise ValueError("No managed installation to repair")
+            package = root / "versions" / previous["environment"] / "package"
+            if not (package / "release.json").is_file():
+                raise ValueError("This older installation has no cached package. Choose an install bundle or rerun the installer to repair it.")
+            release = bundle_release(package)
+            release["channel"] = previous.get("channel")
+        else:
+            release = bundle_release(feed) if feed else release_for(root)
+        if previous and not repair and stable_version(previous["version"]) >= stable_version(release["version"]):
             previous_python = environment_python(root / "versions" / previous["environment"])
             intact = previous_python.is_file()
             if initial and intact:
@@ -321,6 +373,13 @@ def install_release(root: Path, *, initial=False) -> dict:
             if intact:
                 if initial:
                     write_launcher(root, Path(sys.executable))
+                if feed:
+                    previous["channel"] = release["channel"]
+                if user_environment:
+                    previous["user_environment"] = {k: str(Path(v).expanduser().resolve()) for k, v in user_environment.items()
+                                                     if k in ("CONSENSUS_HOME", "CONSENSUS_REPORT_DIR") and isinstance(v, str)}
+                if feed or user_environment:
+                    atomic_json(root / "current.json", previous)
                 result = {"version": previous["version"], "updated": False}
                 if summary := valid_summary(previous.get("summary"), previous["version"]):
                     result["summary"] = summary
@@ -328,7 +387,9 @@ def install_release(root: Path, *, initial=False) -> dict:
         uv = root / "uv" / ("uv.exe" if os.name == "nt" else "uv")
         if not uv.is_file():
             raise ValueError("The installation helper is missing; run the Consensus installer again")
-        extras = previous["extras"] if previous else EXTRAS
+        extras = previous["extras"] if previous else (EXTRAS if extras is None else extras)
+        if not isinstance(extras, list) or any(x not in ("modules", "pdf", "browser", "mcp", "registry") for x in extras):
+            raise ValueError("Invalid optional features")
         name = release["version"] + "-" + uuid.uuid4().hex
         environment = root / "versions" / name
         runtime = Path(sys.executable) if initial else Path(sys.base_prefix) / ("python.exe" if os.name == "nt" else "bin/python3")
@@ -345,25 +406,90 @@ def install_release(root: Path, *, initial=False) -> dict:
             if actual != release["version"]:
                 raise ValueError("Installed version does not match the requested release")
             run([str(python), "-I", "-m", "consensus_osint.cli", "--version"], root, capture=True)
-        atomic_json(environment / "consensus-managed.json", {"version": actual})
+            # Keep the verified wheel so repair does not depend on an old
+            # public release remaining available. Dependencies use pip's cache.
+            package = environment / "package"
+            package.mkdir(exist_ok=True)
+            shutil.copyfile(wheel, package / release["filename"])
+            atomic_json(package / "release.json", {k: release[k] for k in ("version", "filename", "sha256")})
+        atomic_json(environment / "consensus-managed.json", {"version": actual, "extras": extras})
         # Prepare the launcher before committing the only activation change.
-        if initial:
+        if initial or repair:
             write_launcher(root, runtime)
         state = {"version": actual, "environment": name, "extras": extras,
                  "previous": previous["environment"] if previous else None}
+        if release.get("channel"):
+            state["channel"] = release["channel"]
+        context = user_environment if user_environment is not None else (previous or {}).get("user_environment", {})
+        state["user_environment"] = {k: str(Path(v).expanduser().resolve()) for k, v in context.items()
+                                     if k in ("CONSENSUS_HOME", "CONSENSUS_REPORT_DIR") and isinstance(v, str)}
+        if repair and previous.get("auto_update_paused"):
+            state["auto_update_paused"] = True
         result = {"version": actual, "updated": True}
         if summary is not None:
             state["summary"] = result["summary"] = summary
         atomic_json(root / "current.json", state)
+        try:
+            atomic_json(root / "update-check.json", {"checked_at": time.time(), "version": actual})
+        except OSError:
+            pass
         return result
+
+
+def rollback(root):
+    with installation_lock(root):
+        current = active_install(root)
+        name = (current or {}).get("previous")
+        if not isinstance(name, str) or not re.fullmatch(r"[0-9.]+-[a-f0-9]{32}", name):
+            raise ValueError("No previous installation is available")
+        environment = (root / "versions" / name).resolve()
+        if environment.parent != (root / "versions").resolve():
+            raise ValueError("Previous installation escapes its versions directory")
+        marker = json.loads((environment / "consensus-managed.json").read_text(encoding="utf-8"))
+        version = marker["version"]
+        stable_version(version)
+        extras = marker.get("extras", current["extras"])
+        if not isinstance(extras, list) or any(x not in ("modules", "pdf", "browser", "mcp", "registry") for x in extras):
+            raise ValueError("Previous installation has invalid optional features")
+        python = environment_python(environment)
+        actual = run([str(python), "-I", "-c", "from importlib.metadata import version; print(version('consensus-osint'))"],
+                     root, capture=True).stdout.strip()
+        if actual != version:
+            raise ValueError("Previous installation version could not be verified")
+        run([str(python), "-I", "-m", "consensus_osint.cli", "--version"], root, capture=True)
+        state = dict(current, version=version, environment=name, previous=current["environment"],
+                     extras=extras, auto_update_paused=True)
+        state.pop("summary", None)
+        atomic_json(root / "current.json", state)
+        try:
+            atomic_json(root / "auto-update.json", {"state": "paused", "checked_at": time.time()})
+        except OSError:
+            pass
+        return {"version": version, "updated": True}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Install Consensus with its private runtime")
-    parser.parse_args()
+    parser.add_argument("--feed", help="private bundle directory containing release.json")
+    parser.add_argument("--config-dir")
+    parser.add_argument("--reports-dir")
+    parser.add_argument("--extras", help="optional features to retain, comma-separated")
+    recovery = parser.add_mutually_exclusive_group()
+    recovery.add_argument("--repair", action="store_true")
+    recovery.add_argument("--rollback", action="store_true")
+    args = parser.parse_args()
     try:
-        result = install_release(install_root(), initial=True)
-        print(f"Consensus {result['version']} is ready.")
+        context = {k: v for k, v in {"CONSENSUS_HOME": args.config_dir or os.environ.get("CONSENSUS_HOME"),
+                                   "CONSENSUS_REPORT_DIR": args.reports_dir or os.environ.get("CONSENSUS_REPORT_DIR")}.items() if v}
+        result = rollback(install_root()) if args.rollback else install_release(
+            install_root(), initial=True, repair=args.repair, feed=args.feed, user_environment=context or None,
+            extras=args.extras.split(",") if args.extras is not None else None)
+        if args.rollback:
+            print(f"Restored Consensus {result['version']}. Restart Consensus to apply. Automatic upgrades are paused until your next manual update.")
+        elif args.repair:
+            print(f"Repaired Consensus {result['version']}. Restart Consensus to apply.")
+        else:
+            print(f"Consensus {result['version']} is ready. Run consensus to start your first search.")
         return 0
     except (OSError, ValueError, KeyError, TypeError, http.client.HTTPException, subprocess.SubprocessError) as exc:
         print(f"Installation failed: {exc}", file=sys.stderr)

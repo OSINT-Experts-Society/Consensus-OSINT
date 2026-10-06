@@ -125,6 +125,9 @@ class TerminalUI:
         self.network_checked = 0.0
         self.results_view = None
         self.returned_from_results = False
+        self.results_action = None
+        self.result_filters = {}
+        self.prefill = ""
         self.scan_tips = list(_SCAN_TIPS)
         self.tip_started = None
         self.phase_label = ""
@@ -177,8 +180,8 @@ class TerminalUI:
                 app.input = SuspendedInput()
                 try:
                     self.results_view = ResultsView(render, input=original_input, output=app.output,
-                                                    context=self.footer_text, detail=detail, follow_end=follow_end)
-                    await self.results_view.run()
+                                                    context=self.footer_text, detail=detail, follow_end=follow_end, actions=True)
+                    self.results_action = await self.results_view.run()
                     self.returned_from_results = True
                     # The alternate screen has gone. Reset its cursor geometry
                     # before the suspended prompt measures its available height.
@@ -478,6 +481,11 @@ class TerminalUI:
                 return
             self.update("Ready" if question == "consensus> " else "Awaiting input",
                         question=question, reading=True, stop_requested=False)
+            if question == "consensus> " and self.prefill:
+                from prompt_toolkit.document import Document
+
+                buffer.document = Document(self.prefill, cursor_position=len(self.prefill))
+                self.prefill = ""
 
     def remember_command(self, command):
         self.loop.call_soon_threadsafe(self._remember_command, command)

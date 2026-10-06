@@ -1,6 +1,7 @@
 """Local session locations: never infer a report was saved or contact a repository."""
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -22,7 +23,7 @@ class SessionInfo:
 
     @property
     def report_folder(self):
-        return self.working_folder / "reports"
+        return Path(os.environ["CONSENSUS_REPORT_DIR"]).expanduser().resolve() if os.environ.get("CONSENSUS_REPORT_DIR") else self.working_folder / "reports"
 
     def rows(self, output=None):
         from .signing import check_database

@@ -17,7 +17,7 @@ from prompt_toolkit.utils import get_cwidth
 
 
 class ResultsView:
-    def __init__(self, render, *, input=None, output=None, context=None, detail=None, follow_end=False):
+    def __init__(self, render, *, input=None, output=None, context=None, detail=None, follow_end=False, actions=False):
         self.render = render
         self.context = context
         self.detail = detail
@@ -37,6 +37,7 @@ class ResultsView:
         self.sections = []
         self.section_rows = []
         self.caption = "Search results"
+        self.actions = actions
         keys = KeyBindings()
         view = self
 
@@ -139,13 +140,19 @@ class ResultsView:
         keys.add("b")(lambda event: self.back(close=False))
         for key in ("q", "c-c", "c-d"):
             keys.add(key)(lambda event: self.back())
+        if actions:
+            for key, action in (("s", "save"), ("f", "filter"), ("n", "again")):
+                keys.add(key)(lambda event, action=action: self.app.exit(result=action))
         self.header = Window(BarControl(self.navigation, above=True), height=3, style="class:toolbar")
+        self.actions_window = Window(BarControl(self.action_buttons, above=True), height=1 if actions else 0,
+                                     style="class:toolbar", wrap_lines=False)
         self.column_header = Window(BarControl(self.pinned_heading, above=True),
                                     height=lambda: 2 if self.pinned_enabled() else 0,
                                     wrap_lines=False, style="class:toolbar")
         self.footer_window = Window(BarControl(self.footer), height=2, style="class:footer")
         self.app = Application(layout=Layout(HSplit([
             self.header,
+            self.actions_window,
             self.column_header,
             VSplit([self.window, self.scrollbar]),
             self.footer_window
@@ -153,12 +160,30 @@ class ResultsView:
             min_redraw_interval=1 / 60, max_render_postpone_time=0, before_render=lambda app: self.before_render(),
             style=Style.from_dict({"footer": "bg:#202226 #b9bdc5", "toolbar": "bg:#16181c #d8dbe2",
                                   "nav-button": "bg:#ff6a00 #101114 bold", "nav-border": "#ff6a00",
+                                  "action-button": "bg:#30343b #ffffff bold",
                                   "selected-link": "reverse",
                                   "scrollbar.arrow": "#ff6a00 bold", "scrollbar.thumb": "#ff6a00",
                                   "scrollbar.track": "#777777"}))
 
     def _clear_footer(self):
         self._footer_cache = None
+
+    def action_buttons(self):
+        width = self.app.output.get_size().columns
+        labels = (("Save report", "S", "save"), ("Filter results", "F", "filter"), ("Search again", "N", "again"))
+        if width < 58:
+            labels = (("Save", "S", "save"), ("Filter", "F", "filter"), ("Again", "N", "again"))
+        if width < 30:
+            labels = (("", "S", "save"), ("", "F", "filter"), ("", "N", "again"))
+        fragments = []
+        for label, key, action in labels:
+            def click(event, action=action):
+                if event.event_type == MouseEventType.MOUSE_UP:
+                    self.app.exit(result=action)
+                    return None
+                return NotImplemented
+            fragments.extend([("class:action-button", f" {key} {label} ", click), ("", "  ")])
+        return fragments
 
     def before_render(self):
         # Prepare before layout so the pinned rows participate in the initial
@@ -268,11 +293,11 @@ class ResultsView:
         return None
 
     def visible_height(self):
-        return max(1, self.app.output.get_size().rows - 5 - (2 if self.pinned_enabled() else 0))
+        return max(1, self.app.output.get_size().rows - 5 - int(self.actions) - (2 if self.pinned_enabled() else 0))
 
     def last_page(self):
         size = self.app.output.get_size()
-        bottom = max(0, len(self.lines) - max(1, size.rows - 5))
+        bottom = max(0, len(self.lines) - max(1, size.rows - 5 - int(self.actions)))
         if self.sections and size.rows >= 14 and bottom > self.section_rows[0]:
             bottom += 2
         return bottom
@@ -434,6 +459,6 @@ class ResultsView:
 
     async def run(self):
         try:
-            await self.app.run_async()
+            return await self.app.run_async()
         except EOFError:
             pass

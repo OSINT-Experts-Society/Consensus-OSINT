@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "consensus-osint"
-version = "0.2.8"
+version = "0.3.0"
 description = "Unified username, email and phone reverse-lookup OSINT tool: the merged modules and best features of Sherlock, Maigret, WhatsMyName, user-scanner, holehe, socialscan, ignorant, numint, linkook, mailcat, marple and more."
 readme = "README.md"
 requires-python = ">=3.10"

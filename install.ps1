@@ -1,6 +1,7 @@
 # Install or update Consensus. No preinstalled Python, Git or administrator access needed.
 # Release assets are published together by publish.yml.
 # Keep shell preferences and script variables local when piped to Invoke-Expression.
+param([string]$BundlePath, [string]$ConfigDirectory, [string]$ReportsDirectory)
 & {
 $ErrorActionPreference = 'Stop'
 $consensusRoot = if ($env:CONSENSUS_INSTALL_DIR) { [IO.Path]::GetFullPath($env:CONSENSUS_INSTALL_DIR) } else { Join-Path $env:USERPROFILE '.local\share\consensus-app' }
@@ -17,8 +18,16 @@ try {
     $env:UV_PYTHON_INSTALL_DIR = Join-Path $consensusRoot 'python'
     $env:UV_PYTHON_INSTALL_BIN = '0'
     $consensusManager = Join-Path $consensusTemp 'install-manager.py'
+    if (-not $BundlePath -and $PSScriptRoot -and (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'release.json'))) {
+        $BundlePath = $PSScriptRoot
+    }
     try {
+        if ($BundlePath) {
+            $BundlePath = (Resolve-Path -LiteralPath $BundlePath).Path
+            Copy-Item -LiteralPath (Join-Path $BundlePath 'install-manager.py') -Destination $consensusManager
+        } else {
         Invoke-WebRequest "$consensusRelease/install-manager.py" -UseBasicParsing -OutFile $consensusManager
+        }
     } catch {
         throw "Could not download the Consensus installer release. Check that a release is published at https://github.com/OSINT-Experts-Society/Consensus-OSINT/releases and that GitHub is reachable. No application update was installed."
     }
@@ -29,7 +38,12 @@ try {
         & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $consensusTemp 'uv-install.ps1')
         if ($LASTEXITCODE -ne 0) { throw 'Could not install the runtime helper.' }
     }
-    & $consensusUv run --no-config --no-project --managed-python --python 3.13 python -I $consensusManager
+    $consensusArguments = @()
+    if ($BundlePath) { $consensusArguments += @('--feed', $BundlePath) }
+    if ($ConfigDirectory) { $consensusArguments += @('--config-dir', $ConfigDirectory) }
+    if ($ReportsDirectory) { $consensusArguments += @('--reports-dir', $ReportsDirectory) }
+    if ($env:CONSENSUS_INSTALL_EXTRAS) { $consensusArguments += @('--extras', $env:CONSENSUS_INSTALL_EXTRAS) }
+    & $consensusUv run --no-config --no-project --managed-python --python 3.13 python -I $consensusManager @consensusArguments
     if ($LASTEXITCODE -ne 0) { throw 'Consensus installation failed. Any previous version remains selected.' }
     $consensusBin = Join-Path $consensusRoot 'bin'
     $consensusUserPath = [Environment]::GetEnvironmentVariable('Path', 'User')

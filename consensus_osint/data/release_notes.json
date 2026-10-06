@@ -2,6 +2,20 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.3.0",
+      "previous_version": "0.2.8",
+      "new_modules": [],
+      "bug_fixes": [],
+      "other_changes": [
+        "private-managed-installer: Install with an included runtime bootstrap and private bundle channel.",
+        "source-migration: Switch source installations while preserving configuration and report locations.",
+        "updates-screen: View versions, check status, change counts and restart from Settings.",
+        "installation-recovery: Repair from the verified cached package or restore a previous validated version.",
+        "optional-search-history: Opt in to retaining and reopening up to ten local result sets.",
+        "results-actions: Save reports, filter rows and prefill another search directly from results."
+      ]
+    },
+    {
       "version": "0.2.8",
       "previous_version": "0.2.7",
       "new_modules": [],

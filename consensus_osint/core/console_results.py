@@ -35,9 +35,10 @@ class _Buffer(io.StringIO):
         return super().write(value)
 
 
-def result_pages(summary, *, show_all=False, limit=0):
+def result_pages(summary, *, show_all=False, limit=0, filters=None):
     """Keep detail IDs stable across resizing, query groups and coverage panels."""
     findings = list(summary.findings)
+    filters = dict(filters or {})
 
     def console(width):
         stream = _Buffer()
@@ -58,8 +59,15 @@ def result_pages(summary, *, show_all=False, limit=0):
         inconclusive = sum(f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
                            for f in findings if f.category not in INFO_CATEGORIES)
         title = "Search stopped · partial results" if summary.options.get("interrupted") else "Search complete"
+        if filters:
+            title += " · filtered view"
         out.print(Text(title, style=f"bold {ACCENT}"))
-        out.print(Text(f"{len(matches)} found · {sum(has_details(f) for f in matches)} enriched · {len(findings)} outcomes"))
+        if filters:
+            label = " · ".join(clean(value) for value in (filters.get("site"), filters.get("kind")) if value)
+            out.print(Text("Filter: " + label
+                           + ". F changes or clears filters. Saving keeps every outcome.", style=f"bold {ACCENT}"))
+        out.print(Text(("Full search: " if filters else "") +
+                       f"{len(matches)} found · {sum(has_details(f) for f in matches)} enriched · {len(findings)} outcomes"))
         if matches or show_all:
             out.print(Text("X = project lists this lookup; coverage does not mean separate searches.", style="dim"))
         if any(assessment(f)[0] == "Needs review" for f in matches):
@@ -74,10 +82,18 @@ def result_pages(summary, *, show_all=False, limit=0):
             out.print(Text("\n" + clean(group.title), style="bold"))
             rows = [f for f in group.findings if f.category not in INFO_CATEGORIES and
                     (show_all or f.status is Status.FOUND)]
+            if filters:
+                rows = [f for f in rows if filters.get("site", "").casefold() in f.site.casefold()
+                        and (filters.get("kind", "all") != "enriched" or has_details(f))
+                        and (filters.get("kind", "all") != "possible" or assessment(f)[0] == "Needs review")]
             rows.sort(key=lambda f: (assessment(f)[0] == "Needs review", f.site.casefold()))
             shown = rows[:limit] if limit else rows
+            if filters:
+                out.print(Text(f"{len(shown)} rows match the filters", style="dim"))
             if not shown:
-                if summary.options.get("interrupted"):
+                if filters:
+                    message = "No rows match these filters. Press F to change or clear them."
+                elif summary.options.get("interrupted"):
                     message = "No matches reported before the search stopped. This search is incomplete."
                 elif any(f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
                          for f in group.findings if f.category not in INFO_CATEGORIES):

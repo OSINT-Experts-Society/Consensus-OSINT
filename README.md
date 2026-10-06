@@ -118,44 +118,35 @@ Actual Consensus report screens using **fictional demonstration data**. No live 
 
 ## Install
 
-You need [Python 3.10+](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads).
+**Recommended: the managed installer.** During private testing, use the Consensus install bundle supplied by the Society. Extract the entire ZIP first.
 
-```console
-git clone https://github.com/OSINT-Experts-Society/Consensus-OSINT.git
-cd Consensus-OSINT
-python -m pip install ".[modules]"
-consensus
-```
+- **Windows:** double-click **Install.cmd**.
+- **macOS / Linux:** run `sh install.sh` inside the extracted folder.
 
-On macOS/Linux, use `python3` if `python` is unavailable. While this repository is private, you need GitHub access to clone it.
+The installer prepares Python and dependencies for you. Internet access is required; Git and a preinstalled Python are not. Open a new terminal and run **`consensus`**.
 
-Managed release installations check for updates on startup, install them in the background and show when to restart. Source installations above are updated with Git and pip. Use `--no-update-check` to skip startup updates, or set `CONSENSUS_AUTO_UPDATE=0` for notifications only.
+Keep the extracted bundle folder: it is your private update source. For a new bundle, use **Settings ? Installation & updates ? Choose update bundle**, or run its installer. Public release delivery will be enabled separately.
+
+**Already installed from source?** Open **Settings ? Installation & updates ? Switch to managed installation** and select the extracted bundle folder. Existing configuration and report locations are preserved.
+
+Managed installs check for updates at startup. **Settings ? Installation & updates** shows versions, database date, update status, change counts, repair and rollback. `consensus update` installs an available update; `consensus update --repair` repairs the installed version; `consensus update --rollback` restores the previous version and pauses automatic upgrades until your next manual update. Restart to apply changes.
 
 <details>
-<summary>Installation help</summary>
+<summary>Install from source instead</summary>
 
-If pip reports an **externally managed environment**, create a virtual environment in the cloned folder:
+Requires [Python 3.10+](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads), plus repository access while private:
 
-**macOS / Linux**
-
-```sh
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install ".[modules]"
-consensus
-```
-
-**Windows PowerShell** (also works when activation scripts are blocked)
-
-```powershell
+```console
+git clone https://github.com/OSINT-Experts-Society/Consensus-OSINT-OSINT.git
+cd Consensus-OSINT
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install ".[modules]"
-.\.venv\Scripts\consensus.exe
 ```
 
-For later sessions, activate the environment on macOS/Linux, or run `.\.venv\Scripts\consensus.exe` from the cloned folder on Windows.
+Windows: `.\.venv\Scripts\python.exe -m pip install ".[modules]"`, then `.\.venv\Scripts\consensus.exe`.
 
-If `consensus` is not found after a standard installation, run `python -m consensus_osint.cli` with the same Python used to install it.
+macOS/Linux: use `python3` if needed, then `.venv/bin/python -m pip install ".[modules]"` and `.venv/bin/consensus`.
+
+Source installs are updated with Git and pip. The Updates screen can migrate them to managed installation. Set `CONSENSUS_NO_UPDATE_CHECK=1` to skip startup update checks, or `CONSENSUS_AUTO_UPDATE=0` for notifications only.
 
 </details>
 
@@ -165,7 +156,9 @@ Run **`consensus`** to open the menu:
 
 1. Choose **Username**, **Email**, **Phone** or **Bulk search**.
 2. Enter what you want to look up and follow the prompts.
-3. Choose **View results** or **Save report** when finished.
+3. Review results, open enriched details, or use **Save report**, **Filter results** and **Search again** directly from the table.
+
+**Recent searches** in Settings can retain up to 10 searches locally. It is off by default; enable it to reopen results after restarting, and delete saved searches whenever needed.
 
 Use international phone numbers, including the country code. Press **Ctrl+C** to stop a scan; type **`exit`** to quit.
 

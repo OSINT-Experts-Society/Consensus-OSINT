@@ -32,7 +32,8 @@ def command(args) -> int:
     try:
         root = manager.install_root()
         if check:
-            latest = manager.latest_release()["version"]
+            latest = (manager.release_for(root) if manager.managed_install(root) else manager.latest_release())["version"]
+            manager.atomic_json(root / "update-check.json", {"checked_at": time.time(), "version": latest})
             selected = manager.active_install(root)["version"] if manager.managed_install(root) else __version__
             restart = selected != __version__
             result = {"installed": selected, "running": __version__, "latest": latest,
@@ -52,7 +53,12 @@ def command(args) -> int:
                   "to enable consensus update. For a development checkout, update with Git and your environment's package manager.", file=sys.stderr)
             return 2
         print("Checking for a Consensus update...", file=sys.stderr)
-        result = manager.install_release(root)
+        if getattr(args, "rollback", False):
+            result = manager.rollback(root)
+            print(f"Restored Consensus {result['version']}. Restart to apply. Automatic upgrades are paused until your next manual update.")
+            return 0
+        result = manager.install_release(root, repair=True) if getattr(args, "repair", False) else manager.install_release(
+            root, **({"feed": args.feed} if getattr(args, "feed", None) else {}))
         if result["updated"]:
             print(f"Consensus {result['version']} installed. "
                   + manager.summary_text(result.get("summary"), result["version"]))
@@ -112,7 +118,7 @@ def startup_notice(*, disabled=False, auto_install=False) -> None:
             def refresh():
                 value = {"checked_at": now, "version": None}
                 try:
-                    value["version"] = manager.latest_release(timeout=1)["version"]
+                    value["version"] = manager.release_for(root, timeout=1)["version"]
                 except (OSError, ValueError, KeyError, TypeError, http.client.HTTPException):
                     pass
                 try:

@@ -12,6 +12,8 @@ COMMANDS = (
     ("/examples", "Show example searches"),
     ("/info", "Show paths, version and repository"),
     ("/update", "Install the latest Consensus release"),
+    ("/updates", "Open installation, updates and recovery"),
+    ("/history", "Reopen or manage optional saved searches"),
     ("/terminal", "Set up the Windows Terminal tab icon"),
     ("/about", "About Consensus and the Society"),
     ("/menu", "Show the welcome page"),
