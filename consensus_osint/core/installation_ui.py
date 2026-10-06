@@ -62,6 +62,10 @@ def migrate(root, bundle, config_dir, reports_dir):
             pass
     env["CONSENSUS_INSTALL_EXTRAS"] = ",".join(extras)
     if os.name == "nt":
+        # Python preserves PowerShell 7's module path when starting Windows
+        # PowerShell. Its incompatible core modules can break uv's bootstrap.
+        # Let the child rebuild its own defaults; leave the parent untouched.
+        env = {k: v for k, v in env.items() if k.upper() != "PSMODULEPATH"}
         command = ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(folder / "install.ps1"),
                    "-BundlePath", str(folder), "-ConfigDirectory", str(config_dir), "-ReportsDirectory", str(reports_dir)]
     else:
@@ -80,7 +84,12 @@ def restart():
     environment = dict(manager.clean_environment(root), CONSENSUS_INSTALL_DIR=str(root))
     environment.update(state.get("user_environment", {}))
     # Called only after the current full-screen application has restored the terminal.
-    os.execve(str(python), [str(python), "-I", "-m", "consensus_osint.cli"], environment)
+    command = [str(python), "-I", "-m", "consensus_osint.cli"]
+    if os.name == "nt":
+        # Windows exec does not preserve the process the launcher is waiting
+        # for. Keep that parent alive until the restarted console exits.
+        return subprocess.call(command, env=environment)
+    os.execve(str(python), command, environment)
 
 
 def screen(session):
@@ -122,7 +131,14 @@ def screen(session):
                         return
             elif managed and choice == "2":
                 result = manager.install_release(root)
-                session.printer.message(manager.summary_text(result.get("summary"), result["version"]) + " Restart to apply.")
+                state = manager.active_install(root)
+                pending = state["version"] != __version__ or state["environment"] != Path(sys.prefix).name
+                if result["updated"]:
+                    session.printer.message(manager.summary_text(result.get("summary"), result["version"]) + " Restart to apply.")
+                elif pending:
+                    session.printer.message(f"Consensus {result['version']} is installed. Restart to apply.")
+                else:
+                    session.printer.message(f"Consensus {result['version']} is already up to date.")
             elif managed and choice == "3":
                 session.printer.message("Restart closes this session. Save results first if local history is off.")
                 if session.read("Restart now? [y/N]: ").strip().lower() in ("y", "yes"):

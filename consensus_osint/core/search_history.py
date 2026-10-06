@@ -133,6 +133,8 @@ def screen(session):
             else:
                 try:
                     session.latest = history.load(key)
+                    if session.printer.terminal_ui:
+                        session.printer.terminal_ui.result_filters = {}
                     session.show_latest()
                     return
                 except (OSError, ValueError, TypeError, KeyError, RecursionError):

@@ -548,5 +548,5 @@ def start_session(*, color=True, footer=True, animate=True):
     if sessions and sessions[0].restart_requested:
         from .installation_ui import restart
 
-        restart()
+        return restart()
     return result

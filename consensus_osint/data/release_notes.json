@@ -2,6 +2,19 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.3.1",
+      "previous_version": "0.3.0",
+      "new_modules": [],
+      "bug_fixes": [
+        "history-fresh-filters: Opening a saved search clears filters from the previous result set.",
+        "rollback-manual-resume: A manual update resumes automatic updates even when the installed version is already current.",
+        "current-update-message: Only request a restart when an installed change is pending.",
+        "powershell-migration: Prevent inherited PowerShell 7 modules from breaking the Windows bootstrap during migration.",
+        "windows-restart: Keep the launcher attached while the restarted Windows console is running."
+      ],
+      "other_changes": []
+    },
+    {
       "version": "0.3.0",
       "previous_version": "0.2.8",
       "new_modules": [],

@@ -378,8 +378,13 @@ def install_release(root: Path, *, initial=False, repair=False, feed=None, user_
                 if user_environment:
                     previous["user_environment"] = {k: str(Path(v).expanduser().resolve()) for k, v in user_environment.items()
                                                      if k in ("CONSENSUS_HOME", "CONSENSUS_REPORT_DIR") and isinstance(v, str)}
-                if feed or user_environment:
+                resumed = bool(previous.pop("auto_update_paused", False))
+                if feed or user_environment or resumed:
                     atomic_json(root / "current.json", previous)
+                try:
+                    atomic_json(root / "update-check.json", {"checked_at": time.time(), "version": release["version"]})
+                except OSError:
+                    pass
                 result = {"version": previous["version"], "updated": False}
                 if summary := valid_summary(previous.get("summary"), previous["version"]):
                     result["summary"] = summary
