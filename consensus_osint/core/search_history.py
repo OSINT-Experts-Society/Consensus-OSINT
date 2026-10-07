@@ -122,18 +122,18 @@ def screen(session):
                          str(value.get("found", "—"))])
         session.printer.summary_table(rows, "Recent searches · local history " + ("ON" if history.enabled() else "OFF"))
         session.printer.message("Keeps up to 10 searches, including identifiers and returned fields, on this computer. Saved reports are separate.")
-        session.printer.message("Number: open · on/off: retention · delete N: remove one · clear: delete all · 0: back")
-        choice = session.read("History: ").strip().lower()
+        session.printer.message("Number: open · on/off: retention · delete N: remove one · clear: delete all · 0 / Esc: back")
+        choice = session.back_prompt("History: ", zero=True).strip().lower()
         if choice in ("", "0", "back", "cancel"):
             return
         if choice == "on":
-            if session.read("Store future searches locally? [y/N]: ").strip().lower() in ("y", "yes"):
+            if session.back_prompt("Store future searches locally? [y/N]: ").strip().lower() in ("y", "yes"):
                 history.enable(True)
         elif choice == "off":
             history.enable(False)
             session.printer.message("Retention is off. Use clear to delete previously stored searches.")
         elif choice == "clear":
-            if session.read("Delete all locally saved searches? [y/N]: ").strip().lower() in ("y", "yes"):
+            if session.back_prompt("Delete all locally saved searches? [y/N]: ").strip().lower() in ("y", "yes"):
                 history.clear()
         else:
             delete = choice.startswith("delete ")
@@ -153,7 +153,7 @@ def screen(session):
                     if session.printer.terminal_ui:
                         session.printer.terminal_ui.result_filters = {}
                     session.show_latest()
-                    return
+                    return True
                 except (OSError, ValueError, TypeError, KeyError, RecursionError, AttributeError, OverflowError):
                     session.latest = previous
                     if ui:

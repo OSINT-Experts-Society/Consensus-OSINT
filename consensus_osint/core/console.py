@@ -133,7 +133,7 @@ class Printer:
         self.session_information()
         self.command_menu()
 
-    def home(self, version: str, *, has_results=False, saved_report=None, reset_screen=False) -> None:
+    def home(self, version: str, *, has_results=False, saved_report=None, graph_report=None, reset_screen=False) -> None:
         """Interactive home sized to the actual input terminal, including footer."""
         if self.quiet or self.jsonl:
             return
@@ -152,19 +152,13 @@ class Printer:
             if (saved_report or reset_screen) and self.terminal_ui:
                 self.console.clear()
             footer = getattr(self.terminal_ui, "footer_text", None)
-            page = home_page(info, width=width, height=height - bool(saved_report), version=version,
+            page = home_page(info, width=width, height=height - bool(saved_report) - bool(graph_report), version=version,
                              history=self.terminal_ui is not None, has_results=has_results,
                              input_rows=input_rows(width, height) if self.terminal_ui else 1,
                              footer_rows=len(footer(width).splitlines()) if footer else None)
             self.console.print(page, soft_wrap=True)
             if saved_report:
-                from rich.style import Style
-
-                path = Path(saved_report).resolve()
-                notice = Text("Report saved: " + path.name, style=f"bold {ACCENT}")
-                notice.truncate(max(1, width - 1), overflow="ellipsis")
-                notice.stylize(Style(link=path.as_uri()), 0, len(notice))
-                self.console.print(notice, soft_wrap=True)
+                self.report_saved(saved_report, graph_path=graph_report, compact_width=width)
         else:
             self.message(f"[OES] CONSENSUS {version} · By {ORGANIZATION}\n{SLOGAN}\n"
                          "Weekly catalogue updates from major lookup repositories.\n"
@@ -175,6 +169,8 @@ class Printer:
                          "/ commands · /config settings · info: full paths\n"
                          "Bugs can occur. Use test accounts and verify findings.\n"
                          "Lawful, authorised use only. Respect privacy and terms.")
+            if saved_report:
+                self.report_saved(saved_report, graph_path=graph_report)
 
     def actions(self, *, has_results=False):
         if self.quiet or self.jsonl:
@@ -586,20 +582,27 @@ class Printer:
             return Text(coverage_text(f), style="dim")
         return text
 
-    def report_saved(self, path) -> None:
+    def report_saved(self, path, *, graph_path=None, compact_width=None) -> None:
         if self.jsonl:
             return
         resolved = Path(path).expanduser().resolve()
+        graph = Path(graph_path).expanduser().resolve() if graph_path else None
         if self.terminal_ui:
-            self.terminal_ui.update("Report saved", last_report=resolved)
-        if self.console is not None:
-            from rich.style import Style
+            self.terminal_ui.update("Reports saved" if graph else "Report saved",
+                                    last_report=resolved, last_graph_report=graph)
+        links = [("Open HTML report", resolved), ("Open interactive graph", graph)] if graph else [("Report saved", resolved)]
+        for label, target in links:
+            if self.console is not None:
+                from rich.style import Style
 
-            text = Text("Report saved: ", style=f"bold {ACCENT}")
-            text.append(_display(str(resolved), single_line=True), style=Style(link=resolved.as_uri()))
-            self.console.print(text, soft_wrap=True)
-        else:
-            self.message(f"Report saved: {resolved}", always=True)
+                text = Text(label + ": ", style=f"bold {ACCENT}")
+                text.append(_display(target.name if compact_width else str(target), single_line=True))
+                if compact_width:
+                    text.truncate(max(1, compact_width - 1), overflow="ellipsis")
+                text.stylize(Style(link=target.as_uri()), 0, len(text))
+                self.console.print(text, soft_wrap=True)
+            else:
+                self.message(f"{label}: {target}", always=True)
 
     def finish(self, summary, *, review=False, follow_end=False, include_identity=True) -> None:
         """Closing review uses final, deduplicated findings rather than streamed counts."""

@@ -69,7 +69,24 @@ class Session:
         self.preferences = dict(_DEFAULTS)
         self.latest = None
         self._saved_report = None
+        self._saved_graph_report = None
         self.restart_requested = False
+        self._return_home = False
+
+    def back_prompt(self, question, *, zero=False):
+        """Give menu/form input an explicit Escape action without submitting it."""
+        ui = self.printer.terminal_ui
+        if ui:
+            ui.update(back_enabled=True, zero_back=zero)
+        try:
+            return self.read(question)
+        finally:
+            if ui:
+                ui.update(back_enabled=False, zero_back=False)
+
+    def clear_menu(self):
+        if self.printer.terminal_ui and self.printer.console:
+            self.printer.console.clear()
 
     def active_settings(self):
         p = self.preferences
@@ -209,20 +226,29 @@ class Session:
         info = self.printer.terminal_ui.info if self.printer.terminal_ui else SessionInfo.current()
         default = str(info.report_folder / ("consensus-" + datetime.now().strftime("%Y%m%d-%H%M%S-%f") + ".html"))
         if not arguments:
-            self.printer.message("Enter saves HTML. Or choose a path ending in .html, .graph.html, .json, .csv, .md, .txt or .pdf. Ctrl+C cancels.")
+            self.printer.message("Enter saves two files: an HTML report and an interactive evidence graph. Both links appear below the menu.\n"
+                                 "Or choose .graph.html, .json, .csv, .md, .txt or .pdf for a single export. Ctrl+C cancels.")
             self.printer.message("Suggested file: " + default)
         path = arguments[0] if arguments else _unquote(self.read("Save here? Press Enter, or type a different path: ")) or default
-        from .reports import save_report
+        from .reports import infer_format, save_report
 
         if Path(path).expanduser().is_dir():
             raise ValueError(f"{path} is a folder: add a file name, for example {Path(path) / 'report.html'}")
         if self.printer.terminal_ui:
             self.printer.terminal_ui.update("Saving report")
         saved = save_report(self.latest, Path(path).expanduser(), include_all=True)
+        graph = None
+        if infer_format(saved) == "html":
+            try:
+                graph = save_report(self.latest, saved.with_name(saved.stem + ".graph.html"), include_all=True)
+            except (OSError, ValueError) as exc:
+                self.printer.report_saved(saved)
+                raise ValueError(f"HTML report saved, but the interactive graph could not be saved: {exc}") from exc
         if self.printer.terminal_ui:
             self._saved_report = saved
+            self._saved_graph_report = graph
         else:
-            self.printer.report_saved(saved)
+            self.printer.report_saved(saved, graph_path=graph)
 
     def change_setting(self, name, value):
         from ..cli import _positive_float
@@ -246,6 +272,7 @@ class Session:
         self.printer.message("Setting changed for this session. " + self.active_settings(), "dim")
 
     def settings(self):
+        self.clear_menu()
         while True:
             self.printer.summary_table([["Choose", "Setting", "Current"]] + [
                 [str(i), label, "configured default" if self.preferences[name] is None
@@ -257,7 +284,7 @@ class Session:
                  ["h", "Recent searches", "Open"],
                  ["0", "Back", ""], ["reset", "Reset session and forget latest results", ""]],
                 "Settings · search preferences apply to this session")
-            choice = self.read("Setting to change [0 = back]: ").strip().lower()
+            choice = self.back_prompt("Setting to change [0 / Esc = back]: ", zero=True).strip().lower()
             if not choice or choice in _LEAVE_WORDS:
                 return
             if choice == "reset":
@@ -269,12 +296,15 @@ class Session:
                 screen(self)
                 if self.restart_requested:
                     return
+                self.clear_menu()
                 continue
             if choice == "h":
                 from .search_history import screen
 
-                screen(self)
-                return
+                if screen(self):
+                    return
+                self.clear_menu()
+                continue
             if choice == str(len(_SETTINGS) + 1):
                 self.change_setting("animation", "off" if self.animate else "on")
                 continue
@@ -283,8 +313,8 @@ class Session:
                 continue
             name = _SETTINGS[int(choice) - 1][0]
             if name == "timeout":
-                value = self.read("Seconds per site, or default: ").strip()
-                if value:
+                value = self.back_prompt("Seconds per site, or default (Esc cancels): ").strip()
+                if value and value.lower() not in _LEAVE_WORDS:
                     self.change_setting(name, value)
             else:
                 self.preferences[name] = not self.preferences[name]
@@ -362,20 +392,30 @@ class Session:
         elif command == "info":
             self.printer.session_information()
             if self.printer.terminal_ui and self.printer.terminal_ui.last_report:
-                self.printer.report_saved(self.printer.terminal_ui.last_report)
+                self.printer.report_saved(self.printer.terminal_ui.last_report,
+                                          graph_path=self.printer.terminal_ui.last_graph_report)
         elif command == "examples":
             self.printer.examples()
             self.printer.message("Inside this session, leave off the initial consensus in those examples.", "dim")
         elif command == "settings":
-            self.settings()
+            try:
+                self.settings()
+            finally:
+                self._return_home = True
         elif command == "updates":
             from .installation_ui import screen
 
-            screen(self)
+            try:
+                screen(self)
+            finally:
+                self._return_home = True
         elif command == "history":
             from .search_history import screen
 
-            screen(self)
+            try:
+                screen(self)
+            finally:
+                self._return_home = True
         elif command == "set":
             if len(arguments) != 2:
                 raise ValueError("Use set SETTING VALUE, for example: set details on.")
@@ -483,14 +523,22 @@ class Session:
                     break
                 self.results_actions()
                 ui = self.printer.terminal_ui
-                if ui is not None and ui.returned_from_results:
-                    ui.returned_from_results = False
-                    ui.update("Ready")
-                    self.printer.home(__version__, has_results=self.latest is not None, reset_screen=True)
+                if self._return_home or (ui is not None and ui.returned_from_results):
+                    self._return_home = False
+                    if ui is not None:
+                        ui.returned_from_results = False
+                        ui.update("Ready")
+                    self.printer.home(__version__, has_results=self.latest is not None,
+                                      saved_report=self._saved_report, graph_report=self._saved_graph_report,
+                                      reset_screen=True)
+                    self._saved_report = None
+                    self._saved_graph_report = None
                     continue
                 if self._saved_report is not None:
-                    self.printer.home(__version__, has_results=self.latest is not None, saved_report=self._saved_report)
+                    self.printer.home(__version__, has_results=self.latest is not None,
+                                      saved_report=self._saved_report, graph_report=self._saved_graph_report)
                     self._saved_report = None
+                    self._saved_graph_report = None
                     continue
                 if tokens and tokens[0].lower() == "menu":
                     continue
@@ -503,8 +551,17 @@ class Session:
                     self.printer.message("Check the command and try again.", "yellow")
             except Exception as exc:
                 message = redact_options({"error": str(exc)})["error"]
+                if self._return_home:
+                    self._return_home = False
+                    self.printer.home(__version__, has_results=self.latest is not None, reset_screen=True)
+                    self.printer.warn(f"Could not complete that action: {message}")
+                    continue
                 self.printer.warn(f"Could not complete that action: {message}")
-            self.menu()
+            if self._return_home:
+                self._return_home = False
+                self.printer.home(__version__, has_results=self.latest is not None, reset_screen=True)
+            else:
+                self.menu()
         self.printer.message("\nConsensus closed. Saved reports remain available.")
         return 0
 

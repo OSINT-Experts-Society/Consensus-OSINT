@@ -99,8 +99,8 @@ def screen(session):
         managed = manager.managed_install(root)
         session.printer.message("1 Check now · 2 Install update · 3 Restart\n4 Repair · 5 Restore previous · 6 Choose bundle"
                                 if managed else "1 Check public release · 6 Switch to managed installation")
-        session.printer.message("0 Back")
-        choice = session.read("Updates: ").strip().lower()
+        session.printer.message("0 / Esc Back")
+        choice = session.back_prompt("Updates: ", zero=True).strip().lower()
         if choice in ("", "0", "back", "cancel"):
             return
         try:
@@ -109,12 +109,12 @@ def screen(session):
                 manager.atomic_json(root / "update-check.json", {"checked_at": time.time(), "version": release["version"]})
                 session.printer.message("Available version: " + release["version"])
             elif choice == "6":
-                bundle = session.read("Extracted install bundle folder (Enter cancels): ").strip().strip('"')
+                bundle = session.back_prompt("Extracted install bundle folder (Enter cancels): ").strip().strip('"')
                 if not bundle:
                     continue
                 release = manager.bundle_release(bundle)
                 session.printer.message(f"Install Consensus {release['version']} from {bundle}. Settings and reports remain in place.")
-                if session.read("Continue? [y/N]: ").strip().lower() not in ("y", "yes"):
+                if session.back_prompt("Continue? [y/N]: ").strip().lower() not in ("y", "yes"):
                     continue
                 if managed:
                     manager.install_release(root, feed=bundle)
@@ -126,7 +126,7 @@ def screen(session):
                     migrate(root, bundle, user_config_dir().resolve(), info.report_folder)
                     session.printer.message(f"Managed installation ready. Start with {root / 'bin' / ('consensus.cmd' if os.name == 'nt' else 'consensus')}")
                     session.printer.message("Switching closes this session. Save results first if local history is off.")
-                    if session.read("Switch to it now? [y/N]: ").strip().lower() in ("y", "yes"):
+                    if session.back_prompt("Switch to it now? [y/N]: ").strip().lower() in ("y", "yes"):
                         session.restart_requested = True
                         return
             elif managed and choice == "2":
@@ -141,12 +141,12 @@ def screen(session):
                     session.printer.message(f"Consensus {result['version']} is already up to date.")
             elif managed and choice == "3":
                 session.printer.message("Restart closes this session. Save results first if local history is off.")
-                if session.read("Restart now? [y/N]: ").strip().lower() in ("y", "yes"):
+                if session.back_prompt("Restart now? [y/N]: ").strip().lower() in ("y", "yes"):
                     session.restart_requested = True
                     return
             elif managed and choice in ("4", "5"):
                 action = "Repair the installed version" if choice == "4" else "Restore the previous version and pause automatic upgrades"
-                if session.read(action + "? [y/N]: ").strip().lower() in ("y", "yes"):
+                if session.back_prompt(action + "? [y/N]: ").strip().lower() in ("y", "yes"):
                     result = manager.install_release(root, repair=True) if choice == "4" else manager.rollback(root)
                     session.printer.message(f"Consensus {result['version']} is ready. Restart to apply.")
             else:

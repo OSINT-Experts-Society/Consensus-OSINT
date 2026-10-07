@@ -98,12 +98,15 @@ class TerminalUI:
         self.activity = "Starting"
         self.question = ""
         self.reading = False
+        self.back_enabled = False
+        self.zero_back = False
         self.closing = False
         self.completed = 0
         self.total = 0
         self.found = 0
         self.enriched = 0
         self.last_report = None
+        self.last_graph_report = None
         self.controller = None
         self.sources = ()
         self.animate = animate
@@ -583,6 +586,20 @@ class TerminalUI:
         def eof(event):
             if self.reading and not event.current_buffer.text:
                 self.respond(EOFError())
+
+        @keys.add("escape", eager=True, filter=Condition(
+            lambda: self.reading and self.back_enabled
+            and self.session.default_buffer.complete_state is None))
+        def back(event):
+            event.current_buffer.reset()
+            self.respond("")
+
+        @keys.add("0", eager=True, filter=Condition(
+            lambda: self.reading and self.back_enabled and self.zero_back
+            and not self.session.default_buffer.text))
+        def zero_back(event):
+            event.current_buffer.reset()
+            self.respond("0")
 
         @keys.add("escape", eager=True, filter=Condition(
             lambda: self.reading and self.session.default_buffer.complete_state is not None))

@@ -107,6 +107,8 @@ Actual Consensus screens with fictional demonstration data. Click to enlarge.
 
 **Interactive evidence graph** — explore connections and inspect the supporting evidence.
 
+After a search, choose **Save report** and press **Enter**. Consensus saves both an HTML report and an interactive graph, with a separate link to open each in your browser.
+
 <a href="consensus_osint/templates/consensus-demo-graph.png"><img src="consensus_osint/templates/consensus-demo-graph.png" width="920" alt="Actual Consensus interactive graph showing fictional query, result and source-site nodes with an evidence panel"></a>
 
 ## Install

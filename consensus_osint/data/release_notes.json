@@ -2,6 +2,17 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.3.3",
+      "previous_version": "0.3.2",
+      "new_modules": [],
+      "bug_fixes": [
+        "settings-back-navigation: Escape and 0 return one menu level, cancel unsubmitted settings and restore the home screen."
+      ],
+      "other_changes": [
+        "paired-interactive-reports: Default Save report creates HTML and interactive graph reports with separate console links."
+      ]
+    },
+    {
       "version": "0.3.2",
       "previous_version": "0.3.1",
       "new_modules": [],
