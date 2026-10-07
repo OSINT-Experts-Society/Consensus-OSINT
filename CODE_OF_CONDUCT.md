@@ -1,6 +1,8 @@
 # Community Code of Conduct
 
-Consensus is maintained by the OSINT Experts Society. We welcome people of all
+Consensus is maintained by **OSINT GROUP LTD** (company number 16684773), operating
+as the **OSINT Experts Society**. See [legal and privacy information](LEGAL.md).
+We welcome people of all
 backgrounds and experience levels, and expect everyone to treat others with
 respect.
 
@@ -19,7 +21,7 @@ community spaces managed by the Society, including when representing Consensus.
 
 ## Reporting concerns
 
-Contact the **OSINT Experts Society** through [osint.ngo](https://osint.ngo).
+Contact the **OSINT Experts Society** through [osint.ngo](https://osint.ngo/contact-us).
 Avoid posting sensitive allegations or personal details in a public issue.
 Share only the information needed to explain the concern.
 
