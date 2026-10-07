@@ -8,13 +8,11 @@
 
 <p align="center">By the <a href="https://osint.ngo">OSINT Experts Society</a></p>
 
-<p align="center"><strong>7,900+ lookup modules. 19 open-source projects. One tool.</strong></p>
+<h3 align="center">7,900+ lookup modules. 19 open-source projects. One tool.</h3>
 
 <p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a> &middot; <a href="#see-consensus-in-action">See it in action</a></p>
 
-<p align="center">Expert-maintained username, email and phone intelligence, standardised into one tool. Each week, our experts review major open-source projects for new modules—deduplicating, testing, improving and integrating suitable additions, while retiring modules that no longer work.</p>
-
-<p align="center"><strong>One installation. One search workflow. One consistent report across 19 source projects.</strong></p>
+<p align="center">Username, email and phone intelligence, standardised into one tool.<br>Our experts review and update the modules weekly: finding new sources, testing and improving additions, and retiring those that no longer work.</p>
 
 <p align="center">
   <picture>
@@ -42,8 +40,7 @@
 <summary>Compare Consensus with its 19 source projects</summary>
 <a id="compare"></a>
 
-<p align="center"><strong>Overlapping sources. Separate update schedules. One combined solution.</strong></p>
-<p align="center">Consensus brings these sources together, with expert review and updates every week. Default searches select one lookup per site and bring the results into one report.</p>
+<p align="center"><strong>See the overlap. Search it once.</strong><br>Module counts, shared coverage and update frequency across all 19 source projects.</p>
 
 <div align="center">
 <table align="center">
@@ -78,15 +75,13 @@
 <details>
 <summary align="center">About these counts (3 October 2026)</summary>
 
-**Duplicate ratio:** percentage of a project's distinct mapped lookups also listed by another compared tool, excluding Consensus. Estimates compare service + lookup type across **16 mapped source projects**; the fraction below each percentage shows module definitions mapped. Incomplete mappings, unresolved aliases and excluded SherlockV2/Sreg/Mailcat limit this comparison. Shared targets can return different information. Consensus deduplicates default searches; its catalogue retains alternative implementations. This is not a measured 0% catalogue-duplication claim; explicit selections and all-modules mode can retain alternatives.
+**Snapshot: 3 October 2026.** Counts include enabled rules and modules, not unique websites. Phone counts exclude number analysis and search links; an em dash means no comparable definitions.
 
-**Update frequency:** median days between distinct lookup-file update dates, 3 April to 3 October 2026. Multiple commits on one day count once; merge commits, unrelated paths and package-helper-only edits are excluded. Fewer than three update days is insufficient for a typical interval. Dates link to the latest qualifying commit. This measures edits to the selected lookup files, not release frequency or guaranteed maintenance. Consensus's weekly review is a schedule, not a measured upstream cadence.
+- **Duplicate ratio:** share of distinct mapped lookups also listed by another tool, excluding Consensus. Based on service + lookup type across 16 projects; fractions show definitions mapped. Incomplete mappings and unresolved aliases limit accuracy. Shared targets may return different information. Consensus deduplicates default searches; explicit selections and all-modules mode can retain alternatives.
+- **Update frequency:** median days between lookup-file update dates, 3 April–3 October 2026. Same-day commits count once; merges, unrelated files and helper-only edits are excluded. At least three update days are required. This measures file edits, not releases. Consensus's weekly review is a schedule, not a measured interval.
+- **Failing modules:** comparable tests of upstream implementations are unavailable. Existing audits cover Consensus adaptations; blocking, missing credentials and untested modules do not establish failure. “Not verified” does not mean 0%.
 
-**Failing modules (%):** confirmed failures divided by modules tested, with sample size and test date when available. Comparable tests of the original upstream implementations are not available, so no percentage is claimed. Existing audits cover Consensus adaptations. Blocking, missing credentials and untested modules are not confirmed failures; Not verified does not mean 0%. No live scans were run for this comparison.
-
-Counts cover catalogue rules and modules as of 3 October 2026, excluding explicitly disabled entries. Overlapping implementations are not unique websites; results depend on scan options and service requirements. Phone counts exclude number analysis and search links. An em dash means no comparable definitions.
-
-*DetectDee: declared rules in a catalogue with malformed regex escapes. Sreg: configured routes, often repeated across input types. Neither is a live reliability claim. Mailcat: nickname-to-mailbox discovery, shown separately. SherlockV2: public repository returned 404; current counts unverified.*
+*DetectDee counts declared rules despite malformed regex escapes. Sreg counts configured routes, often repeated across input types. Mailcat covers nickname-to-mailbox discovery. SherlockV2's repository was unavailable. Sreg, Mailcat and SherlockV2 are excluded from duplicate ratios.*
 
 </details>
 
@@ -94,79 +89,55 @@ Counts cover catalogue rules and modules as of 3 October 2026, excluding explici
 
 ## Key features
 
-- **7,900+ lookup modules from 19 projects.** Combined username, email and phone capabilities in one installation, one search workflow and one consistent report.
-- **One search per site by default.** Overlapping sources reconciled, with one lookup selected per site to reduce duplicate searches and repeated results.
-- **Reviewed & updated weekly by our experts.** Changes across source projects evaluated, tested, improved and integrated; broken modules retired.
-- **Follow new leads automatically.** Optional recursive searches follow usernames, email addresses and linked profiles discovered in results.
-- **Spot connections across results.** Compare returned names, biographies, contact details and organisations, then inspect the supporting evidence. Shared details are leads, not proof of identity.
-- **See which sources cover a lookup.** Source attribution shows which imported projects list each lookup, making their overlap visible.
-- **Take your findings further.** Export HTML, PDF, CSV and JSON reports, explore interactive evidence graphs, or use XMind and Neo4j exports. PDF requires the optional extra.
-- **Connect compatible AI assistants.** Optional MCP support lets AI tools run Consensus lookups and retrieve results through a standard interface.
-- **Bulk searches, advanced controls and proxies.** Process lists, generate username variations, filter by site or category, and use a guided menu or repeatable CLI commands.
+- **One search per site.** Default searches reconcile overlapping modules across 19 projects.
+- **Expert review, every week.** New and changed modules are tested, improved and integrated; broken modules are retired.
+- **Follow new leads.** Optional recursive searches follow discovered usernames, emails and linked profiles.
+- **Understand each match.** Open enriched details, see source coverage and compare shared information across results.
+- **Reports and evidence graphs.** Export HTML, PDF, CSV or JSON; explore connections visually, with XMind and Neo4j exports also available.
+- **Bulk search and advanced controls.** Process lists, generate username variations, filter sites and categories, and use proxies.
+- **Pick up where you left off.** Filter and save results, repeat a search, or opt in to local history.
+- **Simple maintenance.** Managed installs include update notifications, repair and rollback.
+- **AI integration.** Optional MCP support connects compatible assistants to Consensus lookups and results.
 
 ## See Consensus in action
 
-Actual Consensus report screens using **fictional demonstration data**. No live searches were performed. Click either image to view it full size.
+Actual Consensus screens with fictional demonstration data. Click to enlarge.
 
-**HTML report:** searchable findings, returned profile details and source coverage in one view.
+**HTML report** — searchable findings, profile details and source coverage.
 
 <a href="consensus_osint/templates/consensus-demo-report.png"><img src="consensus_osint/templates/consensus-demo-report.png" width="920" alt="Actual Consensus HTML report showing fictional profile findings, filters and returned details"></a>
 
-**Interactive evidence graph:** explore the connections between a query, its results and source sites, and select a result to inspect its evidence.
+**Interactive evidence graph** — explore connections and inspect the supporting evidence.
 
 <a href="consensus_osint/templates/consensus-demo-graph.png"><img src="consensus_osint/templates/consensus-demo-graph.png" width="920" alt="Actual Consensus interactive graph showing fictional query, result and source-site nodes with an evidence panel"></a>
 
 ## Install
 
-**Recommended: the managed installer.** During private testing, use the Consensus install bundle supplied by the Society. Extract the entire ZIP first.
+**Private preview:** get the install bundle from the [OSINT Experts Society](https://osint.ngo) and extract the ZIP.
 
-- **Windows:** double-click **Install.cmd**.
-- **macOS / Linux:** run `sh install.sh` inside the extracted folder.
+| Platform | Install |
+| --- | --- |
+| **Windows** | Double-click **Install.cmd**. |
+| **macOS / Linux** | Run `sh install.sh` in the extracted folder. |
 
-The installer prepares Python and dependencies for you. Internet access is required; Git and a preinstalled Python are not. Open a new terminal and run **`consensus`**.
+Python and dependencies are installed for you. Internet access is required.
 
-Keep the extracted bundle folder: it is your private update source. For a new bundle, use **Settings ? Installation & updates ? Choose update bundle**, or run its installer. Public release delivery will be enabled separately.
-
-**Already installed from source?** Open **Settings ? Installation & updates ? Switch to managed installation** and select the extracted bundle folder. Existing configuration and report locations are preserved.
-
-Managed installs check for updates at startup. **Settings ? Installation & updates** shows versions, database date, update status, change counts, repair and rollback. `consensus update` installs an available update; `consensus update --repair` repairs the installed version; `consensus update --rollback` restores the previous version and pauses automatic upgrades until your next manual update. Restart to apply changes.
-
-<details>
-<summary>Install from source instead</summary>
-
-Requires [Python 3.10+](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads), plus repository access while private:
+Open a new terminal:
 
 ```console
-git clone https://github.com/OSINT-Experts-Society/Consensus-OSINT-OSINT.git
-cd Consensus-OSINT
-python -m venv .venv
+consensus
 ```
-
-Windows: `.\.venv\Scripts\python.exe -m pip install ".[modules]"`, then `.\.venv\Scripts\consensus.exe`.
-
-macOS/Linux: use `python3` if needed, then `.venv/bin/python -m pip install ".[modules]"` and `.venv/bin/consensus`.
-
-Source installs are updated with Git and pip. The Updates screen can migrate them to managed installation. Set `CONSENSUS_NO_UPDATE_CHECK=1` to skip startup update checks, or `CONSENSUS_AUTO_UPDATE=0` for notifications only.
-
-</details>
 
 ## Start searching
 
-Run **`consensus`** to open the menu:
-
 1. Choose **Username**, **Email**, **Phone** or **Bulk search**.
-2. Enter what you want to look up and follow the prompts.
-3. Review results, open enriched details, or use **Save report**, **Filter results** and **Search again** directly from the table.
+2. Enter your query. Include the country code for phone numbers.
+3. Review matches, open enriched details, then **Save report**, **Filter results** or **Search again**.
 
-**Recent searches** in Settings can retain up to 10 searches locally. It is off by default; enable it to reopen results after restarting, and delete saved searches whenever needed.
+Press **Esc** or **S** to stop an interactive scan; type `exit` to quit. Enable **Recent searches** in Settings to keep up to 10 searches locally. History is off by default.
 
-Use international phone numbers, including the country code. Press **Ctrl+C** to stop a scan; type **`exit`** to quit.
-
-Need command-line options? Run `consensus --help` or `consensus examples`.
-
-### Command-line examples
-
-Replace the quoted placeholders with your search:
+<details>
+<summary>Command-line examples</summary>
 
 ```console
 consensus user "YOUR_USERNAME"
@@ -175,16 +146,68 @@ consensus phone "+COUNTRY_CODE_AND_NUMBER"
 consensus user "YOUR_USERNAME" -o reports/username.html
 ```
 
-For PDF reports or MCP support, install the extras you need: `python -m pip install ".[modules,pdf]"` or `python -m pip install ".[modules,mcp]"`.
+Explore more with `consensus --help` or `consensus examples`.
+
+</details>
+
+<details>
+<summary>Updates, repair and migration</summary>
+
+Open **Settings → Installation & updates** to check versions, install updates, restart or recover an installation.
+
+During private testing, **keep the extracted bundle folder** as your update source. When a new bundle arrives, select **Choose bundle** and point to its extracted folder, or run its installer. Restart to apply changes.
+
+| Command | Action |
+| --- | --- |
+| `consensus update` | Install an available update. |
+| `consensus update --repair` | Repair the installed version. |
+| `consensus update --rollback` | Restore the previous version and pause automatic upgrades. |
+
+A manual update resumes upgrades after rollback. Set `CONSENSUS_AUTO_UPDATE=0` for notifications only, or `CONSENSUS_NO_UPDATE_CHECK=1` to disable startup checks.
+
+**Moving from a source install?** Choose **Switch to managed installation** in the Updates screen and select the extracted bundle. Your configuration and report locations are preserved.
+
+</details>
+
+<details>
+<summary>Install from source</summary>
+
+Requires [Python 3.10+](https://www.python.org/downloads/), [Git](https://git-scm.com/downloads) and repository access while private.
+
+```console
+git clone https://github.com/OSINT-Experts-Society/Consensus-OSINT.git
+cd Consensus-OSINT
+python -m venv .venv
+```
+
+**Windows**
+
+```console
+.\.venv\Scripts\python.exe -m pip install ".[modules,pdf]"
+.\.venv\Scripts\consensus.exe
+```
+
+**macOS / Linux**
+
+Use `python3` above if required, then:
+
+```console
+.venv/bin/python -m pip install ".[modules,pdf]"
+.venv/bin/consensus
+```
+
+Add `mcp` to the extras for AI integration, for example `".[modules,pdf,mcp]"`. PDF support is included in managed installs.
+
+To update a source install, run `git pull`, then repeat its pip command above.
+
+</details>
 
 ## Join the community
 
-**Want your OSINT project evaluated for inclusion in Consensus?** [Contact the OSINT Experts Society](https://osint.ngo).
+**Want your OSINT project included?** [Contact the Society](https://osint.ngo) for evaluation.
 
-Help shape Consensus: share feedback, suggest a site or [report an issue](https://github.com/OSINT-Experts-Society/Consensus-OSINT/issues).
+[Website](https://osint.ngo) · [LinkedIn](https://www.linkedin.com/groups/13047129/) · [Reddit](https://www.reddit.com/r/OSINTExperts/) · [Report an issue](https://github.com/OSINT-Experts-Society/Consensus-OSINT/issues)
 
-Connect with the **OSINT Experts Society** on [our website](https://osint.ngo), [LinkedIn](https://www.linkedin.com/groups/13047129/) and [Reddit](https://www.reddit.com/r/OSINTExperts/).
+Use responsibly. Shared details are leads, not proof of identity; verify important matches at their source.
 
-Use responsibly and verify important matches at their source.
-
-[GPL-3.0-or-later](LICENSE) | [Third-party credits and licences](THIRD_PARTY_NOTICES.txt)
+[GPL-3.0-or-later](LICENSE) · [Third-party credits](THIRD_PARTY_NOTICES.txt)
