@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import uuid
 from pathlib import Path
@@ -70,6 +71,19 @@ class SearchHistory:
         value = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(value, dict) or not isinstance(value.get("findings"), list):
             raise ValueError("Invalid saved search")
+        for name, expected in (("queries", list), ("options", dict)):
+            if name in value and not isinstance(value[name], expected):
+                raise ValueError(f"Invalid saved search {name}")
+        for name in ("started", "finished"):
+            number = value.get(name)
+            if number is None and (name == "finished" or name not in value):
+                continue
+            try:
+                valid = type(number) in (int, float) and math.isfinite(number)
+            except OverflowError:
+                valid = False
+            if not valid:
+                raise ValueError(f"Invalid saved search {name}")
         return ScanSummary(queries=value.get("queries", []), started=value.get("started", 0),
                            finished=value.get("finished"), options=value.get("options", {}),
                            findings=[Finding.from_dict(f) for f in value["findings"]])
@@ -131,11 +145,17 @@ def screen(session):
             if delete:
                 history.delete(key)
             else:
+                previous = session.latest
+                ui = session.printer.terminal_ui
+                filters = ui.result_filters if ui else None
                 try:
                     session.latest = history.load(key)
                     if session.printer.terminal_ui:
                         session.printer.terminal_ui.result_filters = {}
                     session.show_latest()
                     return
-                except (OSError, ValueError, TypeError, KeyError, RecursionError):
+                except (OSError, ValueError, TypeError, KeyError, RecursionError, AttributeError, OverflowError):
+                    session.latest = previous
+                    if ui:
+                        ui.result_filters = filters
                     session.printer.warn("This saved search cannot be opened. You can delete it from history.")
