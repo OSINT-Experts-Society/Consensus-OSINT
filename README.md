@@ -111,16 +111,16 @@ Actual Consensus screens with fictional demonstration data. Click to enlarge.
 
 ## Install
 
-**Private preview:** get the install bundle from the [OSINT Experts Society](https://osint.ngo) and extract the ZIP.
+Choose your preferred installation method. **Private preview:** get the install bundle from the [OSINT Experts Society](https://osint.ngo) and extract the ZIP, or use the source repository if you have access.
 
-| Platform | Install |
-| --- | --- |
-| **Windows** | Double-click **Install.cmd**. |
-| **macOS / Linux** | Run `sh install.sh` in the extracted folder. |
+| Platform | Double-click installer | Install from terminal | Install from source |
+| --- | --- | --- | --- |
+| **Windows** | **Install.cmd** | Run `.\Install.cmd` in CMD or PowerShell. | [Git + Python instructions](#install-from-source) |
+| **macOS / Linux** | Use the terminal option. | Run `sh install.sh`. | [Git + Python instructions](#install-from-source) |
 
-Python and dependencies are installed for you. Internet access is required.
+**Recommended: the install bundle.** Both installer options set up Python and dependencies for you. Run terminal commands from the extracted folder. Internet access is required.
 
-Open a new terminal:
+After a bundle install, open a new terminal:
 
 ```console
 consensus
@@ -169,6 +169,7 @@ A manual update resumes upgrades after rollback. Set `CONSENSUS_AUTO_UPDATE=0` f
 
 <details>
 <summary>Install from source</summary>
+<a id="install-from-source"></a>
 
 Requires [Python 3.10+](https://www.python.org/downloads/), [Git](https://git-scm.com/downloads) and repository access while private.
 
