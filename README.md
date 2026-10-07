@@ -167,9 +167,7 @@ A manual update resumes upgrades after rollback. Set `CONSENSUS_AUTO_UPDATE=0` f
 
 </details>
 
-<details>
-<summary>Install from source</summary>
-<a id="install-from-source"></a>
+## Install from source
 
 Requires [Python 3.10+](https://www.python.org/downloads/), [Git](https://git-scm.com/downloads) and repository access while private.
 
@@ -198,8 +196,6 @@ Use `python3` above if required, then:
 Add `mcp` to the extras for AI integration, for example `".[modules,pdf,mcp]"`. PDF support is included in managed installs.
 
 To update a source install, run `git pull`, then repeat its pip command above.
-
-</details>
 
 ## Join the community
 
