@@ -88,14 +88,13 @@
 
 ## Key features
 
-- **One search per site.** Default searches reconcile overlapping modules across 19 projects.
-- **Expert review, every week.** New and changed modules are tested, improved and integrated; broken modules are retired.
-- **Follow new leads.** Optional recursive searches follow discovered usernames, emails and linked profiles.
-- **Understand each match.** Open enriched details, see source coverage and compare shared information across results.
+- **Expert review, every week.** Our team reviews all 19 source projects weekly and evaluates new OSINT projects as they emerge. Suitable modules are tested, improved and integrated; broken modules are retired.
+- **Follow new leads automatically.** Enable recursive search to investigate usernames, email addresses and linked accounts discovered in your results, expanding your search without entering each new lead yourself.
+- **Enriched results.** Go beyond found/not found with available profile details, including names, biographies and linked accounts. Inspect the returned information, see source coverage and compare details across results.
 - **Reports and evidence graphs.** Export HTML, PDF, CSV or JSON; explore connections visually, with XMind and Neo4j exports also available.
 - **Bulk search and advanced controls.** Process lists, generate username variations, filter sites and categories, and use proxies.
-- **Pick up where you left off.** Filter and save results, repeat a search, or opt in to local history.
-- **Simple maintenance.** Managed installs include update notifications, repair and rollback.
+- **Save your investigation.** Export your findings and reports, or enable local history to reopen saved results and repeat searches later.
+- **Automatic update checks.** Managed installs check for updates at startup and notify you when an update is available or ready to use. Repair and rollback are built in.
 - **AI integration.** Optional MCP support connects compatible assistants to Consensus lookups and results.
 
 ## See Consensus in action
