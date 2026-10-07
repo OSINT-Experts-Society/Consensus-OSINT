@@ -2,6 +2,15 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.3.4",
+      "previous_version": "0.3.3",
+      "new_modules": [],
+      "bug_fixes": [],
+      "other_changes": [
+        "runtime-distribution: Refine packaged catalogue metadata."
+      ]
+    },
+    {
       "version": "0.3.3",
       "previous_version": "0.3.2",
       "new_modules": [],
