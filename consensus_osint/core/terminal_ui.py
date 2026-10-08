@@ -402,6 +402,37 @@ class TerminalUI:
             rows += min(8, len(completion.completions))
         return Dimension(max=min(max(1, size.rows - 4), rows + 2))
 
+    def _reflow_prompt(self, app):
+        """Account for rows inserted by Windows terminal reflow before erasing."""
+        from prompt_toolkit.data_structures import Point
+
+        renderer = app.renderer
+        previous = renderer._last_size
+        screen = renderer.last_rendered_screen
+        get_info = getattr(app.output, "get_win32_screen_buffer_info", None)
+        if app._running_in_terminal or previous is None or screen is None or get_info is None:
+            return
+        size = app.output.get_size()
+        if size.columns >= previous.columns:
+            return
+        # Win32 output reserves the last column, whereas reflow uses the actual
+        # buffer width. Only rows above the editing cursor move its origin.
+        columns = max(1, get_info().dwSize.X)
+        position = renderer._cursor_pos
+        extra = 0
+        for row in range(position.y):
+            cells = screen.data_buffer[row]
+            styles = renderer._style_string_has_style
+            length = max((x for x, cell in cells.items()
+                          if cell.char != " " or (styles and styles[cell.style])), default=-1) + 1
+            extra += max(0, (length - 1) // columns)
+        renderer._cursor_pos = Point(position.x % columns,
+                                     position.y + extra + position.x // columns)
+        # A refresh can beat the resize poll. Clear the whole old prompt once,
+        # using the corrected origin, whichever callback observes the change.
+        renderer.erase(leave_alternate_screen=False)
+        app._request_absolute_cursor_position()
+
     def prompt(self):
         prefix = []
         size = self.session.app.output.get_size() if self.session else None
@@ -638,6 +669,14 @@ class TerminalUI:
         # A burst of finished checks must not trigger a full terminal redraw per
         # result. Counters still update immediately; rendering stays responsive.
         self.session.app.min_redraw_interval = 1 / 15
+        resize = self.session.app._on_resize
+
+        def on_resize():
+            self._reflow_prompt(self.session.app)
+            resize()
+
+        self.session.app._on_resize = on_resize
+        self.session.app.before_render += self._reflow_prompt
         # PromptSession's built-in Frame otherwise fills every spare row above
         # the toolbar. Bound that frame, while keeping its native input/completions.
         self.session.layout.container.children[0].content.height = self.input_height

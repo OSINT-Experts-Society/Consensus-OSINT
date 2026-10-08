@@ -2,6 +2,17 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.3.5",
+      "previous_version": "0.3.4",
+      "new_modules": [],
+      "bug_fixes": [
+        "terminal-resize-reflow: Prevent repeated input borders when narrowing the Windows console after viewing results."
+      ],
+      "other_changes": [
+        "beginner-installation: Add numbered Windows installation and first-search steps."
+      ]
+    },
+    {
       "version": "0.3.4",
       "previous_version": "0.3.3",
       "new_modules": [],

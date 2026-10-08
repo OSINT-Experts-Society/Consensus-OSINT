@@ -123,6 +123,16 @@ After a search, choose **Save report** and press **Enter**. Consensus saves both
 
 Choose your preferred installation method. **Private preview:** get the install bundle from the [OSINT Experts Society](https://osint.ngo) and extract the ZIP, or use the source repository if you have access.
 
+**Quick install on Windows — no coding needed**
+
+1. **Save the installer ZIP** to your Downloads folder.
+2. **Extract it:** right-click the ZIP, select **Extract All**, then **Extract**.
+3. **Install:** open the extracted folder, double-click **Install.cmd**, and wait for installation to finish. Keep your internet connection on.
+4. **Open Consensus:** press the Windows key, type **cmd**, and press **Enter**. In the new window, type **consensus** and press **Enter**.
+5. **Start searching:** choose **Username**, **Email** or **Phone**, then enter what you want to look up.
+
+For macOS, Linux or other installation methods, use the options below.
+
 | Platform | Double-click installer | Install from terminal | Install from source |
 | --- | --- | --- | --- |
 | **Windows** | **Install.cmd** | Run `.\Install.cmd` in CMD or PowerShell. | [Git + Python instructions](#install-from-source) |
