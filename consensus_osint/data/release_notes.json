@@ -2,6 +2,17 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.1",
+      "previous_version": "0.4.0",
+      "new_modules": [],
+      "bug_fixes": [
+        "investigation-input: Keep investigations open and explain invalid selections or missing saved searches.",
+        "analyst-decisions: Retain analyst decisions and notes in results after follow-up searches.",
+        "followup-back: Return to the current investigation when a follow-up is cancelled or no new sources are available."
+      ],
+      "other_changes": []
+    },
+    {
       "version": "0.4.0",
       "previous_version": "0.3.5",
       "new_modules": [],

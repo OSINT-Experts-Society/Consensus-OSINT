@@ -94,6 +94,7 @@ def follow_up(session, mode):
                              "new": "Searching new sources; existing results will be retained.",
                              "recheck": "Rechecking saved identifiers and comparing the returned information."}[mode])
     session.execute(["scan", *flags, "--", *queries], continuation=continuation)
+    return True
 
 
 def actions(session):
@@ -104,13 +105,11 @@ def actions(session):
         if answer in ("", "0"):
             return
         if answer in ("1", "2", "3"):
-            follow_up(session, {"1": "continue", "2": "new", "3": "recheck"}[answer])
-            return
+            return follow_up(session, {"1": "continue", "2": "new", "3": "recheck"}[answer])
         if answer == "4":
             show_changes(session)
         elif answer == "5":
-            screen(session)
-            return
+            return screen(session)
 
 
 def screen(session):
@@ -137,11 +136,12 @@ def screen(session):
             session.printer.message("Choose a listed number or N.")
             continue
         if case_screen(session, store, key):
-            return
+            return True
 
 
 def case_screen(session, store, key):
     current_inventory = inventory()
+    notice = ""
     while True:
         value = store.read(key)
         session.clear_menu()
@@ -161,60 +161,75 @@ def case_screen(session, store, key):
                 session.printer.message("Older saved search: run a fresh search to enable new-source comparisons.")
         session.printer.message("Number Open · S Save latest · N Notes · R Rename · V Review a result\n"
                                 "C Compare searches · F Follow up latest · D Delete investigation · 0 Back")
+        if notice:
+            session.printer.message(notice)
+            notice = ""
         choice = session.back_prompt("Investigation action: ", zero=True).strip().lower()
         if choice in ("", "0"):
             return
-        if choice == "s":
-            if session.latest is None:
-                session.printer.message("Run a search first, then choose Save latest here.")
-                continue
-            if session.back_prompt("Save the latest search in this investigation? [y/N]: ").lower() in ("y", "yes"):
-                store.save(key, session.latest)
+        try:
+            if choice in ("v", "f", "c") and not value["searches"]:
+                raise ValueError("Save a search in this investigation first.")
+            if choice == "c" and len(value["searches"]) < 2:
+                raise ValueError("Save at least two searches to compare their observations.")
+            if choice == "s":
+                if session.latest is None:
+                    raise ValueError("Run a search first, then choose Save latest here.")
+                if session.back_prompt("Save the latest search in this investigation? [y/N]: ").lower() in ("y", "yes"):
+                    store.save(key, session.latest)
+                    session.latest = store.open_search(key)
+            elif choice in ("n", "r"):
+                label = "Notes" if choice == "n" else "New name"
+                updated = session.back_prompt(label + " (Enter cancels; - clears notes): ")
+                if updated:
+                    store.update(key, **({"notes": "" if updated == "-" else updated} if choice == "n" else {"name": updated}))
+            elif choice == "d":
+                if session.back_prompt("Delete this investigation and its saved searches? [y/N]: ").lower() in ("y", "yes"):
+                    store.delete(key)
+                    return
+            elif choice == "c":
+                pair = session.back_prompt("Two search numbers, oldest first (e.g. 1 2): ").split()
+                if not pair:
+                    continue
+                if len(pair) != 2 or not all(p.isdecimal() and 1 <= int(p) <= len(value["searches"]) for p in pair):
+                    raise ValueError("Choose two available search numbers")
+                if int(pair[0]) == int(pair[1]):
+                    raise ValueError("Choose two different saved searches")
+                show_changes(session, compare(store.open_search(key, int(pair[0])-1), store.open_search(key, int(pair[1])-1)))
+                session.back_prompt("Enter to return: ")
+            elif choice == "f":
                 session.latest = store.open_search(key)
-        elif choice in ("n", "r"):
-            label = "Notes" if choice == "n" else "New name"
-            updated = session.back_prompt(label + " (Enter cancels; - clears notes): ")
-            if updated:
-                store.update(key, **({"notes": "" if updated == "-" else updated} if choice == "n" else {"name": updated}))
-        elif choice == "d":
-            if session.back_prompt("Delete this investigation and its saved searches? [y/N]: ").lower() in ("y", "yes"):
-                store.delete(key)
-                return
-        elif choice == "c":
-            pair = session.back_prompt("Two search numbers, oldest first (e.g. 1 2): ").split()
-            if not pair:
-                continue
-            if len(pair) != 2 or not all(p.isdecimal() and 1 <= int(p) <= len(value["searches"]) for p in pair):
-                raise ValueError("Choose two available search numbers")
-            show_changes(session, compare(store.open_search(key, int(pair[0])-1), store.open_search(key, int(pair[1])-1)))
-            session.back_prompt("Enter to return: ")
-        elif choice == "f":
-            session.latest = store.open_search(key)
-            actions(session)
-            return True
-        elif choice == "v":
-            latest = store.open_search(key)
-            found = latest.found
-            session.printer.summary_table([["Result", "Identifier", "Site"],
-                                           *[[str(i), f.query, f.site] for i, f in enumerate(found, 1)]], "Review findings")
-            number = session.back_prompt("Result number (Enter cancels): ").strip()
-            if not number:
-                continue
-            if not number.isdecimal() or not 1 <= int(number) <= len(found):
-                raise ValueError("Choose an available result")
-            decision = session.back_prompt("Relevant / unrelated / unreviewed (Enter cancels): ").strip().lower()
-            if not decision:
-                continue
-            note = session.back_prompt("Review note (optional): ")
-            if session.back_prompt("Save this analyst decision and note? [y/N]: ").lower() in ("y", "yes"):
-                store.review(key, found[int(number)-1], decision, note)
-                session.latest = store.open_search(key)
-        elif choice.isdecimal() and 1 <= int(choice) <= len(value["searches"]):
-            opened = store.open_search(key, int(choice)-1)
-            session.latest = opened
-            if session.printer.terminal_ui:
-                session.printer.terminal_ui.result_filters = {}
-            session.show_latest()
-            return True
-        else:
-            session.printer.message("Choose an available search or action.")
+                if actions(session):
+                    return True
+            elif choice == "v":
+                latest = store.open_search(key)
+                found = latest.found
+                if not found:
+                    raise ValueError("This saved search has no matches to review.")
+                session.printer.summary_table([["Result", "Identifier", "Site"],
+                                               *[[str(i), f.query, f.site] for i, f in enumerate(found, 1)]], "Review findings")
+                number = session.back_prompt("Result number (Enter cancels): ").strip()
+                if not number:
+                    continue
+                if not number.isdecimal() or not 1 <= int(number) <= len(found):
+                    raise ValueError("Choose an available result")
+                decision = session.back_prompt("Relevant / unrelated / unreviewed (Enter cancels): ").strip().lower()
+                if not decision:
+                    continue
+                if decision not in ("relevant", "unrelated", "unreviewed"):
+                    raise ValueError("Choose relevant, unrelated or unreviewed.")
+                note = session.back_prompt("Review note (optional): ")
+                if session.back_prompt("Save this analyst decision and note? [y/N]: ").lower() in ("y", "yes"):
+                    store.review(key, found[int(number)-1], decision, note)
+                    session.latest = store.open_search(key)
+            elif choice.isdecimal() and 1 <= int(choice) <= len(value["searches"]):
+                opened = store.open_search(key, int(choice)-1)
+                session.latest = opened
+                if session.printer.terminal_ui:
+                    session.printer.terminal_ui.result_filters = {}
+                session.show_latest()
+                return True
+            else:
+                notice = "Choose an available search or action."
+        except (OSError, ValueError) as exc:
+            notice = str(exc)

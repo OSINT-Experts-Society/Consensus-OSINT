@@ -89,6 +89,11 @@ class Continuation:
         # Replace observations that were actually made; never let the old
         # positive-winning deduplicator hide a later negative or failed check.
         changes = compare(self.previous, fresh)
+        reviews = {identity(f): f.extra["_analyst_review"] for f in self.previous.findings
+                   if "_analyst_review" in f.extra}
+        for finding in fresh.findings:
+            if identity(finding) in reviews:
+                finding.extra["_analyst_review"] = copy.deepcopy(reviews[identity(finding)])
         replaced = {(f.query, f.query_type, lookup_id(f)) for f in fresh.findings}
         kept = [f for f in self.previous.findings if (f.query, f.query_type, lookup_id(f)) not in replaced]
         fresh.findings = kept + fresh.findings
