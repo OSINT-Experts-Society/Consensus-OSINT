@@ -1,7 +1,8 @@
 # Install or update Consensus. No preinstalled Python, Git or administrator access needed.
 # Release assets are published together by publish.yml.
 # Keep shell preferences and script variables local when piped to Invoke-Expression.
-param([string]$BundlePath, [string]$ConfigDirectory, [string]$ReportsDirectory)
+param([string]$BundlePath, [string]$ConfigDirectory, [string]$ReportsDirectory,
+      [switch]$OfferLaunch, [switch]$NoShortcut, [string]$ShortcutDirectory)
 & {
 $ErrorActionPreference = 'Stop'
 $consensusRoot = if ($env:CONSENSUS_INSTALL_DIR) { [IO.Path]::GetFullPath($env:CONSENSUS_INSTALL_DIR) } else { Join-Path $env:USERPROFILE '.local\share\consensus-app' }
@@ -33,7 +34,7 @@ try {
     }
     $consensusUv = Join-Path $env:UV_UNMANAGED_INSTALL 'uv.exe'
     if (-not (Test-Path -LiteralPath $consensusUv)) {
-        Write-Host 'Preparing the private Consensus runtime...'
+        Write-Host 'Preparing the Consensus runtime...'
         Invoke-WebRequest 'https://astral.sh/uv/0.11.15/install.ps1' -UseBasicParsing -OutFile (Join-Path $consensusTemp 'uv-install.ps1')
         & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $consensusTemp 'uv-install.ps1')
         if ($LASTEXITCODE -ne 0) { throw 'Could not install the runtime helper.' }
@@ -46,6 +47,23 @@ try {
     & $consensusUv run --no-config --no-project --managed-python --python 3.13 python -I $consensusManager @consensusArguments
     if ($LASTEXITCODE -ne 0) { throw 'Consensus installation failed. Any previous version remains selected.' }
     $consensusBin = Join-Path $consensusRoot 'bin'
+    $consensusLauncher = Join-Path $consensusBin 'consensus.cmd'
+    if (-not $NoShortcut -and $env:CONSENSUS_NO_SHORTCUT -ne '1') {
+        try {
+            $consensusShortcuts = if ($ShortcutDirectory) { [IO.Path]::GetFullPath($ShortcutDirectory) } else { [Environment]::GetFolderPath('Programs') }
+            if (-not $consensusShortcuts) { throw 'Start menu folder is unavailable.' }
+            New-Item -ItemType Directory -Path $consensusShortcuts -Force | Out-Null
+            $consensusShell = New-Object -ComObject WScript.Shell
+            $consensusShortcut = $consensusShell.CreateShortcut((Join-Path $consensusShortcuts 'Consensus.lnk'))
+            $consensusShortcut.TargetPath = $consensusLauncher
+            $consensusShortcut.WorkingDirectory = $env:USERPROFILE
+            $consensusShortcut.Description = 'Consensus - OSINT Experts Society'
+            $consensusShortcut.Save()
+            Write-Host 'Start menu shortcut created. Search for Consensus to open it.'
+        } catch {
+            Write-Warning "Consensus is installed, but its Start menu shortcut could not be created: $($_.Exception.Message)"
+        }
+    }
     $consensusUserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
     if ($env:CONSENSUS_NO_MODIFY_PATH -ne '1' -and $consensusBin -notin ($consensusUserPath -split ';')) {
         [Environment]::SetEnvironmentVariable('Path', ($consensusBin + ';' + $consensusUserPath), 'User')
@@ -57,6 +75,9 @@ try {
         Write-Host "Ready. Add $consensusBin to PATH or run its consensus.cmd launcher directly."
     } else {
         Write-Host 'Ready. Run consensus. To update later, run consensus update.'
+    }
+    if ($OfferLaunch -and (Read-Host 'Launch Consensus now? [Y/n]') -notmatch '^(n|no)$') {
+        & $consensusLauncher
     }
 } finally {
     foreach ($name in $consensusSavedEnv.Keys) {

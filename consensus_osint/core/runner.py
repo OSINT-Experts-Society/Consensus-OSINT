@@ -165,6 +165,7 @@ async def _checked(call, query: str, item, query_type: str) -> Finding:
                 "warnings": decoding[0],
                 "message": "Some source characters were replaced during decoding; inspect returned text.",
             }
+        finding.extra["_lookup_id"] = ("module:" if isinstance(item, Module) else "site:") + item.id
         return finding
 
 

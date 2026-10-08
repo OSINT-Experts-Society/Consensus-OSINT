@@ -160,7 +160,7 @@ class TerminalUI:
 
         self.loop.call_soon_threadsafe(start)
 
-    def review(self, render, *, detail=None, follow_end=False):
+    def review(self, render, *, detail=None, follow_end=False, actions=True, title="Search results", exit_label="Main menu"):
         """Suspend input ownership cleanly while a full-screen viewer is active."""
         async def show():
             from prompt_toolkit.application import in_terminal
@@ -183,9 +183,12 @@ class TerminalUI:
                 app.input = SuspendedInput()
                 try:
                     self.results_view = ResultsView(render, input=original_input, output=app.output,
-                                                    context=self.footer_text, detail=detail, follow_end=follow_end, actions=True)
-                    self.results_action = await self.results_view.run()
-                    self.returned_from_results = True
+                                                    context=self.footer_text, detail=detail, follow_end=follow_end,
+                                                    actions=actions, title=title, exit_label=exit_label)
+                    action = await self.results_view.run()
+                    if actions:
+                        self.results_action = action
+                        self.returned_from_results = True
                     # The alternate screen has gone. Reset its cursor geometry
                     # before the suspended prompt measures its available height.
                     app.output.erase_screen()
@@ -400,7 +403,10 @@ class TerminalUI:
         completion = self.session.default_buffer.complete_state
         if completion is not None:
             rows += min(8, len(completion.completions))
-        return Dimension(max=min(max(1, size.rows - 4), rows + 2))
+        height = min(max(1, size.rows - 4), rows + 2)
+        # After long output the cursor may have only one row below it. Give
+        # the renderer a preferred height so it scrolls enough room for input.
+        return Dimension(max=height, preferred=height)
 
     def _reflow_prompt(self, app):
         """Account for rows inserted by Windows terminal reflow before erasing."""

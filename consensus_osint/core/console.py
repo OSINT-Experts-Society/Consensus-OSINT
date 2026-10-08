@@ -164,7 +164,7 @@ class Printer:
                          "Weekly catalogue updates from major lookup repositories.\n"
                          "1 Username   2 Email   3 Phone   4 Bulk search\n"
                          "5 View results   6 Save report   7 Settings\n"
-                         "8 Examples   9 Help   0 Exit\n"
+                         "8 Investigations   9 Help   0 Exit\n"
                          "Paste a username, email or phone below.\n"
                          "/ commands · /config settings · info: full paths\n"
                          "Bugs can occur. Use test accounts and verify findings.\n"
@@ -187,7 +187,7 @@ class Printer:
                 return
         self.message("1 Username · 2 Email · 3 Phone · 4 Bulk search")
         self.message("5 View results · 6 Save report · 7 Settings")
-        self.message("8 Examples · 9 Help · 0 Exit")
+        self.message("8 Investigations · 9 Help · 0 Exit")
         if not has_results:
             self.message("5/6: Run a search first.", "dim")
 

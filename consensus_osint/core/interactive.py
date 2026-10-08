@@ -18,9 +18,9 @@ CHOICES = (
     ("1", "Username", "user"), ("2", "Email", "email"), ("3", "Phone", "phone"),
     ("4", "Bulk search", "bulk"), ("5", "View latest results", "last"),
     ("6", "Save latest report", "save"), ("7", "Settings", "settings"),
-    ("8", "Examples", "examples"), ("9", "Help", "help"), ("0", "Exit", "exit"),
+    ("8", "Investigations", "investigations"), ("9", "Help", "help"), ("0", "Exit", "exit"),
 )
-_DEFAULTS = {"details": False, "all": False, "fast": False, "no_breach": False, "timeout": None}
+_DEFAULTS = {"details": False, "all": False, "fast": True, "no_breach": False, "timeout": None}
 _SETTINGS = (
     ("details", "Expand comparison evidence"), ("all", "Show all outcomes"),
     ("fast", "Quick username search"), ("no_breach", "Exclude breach lookups"),
@@ -115,7 +115,7 @@ class Session:
         except (OSError, ValueError, TypeError) as exc:
             self.printer.warn(f"Could not retain local history: {exc}. Results are still available in this session.")
 
-    def execute(self, tokens, *, remember=False):
+    def execute(self, tokens, *, remember=False, continuation=None):
         from ..cli import main
 
         if self.printer.terminal_ui:
@@ -126,7 +126,11 @@ class Session:
             tokens = [tokens[0], "--no-color", *tokens[1:]]
         if not self.animate and "--no-animation" not in tokens and tokens[0] in {"scan", "user", "username", "email", "phone"}:
             tokens = [tokens[0], "--no-animation", *tokens[1:]]
-        code = main(tokens, scan_defaults=dict(self.preferences), on_summary=self.remember, in_session=True)
+        defaults = dict(self.preferences)
+        if continuation:
+            defaults["fast"] = False
+        extra = {"continuation": continuation} if continuation else {}
+        code = main(tokens, scan_defaults=defaults, on_summary=self.remember, in_session=True, **extra)
         if code:
             self.printer.message("Search stopped; collected results are retained." if code == 130
                                  else "Command did not complete successfully. You can correct it and try again.", "yellow")
@@ -140,7 +144,7 @@ class Session:
             if self._leaves_prompt(value, f"{command} {value}"):
                 return
         if value:
-            flags = []
+            flags = ["--fast"] if command == "user" and self.preferences["fast"] else []
             phone_value = re.sub(r"^tel:", "", value.lstrip(), flags=re.I).lstrip()
             if command == "phone" and not phone_value.startswith(("+", "00")):
                 from ..cli import _phone_region
@@ -343,6 +347,9 @@ class Session:
         self.printer.message("last = review latest results · save [PATH] = export · settings = preferences · "
                              "reset = reset session · info = paths and version · about = project details · menu = home · exit = close")
         self.printer.message("Use email --help for scan options. Quote paths containing spaces; backslashes stay literal.", "dim")
+        self.printer.message("Username menu searches start quick. Use Continue full search under I Follow up in results.\n"
+                             "8 Investigations saves named cases, notes and decisions. /new-sources searches additions; "
+                             "/recheck compares a fresh search; /changes shows differences.")
         if self.printer.terminal_ui:
             self.printer.message("At the main prompt, Up/Down recalls commands from this session, including guided searches. "
                                  "Edit a recalled command and press Enter to run it. History clears on reset or exit.", "dim")
@@ -416,6 +423,22 @@ class Session:
                 screen(self)
             finally:
                 self._return_home = True
+        elif command in {"investigations", "followup", "continue", "new-sources", "recheck", "changes"}:
+            if arguments:
+                raise ValueError(f"{command} does not take extra arguments.")
+            from .investigation_ui import actions, follow_up, screen, show_changes
+
+            if command == "investigations":
+                try:
+                    screen(self)
+                finally:
+                    self._return_home = True
+            elif command == "followup":
+                actions(self)
+            elif command == "changes":
+                show_changes(self)
+            else:
+                follow_up(self, {"continue": "continue", "new-sources": "new", "recheck": "recheck"}[command])
         elif command == "set":
             if len(arguments) != 2:
                 raise ValueError("Use set SETTING VALUE, for example: set details on.")
@@ -463,6 +486,17 @@ class Session:
         while ui is not None and ui.results_action:
             action, ui.results_action = ui.results_action, None
             try:
+                if action == "followup":
+                    from .investigation_ui import actions
+
+                    ui.returned_from_results = False
+                    actions(self)
+                    if ui.results_action:
+                        continue
+                    if ui.returned_from_results:
+                        return
+                    self.show_latest()
+                    continue
                 if action == "save":
                     ui.returned_from_results = False
                     self.save_latest([])

@@ -46,6 +46,7 @@ from xml.etree import ElementTree as ET
 from .. import __version__
 from .branding import DESCRIPTION, HEALTH_WARNING, LINKS, MENU, ORGANIZATION, SLOGAN, UPDATE_NOTE, report_identity
 from .common_details import comparisons
+from .continuity import observation_time
 from .models import INFO_CATEGORIES, Finding, QueryType, ScanSummary, Status, redact_options
 from .presentation import assessment, enrichment_fields, has_details, split_fields
 from .provenance import LEGEND, coverage_text, information_source, repository_coverage
@@ -529,6 +530,7 @@ def _text_line(f: Finding) -> str:
     if notes:
         line += "  " + " ".join(notes)
     line += "\n    Meaning: " + explanation
+    line += "\n    Observed: " + observation_time(f)
     kv = _kv_line(split_fields(f.extra)[0])
     if kv:
         line += "\n    " + _field_heading(f) + ": " + kv
@@ -658,11 +660,11 @@ def render_markdown(summary: ScanSummary, include_all: bool = False) -> str:
             for f in items:
                 st = _status(f)
                 label, explanation, _ = assessment(f)
-                note = ""
+                note = "Observed: " + observation_time(f)
                 if f.error:
-                    note = _md_text(f.error, cell=True)
+                    note += "; " + _md_text(f.error, cell=True)
                 elif f.http_status and st is not Status.FOUND:
-                    note = f"HTTP {f.http_status}"
+                    note += f"; HTTP {f.http_status}"
                 url = _md_link(f.url).replace("|", "%7C")
                 out.append(
                     f"| {_md_text(f.site or f.site_id, 60, cell=True)} | {_md_text(cat, 40, cell=True)} "
@@ -689,6 +691,7 @@ def render_markdown(summary: ScanSummary, include_all: bool = False) -> str:
 CSV_COLUMNS = [
     "query", "query_type", "site", "site_id", "category", "status", "url",
     "source", "method", "confidence", "extra_json", "error", "upstream_repositories",
+    "assessment", "explanation", "observed_at",
 ]
 
 
@@ -728,6 +731,9 @@ def render_csv(summary: ScanSummary, include_all: bool = False) -> str:
             _csv_cell(_compact_json(extra) if extra else ""),
             _csv_cell(f.error),
             _csv_cell(_compact_json(repository_coverage(f))),
+            _csv_cell(assessment(f)[0]),
+            _csv_cell(assessment(f)[1]),
+            _csv_cell(observation_time(f)),
         ])
     return buf.getvalue()
 
@@ -956,6 +962,7 @@ def _env():
 
 def _card(f: Finding) -> dict:
     """Template-ready view of one finding (all values pre-sanitised strings)."""
+    from .continuity import observation_time
     st = _status(f)
     elapsed = ""
     if f.elapsed is not None:
@@ -985,6 +992,8 @@ def _card(f: Finding) -> dict:
         "diagnostics": display_fields(diagnostics, limit=0, include_images=True),
         "assessment": label,
         "reason": reason,
+        "observed_at": observation_time(f),
+        "analyst_review": f.extra.get("_analyst_review"),
         "tone": tone,
         "has_details": bool(detail_count),
         "detail_count": detail_count,
@@ -1036,6 +1045,8 @@ def build_html_context(summary: ScanSummary, include_all: bool = False) -> dict:
         "comparisons": compared,
         "queries": queries,
         "include_all": bool(include_all),
+        "changes": summary.options.get("changes"),
+        "investigation": summary.options.get("investigation"),
         "categories": sorted({str(f.category or "misc") for v in views for f in v.findings
                               if include_all or _status(f) is Status.FOUND or f.category in INFO_CATEGORIES}),
         "options": [(str(k), _compact(val, 200)) for k, val in redact_options(summary.options).items()],
@@ -1182,7 +1193,7 @@ def render_pdf(summary: ScanSummary, include_all: bool = False) -> bytes:
             for cat, items in v.by_category():
                 for f in items:
                     label, explanation, _ = assessment(f)
-                    lines = [esc(label), esc(explanation)]
+                    lines = [esc(label), esc(explanation), "Observed: " + esc(observation_time(f))]
                     if f.error:
                         lines.append(esc(f.error))
                     details = display_fields(split_fields(f.extra)[0], limit=0, include_images=True)
@@ -1199,7 +1210,7 @@ def render_pdf(summary: ScanSummary, include_all: bool = False) -> bytes:
             rows = [[P("Site", head), P("Status", head), P("URL", head), P("Note", head), P("Tools with this lookup", head)]]
             for f in v.others:
                 label, explanation, _ = assessment(f)
-                notes = [esc(explanation)]
+                notes = [esc(explanation), "Observed: " + esc(observation_time(f))]
                 if f.error:
                     notes.append(esc(f.error))
                 if f.http_status:

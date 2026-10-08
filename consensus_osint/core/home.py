@@ -11,7 +11,7 @@ from .terminal_ui import clean
 
 def action_panels(width, *, has_results=False):
     """Quiet two-column actions; spacing and typography carry the hierarchy."""
-    inset = 4 if width >= 78 else 3
+    inset = 4 if width >= 78 else 3 if width >= 48 else 2
     available = min(112, width - inset * 2)
     gap = 8 if width >= 100 else 6 if width >= 70 else 2
     columns = max(1, (available - gap) // 2)
@@ -42,7 +42,7 @@ def action_panels(width, *, has_results=False):
               item("2", "Email", "Find linked accounts", "Linked accounts"),
               item("3", "Phone", "Check number details", "Number details"),
               item("4", "Bulk search", "Search a list of identifiers", "Search a list"),
-              item("8", "Examples", "See example searches", "Sample searches")]
+              item("8", "Investigations", "Save, compare and review", "Saved investigations")]
     results = [item("5", "View results", "Reopen your latest search" if has_results else "",
                     "Latest search" if has_results else "", inactive=not has_results),
                item("6", "Save report", "Export your latest results" if has_results else "",
@@ -208,7 +208,7 @@ def _small_home(info, *, width, budget, version, has_results=False):
         column_width = (width - 2) // 2
         for first, second in (("1  Username", "5  View results"), ("2  Email", "6  Save report"),
                               ("3  Phone", "7  Settings"), ("4  Bulk search", "9  Help"),
-                              ("8  Examples", "0  Exit")):
+                              ("8  Investigations", "0  Exit")):
             row = Text(first.ljust(column_width) + "  " + second)
             row.stylize(f"bold {ACCENT}", 0, 1)
             row.stylize(f"bold {ACCENT}", column_width + 2, column_width + 3)

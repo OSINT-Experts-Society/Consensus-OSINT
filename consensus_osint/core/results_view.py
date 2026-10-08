@@ -17,7 +17,8 @@ from prompt_toolkit.utils import get_cwidth
 
 
 class ResultsView:
-    def __init__(self, render, *, input=None, output=None, context=None, detail=None, follow_end=False, actions=False):
+    def __init__(self, render, *, input=None, output=None, context=None, detail=None, follow_end=False, actions=False,
+                 title="Search results", exit_label="Main menu"):
         self.render = render
         self.context = context
         self.detail = detail
@@ -36,7 +37,8 @@ class ResultsView:
         self._footer_cache = None
         self.sections = []
         self.section_rows = []
-        self.caption = "Search results"
+        self.caption = self.title = title
+        self.exit_label = exit_label
         self.actions = actions
         keys = KeyBindings()
         view = self
@@ -136,12 +138,12 @@ class ResultsView:
 
         # Escape only navigates back within results. Repeated Escape must not
         # dismiss the table; leaving it is a separate, labelled action.
-        keys.add("escape")(lambda event: self.back(close=False))
+        keys.add("escape")(lambda event: self.back(close=self.exit_label != "Main menu"))
         keys.add("b")(lambda event: self.back(close=False))
         for key in ("q", "c-c", "c-d"):
             keys.add(key)(lambda event: self.back())
         if actions:
-            for key, action in (("s", "save"), ("f", "filter"), ("n", "again")):
+            for key, action in (("s", "save"), ("f", "filter"), ("n", "again"), ("i", "followup")):
                 keys.add(key)(lambda event, action=action: self.app.exit(result=action))
         self.header = Window(BarControl(self.navigation, above=True), height=3, style="class:toolbar")
         self.actions_window = Window(BarControl(self.action_buttons, above=True), height=1 if actions else 0,
@@ -171,10 +173,11 @@ class ResultsView:
     def action_buttons(self):
         width = self.app.output.get_size().columns
         labels = (("Save report", "S", "save"), ("Filter results", "F", "filter"), ("Search again", "N", "again"))
-        if width < 58:
+        if width < 78:
             labels = (("Save", "S", "save"), ("Filter", "F", "filter"), ("Again", "N", "again"))
-        if width < 30:
+        if width < 40:
             labels = (("", "S", "save"), ("", "F", "filter"), ("", "N", "again"))
+        labels += (("Follow up" if width >= 78 else "More" if width >= 40 else "", "I", "followup"),)
         fragments = []
         for label, key, action in labels:
             def click(event, action=action):
@@ -182,7 +185,7 @@ class ResultsView:
                     self.app.exit(result=action)
                     return None
                 return NotImplemented
-            fragments.extend([("class:action-button", f" {key} {label} ", click), ("", "  ")])
+            fragments.extend([("class:action-button", f" {key} {label} ", click), ("", " ")])
         return fragments
 
     def before_render(self):
@@ -229,10 +232,10 @@ class ResultsView:
             return NotImplemented
 
         width = self.app.output.get_size().columns
-        label = "  ← Back to results  Esc  " if self.history else "  ← Main menu  Q  "
+        label = "  ← Back to results  Esc  " if self.history else f"  ← {self.exit_label}  Q  "
         if width < len(label) + 2:
             label = " ← Results " if self.history else " ← Menu "
-        title = "Result details" if self.history else self.caption if self.line else "Search results"
+        title = "Result details" if self.history else self.caption if self.line else self.title
         return [("class:nav-border", "╭" + "─" * len(label) + "╮\n", click),
                 ("class:nav-border", "│", click), ("class:nav-button", label, click),
                 ("class:nav-border", "│", click), ("bold", "   " + title if width >= len(label) + len(title) + 6 else ""),

@@ -135,10 +135,14 @@ class Finding:
         return self.status is Status.FOUND
 
     def to_dict(self) -> dict:
+        from .continuity import observation_time
+        from .presentation import assessment
         from .provenance import repository_coverage
 
         result = as_json_safe(self)
         result["upstream_repositories"] = repository_coverage(self)
+        label, explanation, _ = assessment(self)
+        result["evidence"] = {"assessment": label, "explanation": explanation, "observed_at": observation_time(self)}
         return result
 
     @classmethod

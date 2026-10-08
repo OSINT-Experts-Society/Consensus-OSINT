@@ -11,6 +11,7 @@ from .presentation import assessment
 
 
 def graph_data(summary, include_all=False):
+    from .continuity import observation_time
     nodes, edges, ids = [], [], {}
 
     def node(key, label, kind, details):
@@ -55,6 +56,10 @@ def graph_data(summary, include_all=False):
                 "query": finding.query,
                 "query_type": finding.query_type,
                 "status": finding.status.value,
+                "assessment": assessment(finding)[0],
+                "explanation": assessment(finding)[1],
+                "observed_at": observation_time(finding),
+                "analyst_review": finding.extra.get("_analyst_review"),
                 "url": finding.url,
                 "method": finding.method,
                 "source": finding.source,

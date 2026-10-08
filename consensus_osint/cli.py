@@ -41,7 +41,7 @@ SUBCOMMANDS = {'about', 'email', 'examples', 'info', 'keys', 'mcp', 'modules', '
 
 # First words people type expecting a command. Each used to be looked up as a username on every site,
 # together with any word after it; `consensus user WORD` still searches for the word itself.
-NOT_A_SEARCH = {'search': 'consensus scan "YOUR_QUERY"', 'find': 'consensus scan "YOUR_QUERY"', 'lookup': 'consensus scan "YOUR_QUERY"', 'check': 'consensus scan "YOUR_QUERY"', 'mail': 'consensus email "YOUR_EMAIL"', 'tel': 'consensus phone "+COUNTRY_CODE_NUMBER"', 'site': 'consensus sites list', 'list': 'consensus sites list', 'key': 'consensus keys list', 'config': 'consensus keys path', 'settings': 'consensus keys path', 'module': 'consensus modules', 'reports': 'consensus report SAVED.json -o REPORT.html', 'upgrade': 'consensus update', 'install': 'consensus update', 'uninstall': "the README's uninstall section", 'status': 'consensus version', 'quit': 'nothing: there is no session to leave here', 'exit': 'nothing: there is no session to leave here', 'registry': 'consensus --help', 'selfcheck': 'consensus --help', 'test': 'consensus --help'}
+NOT_A_SEARCH = {'investigations': 'run consensus, then choose Investigations in its menu', 'followup': 'run consensus, then use followup in its interactive session', 'continue': 'run consensus, then use continue in its interactive session', 'new-sources': 'run consensus, then use new-sources in its interactive session', 'recheck': 'run consensus, then use recheck in its interactive session', 'changes': 'run consensus, then use changes in its interactive session', 'search': 'consensus scan "YOUR_QUERY"', 'find': 'consensus scan "YOUR_QUERY"', 'lookup': 'consensus scan "YOUR_QUERY"', 'check': 'consensus scan "YOUR_QUERY"', 'mail': 'consensus email "YOUR_EMAIL"', 'tel': 'consensus phone "+COUNTRY_CODE_NUMBER"', 'site': 'consensus sites list', 'list': 'consensus sites list', 'key': 'consensus keys list', 'config': 'consensus keys path', 'settings': 'consensus keys path', 'module': 'consensus modules', 'reports': 'consensus report SAVED.json -o REPORT.html', 'upgrade': 'consensus update', 'install': 'consensus update', 'uninstall': "the README's uninstall section", 'status': 'consensus version', 'quit': 'nothing: there is no session to leave here', 'exit': 'nothing: there is no session to leave here', 'registry': 'consensus --help', 'selfcheck': 'consensus --help', 'test': 'consensus --help'}
 
 
 def redact_proxy(proxy: str | None) -> str | None:
@@ -191,7 +191,7 @@ def add_scan_options(p: argparse.ArgumentParser, *, full_help: bool = False) -> 
     s.add_argument("--exclude-tags", type=_nonempty_selector, action=_JoinedSelector, help="skip sites with these tags")
     s.add_argument("--top", type=_positive_int, help="only the N most popular sites")
     s.add_argument("--fast", action="store_true",
-                   help="limit the main site list to 300 entries; other eligible checks may still run")
+                   help="start with up to 300 username site and module lookups; --top overrides this limit")
     s.add_argument("--nsfw", action="store_true", help="include NSFW sites and modules")
     s.add_argument("--all-sites", action="store_true", help="also list disabled sites, as skipped results with the reason; they are not contacted")
     s.add_argument("--source", type=_nonempty_selector, action=_JoinedSelector, help="only sites from these upstream lists (sherlock,maigret,wmn,...)")
@@ -477,7 +477,7 @@ class Scanner:
                            allow_loud=args.allow_loud, options={"nsfw": args.nsfw, "extract": not args.no_extract})
         self.db: SiteDB | None = None
         self.matcher = None
-        options = {k: v for k, v in vars(args).items() if k not in ("queries",)}
+        options = {k: v for k, v in vars(args).items() if k not in ("queries",) and not k.startswith("_")}
         options["proxy"] = redact_proxy(self.http.proxy)  # never write credentials into reports
         self.summary = ScanSummary(options=options)
         self._streamed: list = []   # every finding as it arrives, so an interrupted scan keeps them
@@ -486,6 +486,7 @@ class Scanner:
         self.site_index: dict = {}
         self._coverage = None
         self._query_context = ContextVar("query_relationship", default=None)
+        self.continuation = getattr(args, "_continuation", None)
 
     # ------------------------------------------------------------- helpers
     def sites_db(self) -> SiteDB:
@@ -571,15 +572,23 @@ class Scanner:
 
         sites = self.select_sites(id_type=id_type)
         modules = self.select_modules("username") if id_type == "username" else []
+        paired = []
         # an explicit --site selection is the user's plan; otherwise ask each service once
         if sites and modules and not getattr(self.args, "all_modules", False) and not self.args.site:
             from .core.modules import reconcile_plan
 
-            sites, modules, _ = reconcile_plan(sites, modules, ctx=self.ctx, query=username)
+            sites, modules, paired = reconcile_plan(sites, modules, ctx=self.ctx, query=username)
+        if getattr(self.args, "fast", False) and not self.args.top:
+            sites = sites[:300]
+            modules = modules[:max(0, 300 - len(sites))]
+        if self.continuation:
+            sites = self.continuation.select(username, id_type, sites, "site:")
+            modules = self.continuation.select(username, id_type, modules, "module:")
+            sites, modules = self.continuation.exclude_completed_alternatives(username, id_type, sites, modules, paired)
         total = len(sites) + len(modules)
         # Switching every check off (--no-sites --no-modules) is a deliberate dry run;
         # a filter that happens to select nothing is a mistake worth explaining.
-        if not total and depth == 0 and not self.args.no_sites:
+        if not total and depth == 0 and not self.args.no_sites and not self.continuation:
             self.unchecked.append(username)
             self.printer.warn(f"Nothing was checked for {username}: the chosen filters (--site, --tags, --exclude, --source "
                               "and similar) leave no sites or modules for this search. This is not a negative result.")
@@ -595,9 +604,9 @@ class Scanner:
             self.printer.stop_progress()
         findings = self._finish(findings, username, depth, parent)
 
-        if id_type == "username" and self.args.search_engines:
+        if id_type == "username" and self.args.search_engines and not self.continuation:
             findings += await self._search_engines(username, depth, parent)
-        if id_type == "username" and self.args.mailcat:
+        if id_type == "username" and self.args.mailcat and not self.continuation:
             findings += await self._mailcat(username, depth, parent)
         return findings
 
@@ -649,10 +658,25 @@ class Scanner:
         from .core.emailinfo import async_dns_info, local_analysis, to_finding
         from .core.runner import run_modules
 
+        continuation = getattr(self, "continuation", None)
+        modules = None
+        if continuation:
+            modules = continuation.select(email, "email", self.select_modules("email"), "module:")
+            if not modules and continuation.mode != "recheck":
+                return []
+
         self.printer.message("   analysing address and domain…", "dim")
         self.printer.activity("Analysing email domain", ["Consensus"])
         info = await asyncio.to_thread(local_analysis, email, resolve_dns=False)
         local = to_finding(info, email)
+        if continuation and continuation.mode != "recheck":
+            # Keep the original domain evidence and its collection time when
+            # only adding lookup coverage; do not replace it with partial data.
+            import copy
+            previous = next((f for f in continuation.previous.findings
+                             if f.query == email and f.query_type == "email" and f.site_id == local.site_id), None)
+            if previous:
+                local = copy.deepcopy(previous)
         # Machine streams cannot revise an emitted row. Delay their background
         # record until DNS finishes (or cancellation retains the partial data).
         if not self.printer.jsonl or not info.get("valid_syntax"):
@@ -662,7 +686,8 @@ class Scanner:
             return self._finish([local], email, depth, parent)
         if info.get("disposable"):
             self.printer.warn("disposable e-mail domain")
-        modules = self.select_modules("email")
+        if modules is None:
+            modules = self.select_modules("email")
         self.printer.activity("Scanning", self._tool_names([], modules))
         self.printer.message(f"   {len(modules)} sites being scanned for this email", "cyan")
         self.printer.start_progress(len(modules), f"checking {email}")
@@ -670,7 +695,10 @@ class Scanner:
             from .core.scan_control import checkpoint
 
             await checkpoint()
-            info.update(await async_dns_info(info["domain"]))
+            if continuation and continuation.mode != "recheck":
+                return
+            if not continuation or continuation.mode == "recheck":
+                info.update(await async_dns_info(info["domain"]))
             # Update the already collected background finding in place. It is
             # not a second site result and must not increment progress counters.
             updated = to_finding(info, email)
@@ -725,6 +753,10 @@ class Scanner:
                 ids=self._csv(self.args.site), exclude=self._csv(self.args.exclude),
                 tags=self._csv(self.args.tags), exclude_tags=self._csv(self.args.exclude_tags),
             )} if scoped else {}
+            if self.continuation:
+                selected = service_options.get("selected", set(phone_mod.SERVICES))
+                service_options["selected"] = {key for key in selected
+                    if self.continuation.allows(number, "phone", "phone:" + key)}
             try:
                 await checkpoint()
                 self.printer.activity("Checking phone reputation")
@@ -744,6 +776,8 @@ class Scanner:
             except Exception as exc:  # noqa: BLE001
                 self.printer.warn(f"API lookups failed: {exc}")
         modules = self.select_modules("phone")
+        if self.continuation:
+            modules = self.continuation.select(number, "phone", modules, "module:")
         self.printer.activity("Scanning", self._tool_names([], modules))
         self.printer.message(f"   {len(modules)} sites being scanned for this phone number", "cyan")
         self.printer.start_progress(len(modules), f"checking {e164}")
@@ -798,6 +832,8 @@ class Scanner:
                       | ({"Consensus"} if sources & {"extras", "rules", "bundled"} else set()))
 
     def _collect(self, f: Finding) -> None:
+        if f.source == "phone":
+            f.extra.setdefault("_lookup_id", "phone:" + f.site_id)
         context = getattr(self, "_query_context", None)
         relationship = context.get() if context is not None else None
         if relationship is not None:
@@ -822,7 +858,10 @@ class Scanner:
         return s
 
     async def run(self, queries: list) -> ScanSummary:
+        from .core.continuity import inventory
         from .core.recursion import LinkMatcher, extract_pivots, plan_next_queries
+
+        self.summary.options["lookup_inventory"] = inventory(self.sites_db().sites)
 
         frontier = [(q, t, 0, None) for q, t in queries]
         scheduled = {(q, t) for q, t in queries}
@@ -1183,6 +1222,8 @@ def cmd_scan(args: argparse.Namespace, *, on_summary=None, in_session=False) -> 
     if solver_line:
         printer.message(solver_line, "dim")
     interrupted = interrupted or bool(summary.options.get("interrupted"))
+    if getattr(args, "_continuation", None):
+        summary = args._continuation.merge(summary)
     if on_summary is not None:
         on_summary(summary)
 
@@ -1645,7 +1686,7 @@ def cmd_catalogue_update(args: argparse.Namespace) -> int:
     return 0
 
 
-def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_session=False) -> int:
+def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_session=False, continuation=None) -> int:
     _utf8_console(sys.stdout, sys.stderr)
     raw_argv = list(sys.argv[1:] if argv is None else argv)
     # A global startup switch works before or after the command. Preserve tokens
@@ -1672,6 +1713,8 @@ def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_se
     parser = build_parser(full_help="--help-all" in argv, color="--no-color" not in argv,
                           scan_defaults=scan_defaults, compact_errors=in_session)
     args = parser.parse_args(argv)
+    if continuation is not None:
+        args._continuation = continuation
     if getattr(args, "debug", False):
         logging.basicConfig(level=logging.DEBUG, format="%(name)s %(levelname)s %(message)s")
     else:

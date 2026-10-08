@@ -46,7 +46,7 @@ QUERY_GUIDANCE = "Replace the quoted placeholders with your username, email or p
 PHONE_GUIDANCE = 'Phone: include + and the country code, for example "+44 7700 900123".'
 EXAMPLES = (
     ("Username", 'consensus user "YOUR_USERNAME"', "Search a username across the selected sites."),
-    ("Quick username", 'consensus user "YOUR_USERNAME" --fast', "Limit the main site list to 300 entries; other eligible checks may still run."),
+    ("Quick username", 'consensus user "YOUR_USERNAME" --fast', "Start with up to 300 site and module lookups; continue the full search from the results menu."),
     ("Email + shared details", 'consensus email "YOUR_EMAIL" --details', "Expand the evidence for details shared by multiple sites. All returned fields are already shown by default."),
     ("Email without breaches", 'consensus email "YOUR_EMAIL" --no-breach', "Look up the email while excluding breach and infostealer checks."),
     ("Phone", 'consensus phone "+COUNTRY_CODE_NUMBER"', "Analyze an international phone number and run eligible phone checks."),

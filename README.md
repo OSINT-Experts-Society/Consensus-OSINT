@@ -14,6 +14,9 @@
 
 <p align="center">Username, email and phone intelligence, standardised into one tool.<br>Our experts review and update the modules weekly: finding new sources, testing and improving additions, and retiring those that no longer work.</p>
 
+<p align="center"><strong>See the information behind a match.</strong><br>Actual Consensus report, using clearly labelled fictional data.</p>
+<p align="center"><a href="consensus_osint/templates/consensus-example-report.html"><img src="consensus_osint/templates/consensus-enriched-example.png" width="620" alt="Actual enriched result with profile details, evidence explanation, observation time and project coverage; fictional demonstration data"></a></p>
+
 <p align="center">
   <picture>
     <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark-mobile.svg">
@@ -40,7 +43,7 @@
 <summary>Compare Consensus with its 19 source projects</summary>
 <a id="compare"></a>
 
-<p align="center"><strong>See the overlap. Search it once.</strong><br>Module counts, shared coverage and update frequency across all 19 source projects.</p>
+<p align="center"><strong>Combined coverage. Maintained modules. Consistent results.</strong><br>One installation and update process replaces managing separate tools and reconciling their results.</p>
 
 <div align="center">
 <table align="center">
@@ -48,7 +51,7 @@
     <tr><th align="left">Tool</th><th align="center">Username</th><th align="center">Email</th><th align="center">Phone</th><th align="center">Duplicate<br>ratio*</th><th align="center">Update<br>frequency*</th><th align="center">Last&nbsp;module<br>update</th></tr>
   </thead>
   <tbody>
-    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-wordmark-dark.svg"><img src="consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches*</sub></td><td align="center"><strong>Weekly<br>expert review</strong></td><td align="center">Not measured</td></tr>
+    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-wordmark-dark.svg"><img src="consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches*</sub></td><td align="center"><strong>Weekly<br>expert review</strong></td><td align="center">02&nbsp;Oct&nbsp;2026</td></tr>
     <tr><td align="left"><a href="https://github.com/soxoj/maigret/tree/b6642744988e7e6c2d21f75db60ec3093019ba25">Maigret</a></td><td align="center">5,483</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>40.8%</strong><br><sub>5,482/5,483&nbsp;mapped</sub></td><td align="center">Every&nbsp;2&nbsp;days</td><td align="center"><a href="https://github.com/soxoj/maigret/commit/3d2b613cfd9a18bebc9d65bb22bcf8af13aa18ef">25&nbsp;Sep&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b">User Scanner</a></td><td align="center">2,511</td><td align="center">211</td><td align="center">—</td><td align="center"><strong>68.9%</strong><br><sub>2,575/2,722&nbsp;mapped</sub></td><td align="center">Every&nbsp;1&nbsp;day</td><td align="center"><a href="https://github.com/kaifcodec/user-scanner/commit/8f4de8e7b3e68672c50ba318b2d15a9d2b4617e9">29&nbsp;Sep&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/arxhr007/Aliens_eye/tree/b1316648fe0e648469d30512bb0535ebc8c4bbc7">Aliens Eye</a></td><td align="center">840</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>65.4%</strong><br><sub>837/840&nbsp;mapped</sub></td><td align="center">Too few updates</td><td align="center"><a href="https://github.com/arxhr007/Aliens_eye/commit/eb10623492e1e171ff2d7d9cfc043a4a0a0e493a">10&nbsp;Jun&nbsp;2026</a></td></tr>
@@ -77,6 +80,8 @@
 
 **Snapshot: 3 October 2026.** Counts include enabled rules and modules, not unique websites. Phone counts exclude number analysis and search links; an em dash means no comparable definitions.
 
+Consensus's last module update is the date of its signed catalogue. The maintenance summary reports additions in the latest recorded intake; those implementation counts can include overlapping sites. Unrecorded repair or retirement totals are not presented as zero.
+
 - **Duplicate ratio:** share of distinct mapped lookups also listed by another tool, excluding Consensus. Based on service + lookup type across 16 projects; fractions show definitions mapped. Incomplete mappings and unresolved aliases limit accuracy. Shared targets may return different information. Consensus deduplicates default searches; explicit selections and all-modules mode can retain alternatives.
 - **Update frequency:** median days between lookup-file update dates, 3 April–3 October 2026. Same-day commits count once; merges, unrelated files and helper-only edits are excluded. At least three update days are required. This measures file edits, not releases. Consensus's weekly review is a schedule, not a measured interval.
 
@@ -86,20 +91,28 @@
 
 </details>
 
+<!-- maintenance-summary:start -->
+<p align="center">Last expert review: <strong>02 October 2026</strong> &middot; Latest intake: <strong>1,181 modules + 668 site rules added</strong></p>
+<!-- maintenance-summary:end -->
+
 ## Key features
 
 - **Expert review, every week.** Our team reviews all 19 source projects weekly and evaluates new OSINT projects as they emerge. Suitable modules are tested, improved and integrated; broken modules are retired.
 - **Follow new leads automatically.** Enable recursive search to investigate usernames, email addresses and linked accounts discovered in your results, expanding your search without entering each new lead yourself.
+- **Keep investigations current.** Search newly added lookup sources, or recheck saved identifiers and see newly discovered matches, changed details and inconclusive results.
+- **Quick first results.** Username menu searches start with up to 300 site and module lookups. Continue the full search while retaining completed results.
 - **Enriched results.** Go beyond found/not found with available profile details, including names, biographies and linked accounts. Inspect the returned information, see source coverage and compare details across results.
 - **Reports and evidence graphs.** Export HTML, PDF, CSV or JSON; explore connections visually, with XMind and Neo4j exports also available.
 - **Bulk search and advanced controls.** Process lists, generate username variations, filter sites and categories, and use proxies.
-- **Save your investigation.** Export your findings and reports, or enable local history to reopen saved results and repeat searches later.
+- **Save your investigation.** Keep named investigations with multiple saved searches, notes and relevant/unrelated decisions. Storage is local and explicit; optional recent-search history is separate.
 - **Automatic update checks.** Managed installs check for updates at startup and notify you when an update is available or ready to use. Repair and rollback are built in.
 - **AI integration.** Optional MCP support connects compatible assistants to Consensus lookups and results.
 
 ## See Consensus in action
 
 Click any image to enlarge. Console screenshots have personal details redacted; report and graph examples use fictional data.
+
+**Try the output before installing:** download the [example HTML report](https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-example-report.html) or [interactive graph](https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-example-graph.html), then open the saved HTML file in your browser. Both use fictional profiles and work offline.
 
 **Start a search** — username, email, phone and bulk searches from one menu.
 
@@ -128,7 +141,7 @@ Choose an installation option below.
 1. **Download:** open [Releases](https://github.com/OSINT-Experts-Society/Consensus-OSINT/releases), find **Assets**, and save the `Consensus-<version>.zip` installer to your Downloads folder.
 2. **Extract it:** right-click the ZIP, select **Extract All**, then **Extract**.
 3. **Install:** open the extracted folder, double-click **Install.cmd**, and wait for installation to finish. Keep your internet connection on.
-4. **Open Consensus:** press the Windows key, type **cmd**, and press **Enter**. In the new window, type **consensus** and press **Enter**.
+4. **Open Consensus:** choose **Launch Consensus** when prompted, or press the Windows key, type **Consensus**, and open the Start menu shortcut.
 5. **Start searching:** choose **Username**, **Email** or **Phone**, then enter what you want to look up.
 
 For macOS, Linux or other installation methods, use the options below.
@@ -151,6 +164,8 @@ consensus
 1. Choose **Username**, **Email**, **Phone** or **Bulk search**.
 2. Enter your query. Include the country code for phone numbers.
 3. Review matches, open enriched details, then **Save report**, **Filter results** or **Search again**.
+
+Choose **I Follow up** in results to continue a full search, search new sources, recheck or view changes. Choose **8 Investigations** from the main menu to save searches and notes together. Newly discovered profiles are not necessarily newly created accounts; an unavailable result does not prove deletion.
 
 Press **Esc** or **S** to stop an interactive scan; type `exit` to quit. Enable **Recent searches** in Settings to keep up to 10 searches locally. History is off by default.
 

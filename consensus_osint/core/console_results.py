@@ -68,6 +68,13 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
                            + ". F changes or clears filters. Saving keeps every outcome.", style=f"bold {ACCENT}"))
         out.print(Text(("Full search: " if filters else "") +
                        f"{len(matches)} found · {sum(has_details(f) for f in matches)} enriched · {len(findings)} outcomes"))
+        if summary.options.get("fast"):
+            out.print(Text("Quick search · I Follow up → Continue full search keeps completed results.", style=f"bold {ACCENT}"))
+        if summary.options.get("continuation"):
+            retained = summary.options["continuation"].get("retained_results", 0)
+            out.print(Text(f"{retained} earlier outcomes retained with their original observation times.", style="dim"))
+        if summary.options.get("changes"):
+            out.print(Text("Changes available · I Follow up → View changes", style=f"bold {ACCENT}"))
         if matches or show_all:
             out.print(Text("X = project lists this lookup; coverage does not mean separate searches.", style="dim"))
         if any(assessment(f)[0] == "Needs review" for f in matches):
@@ -173,6 +180,14 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
             out.print(Text("Possible match" if label == "Needs review" else label,
                            style="bold yellow" if tone == "warn" else f"bold {ACCENT}"))
             out.print(Text(clean(explanation)))
+            from .continuity import observation_time
+
+            out.print(Text("Observed: " + observation_time(f), style="dim"))
+            review = f.extra.get("_analyst_review")
+            if isinstance(review, dict):
+                out.print(Text("Analyst decision: " + clean(review.get("decision", "unreviewed")), style=f"bold {ACCENT}"))
+                if review.get("note"):
+                    out.print(Text(clean(review["note"])))
             if f.error:
                 out.print(Text(clean(f.error), style="yellow"))
             enriched = enrichment_fields(f)
@@ -206,6 +221,7 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
                 out.print(target)
             out.print(Text("\nTools with this lookup", style=f"bold {ACCENT}"))
             out.print(printer._coverage_cell(f))
+            out.print(Text("Project coverage shows shared lookup definitions, not independent confirmations.", style="dim"))
         else:
             out.print(Text("This result is no longer available."))
         return stream.getvalue()

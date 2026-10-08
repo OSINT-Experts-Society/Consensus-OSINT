@@ -59,7 +59,10 @@ imply its endorsement, partnership or approval of Consensus.
 - **Your device:** configuration, saved reports and optional search history are
   stored locally. Configuration may contain API credentials. Recent-search
   history is off by default; enabling it retains up to ten saved searches. Use
-  its delete/clear controls to remove saved entries. Exported reports, terminal
+  its delete/clear controls to remove saved history entries. Use
+  **Investigations** to explicitly save named cases, search snapshots, notes and
+  analyst decisions locally. These are separate from recent-search history;
+  delete a case through its investigation menu to remove its saved records. Exported reports, terminal
   output, shell history, backups and copies you share are separate and are not
   removed by clearing Consensus history. Local files are not automatically
   encrypted by Consensus.

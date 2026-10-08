@@ -2,6 +2,23 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.0",
+      "previous_version": "0.3.5",
+      "new_modules": [],
+      "bug_fixes": [
+        "input-space: Keep the input frame visible after long console output and prompts."
+      ],
+      "other_changes": [
+        "search-new-sources: Search newly added lookup coverage for a saved identifier without repeating completed lookups.",
+        "search-comparison: Compare observations and retain earlier dated evidence when a result changes or cannot be rechecked.",
+        "evidence-explanations: Show assessment explanations and observation times across console, HTML and graph results.",
+        "quick-to-full: Start with up to 300 username lookups, then continue the full search with completed work retained.",
+        "local-investigations: Save named investigations with multiple searches, notes and analyst decisions.",
+        "windows-launch: Create a Start menu shortcut and offer to open Consensus after interactive installation.",
+        "product-examples: Add maintenance facts, an enriched-result example and downloadable fictional reports to the README."
+      ]
+    },
+    {
       "version": "0.3.5",
       "previous_version": "0.3.4",
       "new_modules": [],
