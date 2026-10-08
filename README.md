@@ -99,7 +99,15 @@
 
 ## See Consensus in action
 
-Actual Consensus screens with fictional demonstration data. Click to enlarge.
+Click any image to enlarge. Console screenshots have personal details redacted; report and graph examples use fictional data.
+
+**Start a search** — username, email, phone and bulk searches from one menu.
+
+<a href="consensus_osint/templates/consensus-home-redacted.png"><img src="consensus_osint/templates/consensus-home-redacted.png" width="920" alt="Consensus console home screen with search options and personal details redacted"></a>
+
+**Follow your search** — see progress, matches and enriched results; preview, pause or stop at any time.
+
+<a href="consensus_osint/templates/consensus-search-redacted.png"><img src="consensus_osint/templates/consensus-search-redacted.png" width="920" alt="Consensus username search in progress, showing progress and result counts with personal details redacted"></a>
 
 **HTML report** — searchable findings, profile details and source coverage.
 
