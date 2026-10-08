@@ -208,5 +208,3 @@ To update a source install, run `git pull`, then repeat its pip command above.
 Use responsibly. Shared details are leads, not proof of identity; verify important matches at their source.
 
 [GPL-3.0-or-later](LICENSE) · [Third-party credits](THIRD_PARTY_NOTICES.txt) · [Legal & privacy](LEGAL.md)
-
-Maintained by **OSINT GROUP LTD**, operating as the OSINT Experts Society. Registered in England and Wales, company **16684773**, limited by guarantee. Registered office: Second Floor, Avalon House, 5-7 Cathedral Road, Cardiff, United Kingdom, CF11 9HA.
