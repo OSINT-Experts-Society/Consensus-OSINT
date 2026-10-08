@@ -121,11 +121,11 @@ After a search, choose **Save report** and press **Enter**. Consensus saves both
 
 ## Install
 
-Choose your preferred installation method. **Private preview:** get the install bundle from the [OSINT Experts Society](https://osint.ngo) and extract the ZIP, or use the source repository if you have access.
+Choose an installation option below.
 
 **Quick install on Windows — no coding needed**
 
-1. **Save the installer ZIP** to your Downloads folder.
+1. **Download:** open [Releases](https://github.com/OSINT-Experts-Society/Consensus-OSINT/releases), find **Assets**, and save the `Consensus-<version>.zip` installer to your Downloads folder.
 2. **Extract it:** right-click the ZIP, select **Extract All**, then **Extract**.
 3. **Install:** open the extracted folder, double-click **Install.cmd**, and wait for installation to finish. Keep your internet connection on.
 4. **Open Consensus:** press the Windows key, type **cmd**, and press **Enter**. In the new window, type **consensus** and press **Enter**.
@@ -173,7 +173,7 @@ Explore more with `consensus --help` or `consensus examples`.
 
 Open **Settings → Installation & updates** to check versions, install updates, restart or recover an installation.
 
-During private testing, **keep the extracted bundle folder** as your update source. When a new bundle arrives, select **Choose bundle** and point to its extracted folder, or run its installer. Restart to apply changes.
+To update from an installer ZIP, extract it, then select **Choose bundle** in Settings and choose the extracted folder, or run its installer. Restart to apply changes.
 
 | Command | Action |
 | --- | --- |
@@ -189,7 +189,7 @@ A manual update resumes upgrades after rollback. Set `CONSENSUS_AUTO_UPDATE=0` f
 
 ## Install from source
 
-Requires [Python 3.10+](https://www.python.org/downloads/), [Git](https://git-scm.com/downloads) and repository access while private.
+Requires [Python 3.10+](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads).
 
 ```console
 git clone https://github.com/OSINT-Experts-Society/Consensus-OSINT.git
