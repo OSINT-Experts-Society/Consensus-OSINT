@@ -152,12 +152,12 @@ The Windows install bundle is recommended for most users. It sets up Python and 
 
 ### Other installation options
 
-For macOS, Linux or a terminal-based installation, use the options below.
+For macOS, Linux, PyPI or a terminal-based installation, use the options below.
 
-| Platform | Double-click installer | Install from terminal | Install from source |
-| --- | --- | --- | --- |
-| **Windows** | **Install.cmd** | Run `.\Install.cmd` in CMD or PowerShell. | [Git + Python instructions](#install-from-source) |
-| **macOS / Linux** | Use the terminal option. | Run `sh install.sh`. | [Git + Python instructions](#install-from-source) |
+| Platform | Double-click installer | Bundle from terminal | Install from PyPI | Install from source |
+| --- | --- | --- | --- | --- |
+| **Windows** | **Install.cmd** | Run `.\Install.cmd` in CMD or PowerShell. | [Python + PyPI instructions](#install-from-pypi) | [Git + Python instructions](#install-from-source) |
+| **macOS / Linux** | Use the terminal option. | Run `sh install.sh`. | [Python + PyPI instructions](#install-from-pypi) | [Git + Python instructions](#install-from-source) |
 
 Both bundle options set up Python and dependencies for you. Run terminal commands from the extracted folder. Internet access is required.
 
@@ -166,6 +166,17 @@ After a bundle install, open a new terminal:
 ```console
 consensus
 ```
+
+### Install from PyPI
+
+Already have Python 3.10 or newer? Install Consensus with its lookup modules and PDF reporting:
+
+```console
+python -m pip install "consensus-osint[modules,pdf]"
+consensus
+```
+
+Use `py` instead of `python` on Windows, or `python3` on macOS/Linux, if required.
 
 ## Start searching
 
@@ -191,10 +202,18 @@ Explore more with `consensus --help` or `consensus examples`.
 
 </details>
 
-## Manage your installation
+## Update Consensus
+
+| Installed with | How to update |
+| --- | --- |
+| **Windows, macOS or Linux installer** | Run `consensus update`. |
+| **PyPI** | Run `python -m pip install --upgrade "consensus-osint[modules,pdf]"`. |
+| **Git / source** | Run `git pull`, then repeat the platform install command under [Install from source](#install-from-source). |
+
+Restart Consensus after updating. Installer-based installations also check for updates when Consensus starts and install them automatically by default.
 
 <details>
-<summary><strong>Updates, repair and migration</strong></summary>
+<summary><strong>Repair, rollback and update controls</strong></summary>
 
 Open **Settings → Installation & updates** to check versions, install updates, restart or recover an installation.
 
@@ -202,7 +221,6 @@ To update from an installer ZIP, extract it, then select **Choose bundle** in Se
 
 | Command | Action |
 | --- | --- |
-| `consensus update` | Install an available update. |
 | `consensus update --repair` | Repair the installed version. |
 | `consensus update --rollback` | Restore the previous version and pause automatic upgrades. |
 
@@ -241,8 +259,6 @@ Use `python3` above if required, then:
 ```
 
 Add `mcp` to the extras for AI integration, for example `".[modules,pdf,mcp]"`. PDF support is included in managed installs.
-
-To update a source install, run `git pull`, then repeat its pip command above.
 
 ## Join the community
 
