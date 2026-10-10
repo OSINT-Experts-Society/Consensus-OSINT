@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "consensus-osint"
 version = "0.4.1"
-description = "Unified username, email and phone reverse-lookup OSINT tool: the merged modules and best features of Sherlock, Maigret, WhatsMyName, user-scanner, holehe, socialscan, ignorant, numint, linkook, mailcat, marple and more."
+description = "Expert-maintained username, email and phone intelligence with 7,900+ standardised lookup modules from 19 open-source projects."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.txt", "licenses/*.txt", "consensus_osint/vendor/*/LICENSE"]
-authors = [{name = "Consensus contributors"}]
+authors = [{name = "OSINT Experts Society"}]
 keywords = ["osint", "username", "email", "phone", "reverse-lookup", "sherlock", "maigret", "holehe", "whatsmyname"]
 classifiers = [
   "Programming Language :: Python :: 3",
