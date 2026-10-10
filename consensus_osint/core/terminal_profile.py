@@ -10,12 +10,11 @@ import os
 import subprocess
 import sys
 import tempfile
-import uuid
 from pathlib import Path
 
 from .branding import ACCENT
 
-PROFILE_GUID = "{" + str(uuid.uuid5(uuid.NAMESPACE_URL, "https://github.com/OSINT-Experts-Society/Consensus/terminal")) + "}"
+PROFILE_GUID = "{d7b9ce0a-e468-5103-98a0-1fad7bf9a673}"
 MARKER = "Consensus terminal profile v1"
 
 
