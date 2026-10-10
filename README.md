@@ -14,9 +14,6 @@
 
 <p align="center">Username, email and phone intelligence, standardised into one tool.<br>Our experts review and update the modules weekly: finding new sources, testing and improving additions, and retiring those that no longer work.</p>
 
-<p align="center"><strong>See the information behind a match.</strong><br>Actual Consensus report, using clearly labelled fictional data.</p>
-<p align="center"><a href="consensus_osint/templates/consensus-example-report.html"><img src="consensus_osint/templates/consensus-enriched-example.png" width="620" alt="Actual enriched result with profile details, evidence explanation, observation time and project coverage; fictional demonstration data"></a></p>
-
 <p align="center">
   <picture>
     <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark-mobile.svg">
