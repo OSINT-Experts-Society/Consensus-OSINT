@@ -12,35 +12,39 @@
 
 <p align="center">A unified lookup tool combining 7,900+ modules from 19 open-source projects, reviewed and updated weekly by our experts.</p>
 
-<p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a> &middot; <a href="#see-consensus-in-action">See it in action</a></p>
+<p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#see-consensus-in-action">See it in action</a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a></p>
+
+<p align="center">
+  <a href="#compare"><img src="consensus_osint/templates/consensus-badge-projects.svg" alt="19 projects combined" height="24"></a>
+  <a href="#key-features"><img src="consensus_osint/templates/consensus-badge-modules.svg" alt="7,900+ lookup modules" height="24"></a>
+  <a href="#why-consensus"><img src="consensus_osint/templates/consensus-badge-review.svg" alt="Expert review: weekly" height="24"></a>
+</p>
+
+## Why Consensus
 
 <p align="center">
   <picture>
     <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark-mobile.svg">
     <source media="(max-width: 600px)" srcset="consensus_osint/templates/consensus-process-light-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark.svg">
-    <img src="consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus is built: 19 source projects list 12,356 modules and rules including overlaps; expert review feeds Consensus with 7,989 enabled modules and rules. Weekly process: horizon scan, identify new modules, expert review, update Consensus. Default searches select one lookup per site and produce unified results.">
+    <img src="consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus works: 19 source projects list 12,356 modules and rules including overlaps; expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts review and update Consensus weekly. Default searches select relevant modules, remove duplicate routes and present unified results.">
   </picture>
 </p>
 
-<p align="center">
-  <a href="#compare"><img src="consensus_osint/templates/consensus-badge-projects.svg" alt="19 projects combined" height="24"></a>
-  <a href="#key-features"><img src="consensus_osint/templates/consensus-badge-modules.svg" alt="7,900+ lookup modules" height="24"></a>
-  <a href="LICENSE"><img src="consensus_osint/templates/consensus-badge-license.svg" alt="Licence: GPL-3.0-or-later" height="24"></a>
-  <a href="CONTRIBUTING.md"><img src="consensus_osint/templates/consensus-badge-prs.svg" alt="PRs welcome" height="24"></a>
-</p>
+<!-- maintenance-summary:start -->
+<p align="center"><sub>Last expert review: <strong>02 October 2026</strong> &middot; Latest intake: <strong>1,181 modules + 668 site rules added</strong></sub></p>
+<!-- maintenance-summary:end -->
+
+## Compare
+
+<p><strong>Combined coverage. Maintained modules. Consistent results.</strong> One installation and update process replaces managing separate tools and reconciling their results.</p>
+
+<details open>
+<summary><strong>Full comparison: Consensus and its 19 source projects</strong></summary>
 
 <p align="center">
-  <a href="https://osint.ngo"><img src="consensus_osint/templates/consensus-badge-website.svg" alt="Visit the OSINT Experts Society website" height="24"></a>
-  <a href="https://www.linkedin.com/groups/13047129/"><img src="consensus_osint/templates/consensus-badge-linkedin.svg" alt="Join our LinkedIn community" height="24"></a>
-  <a href="https://www.reddit.com/r/OSINTExperts/"><img src="consensus_osint/templates/consensus-badge-reddit.svg" alt="Join our Reddit community" height="24"></a>
+<sub>Counts are a documented snapshot from 3 October 2026. Open the methodology below for definitions and limitations; scroll the table horizontally on smaller screens.</sub>
 </p>
-
-<details>
-<summary>Compare Consensus with its 19 source projects</summary>
-<a id="compare"></a>
-
-<p align="center"><strong>Combined coverage. Maintained modules. Consistent results.</strong><br>One installation and update process replaces managing separate tools and reconciling their results.</p>
 
 <div align="center">
 <table align="center">
@@ -72,8 +76,10 @@
 </table>
 </div>
 
+</details>
+
 <details>
-<summary align="center">About these counts (3 October 2026)</summary>
+<summary><strong>Methodology and count definitions</strong></summary>
 
 **Snapshot: 3 October 2026.** Counts include enabled rules and modules, not unique websites. Phone counts exclude number analysis and search links; an em dash means no comparable definitions.
 
@@ -86,54 +92,67 @@ Consensus's last module update is the date of its signed catalogue. The maintena
 
 </details>
 
-</details>
-
-<!-- maintenance-summary:start -->
-<p align="center">Last expert review: <strong>02 October 2026</strong> &middot; Latest intake: <strong>1,181 modules + 668 site rules added</strong></p>
-<!-- maintenance-summary:end -->
-
 ## Key features
 
+### Coverage and maintenance
+
 - **Expert review, every week.** Our team reviews all 19 source projects weekly and evaluates new OSINT projects as they emerge. Suitable modules are tested, improved and integrated; broken modules are retired.
-- **Follow new leads automatically.** Enable recursive search to investigate usernames, email addresses and linked accounts discovered in your results, expanding your search without entering each new lead yourself.
 - **Keep investigations current.** Search newly added lookup sources, or recheck saved identifiers and see newly discovered matches, changed details and inconclusive results.
 - **Quick first results.** Username menu searches start with up to 300 site and module lookups. Continue the full search while retaining completed results.
+- **Automatic update checks.** Managed installs check for updates at startup and notify you when an update is available or ready to use. Repair and rollback are built in.
+
+### Investigation workflow
+
+- **Follow new leads automatically.** Enable recursive search to investigate usernames, email addresses and linked accounts discovered in your results, expanding your search without entering each new lead yourself.
 - **Enriched results.** Go beyond found/not found with available profile details, including names, biographies and linked accounts. Inspect the returned information, see source coverage and compare details across results.
-- **Reports and evidence graphs.** Export HTML, PDF, CSV or JSON; explore connections visually, with XMind and Neo4j exports also available.
 - **Bulk search and advanced controls.** Process lists, generate username variations, filter sites and categories, and use proxies.
 - **Save your investigation.** Keep named investigations with multiple saved searches, notes and relevant/unrelated decisions. Storage is local and explicit; optional recent-search history is separate.
-- **Automatic update checks.** Managed installs check for updates at startup and notify you when an update is available or ready to use. Repair and rollback are built in.
+
+### Reports and integrations
+
+- **Reports and evidence graphs.** Export HTML, PDF, CSV or JSON; explore connections visually, with XMind and Neo4j exports also available.
 - **AI integration.** Optional MCP support connects compatible assistants to Consensus lookups and results.
 
 ## See Consensus in action
 
-Click any image to enlarge. Console screenshots have personal details redacted; report and graph examples use fictional data.
+Follow a search from query to evidence. Click any image to enlarge. Console screenshots have personal details redacted; report and graph examples use fictional data.
 
-**Try the output before installing:** download the [example HTML report](https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-example-report.html) or [interactive graph](https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-example-graph.html), then open the saved HTML file in your browser. Both use fictional profiles and work offline.
+<p align="center"><strong>Try the output before installing:</strong> <a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-example-report.html">Example HTML report</a> &middot; <a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/raw/refs/heads/main/consensus_osint/templates/consensus-example-graph.html">Interactive graph</a><br><sub>Download either file and open it in your browser. Both use fictional profiles and work offline.</sub></p>
 
-**Start a search** — username, email, phone and bulk searches from one menu.
-
-<a href="consensus_osint/templates/consensus-home-redacted.png"><img src="consensus_osint/templates/consensus-home-redacted.png" width="920" alt="Consensus console home screen with search options and personal details redacted"></a>
-
-**Follow your search** — see progress, matches and enriched results; preview, pause or stop at any time.
-
-<a href="consensus_osint/templates/consensus-search-redacted.png"><img src="consensus_osint/templates/consensus-search-redacted.png" width="920" alt="Consensus username search in progress, showing progress and result counts with personal details redacted"></a>
-
-**HTML report** — searchable findings, profile details and source coverage.
-
-<a href="consensus_osint/templates/consensus-demo-report.png"><img src="consensus_osint/templates/consensus-demo-report.png" width="920" alt="Actual Consensus HTML report showing fictional profile findings, filters and returned details"></a>
-
-**Interactive evidence graph** — explore connections and inspect the supporting evidence.
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>1. Start a search</strong><br>
+      <sub>Username, email, phone and bulk searches from one menu.</sub><br><br>
+      <a href="consensus_osint/templates/consensus-home-redacted.png"><img src="consensus_osint/templates/consensus-home-redacted.png" width="440" alt="Consensus console home screen with search options and personal details redacted"></a>
+    </td>
+    <td width="50%" valign="top">
+      <strong>2. Follow your search</strong><br>
+      <sub>See progress, matches and enrichment; preview, pause or stop at any time.</sub><br><br>
+      <a href="consensus_osint/templates/consensus-search-redacted.png"><img src="consensus_osint/templates/consensus-search-redacted.png" width="440" alt="Consensus username search in progress, showing progress and result counts with personal details redacted"></a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>3. Review the report</strong><br>
+      <sub>Search findings, profile details and source coverage.</sub><br><br>
+      <a href="consensus_osint/templates/consensus-demo-report.png"><img src="consensus_osint/templates/consensus-demo-report.png" width="440" alt="Actual Consensus HTML report showing fictional profile findings, filters and returned details"></a>
+    </td>
+    <td width="50%" valign="top">
+      <strong>4. Explore the evidence graph</strong><br>
+      <sub>Follow connections and inspect the supporting evidence.</sub><br><br>
+      <a href="consensus_osint/templates/consensus-demo-graph.png"><img src="consensus_osint/templates/consensus-demo-graph.png" width="440" alt="Actual Consensus interactive graph showing fictional query, result and source-site nodes with an evidence panel"></a>
+    </td>
+  </tr>
+</table>
 
 After a search, choose **Save report** and press **Enter**. Consensus saves both an HTML report and an interactive graph, with a separate link to open each in your browser.
 
-<a href="consensus_osint/templates/consensus-demo-graph.png"><img src="consensus_osint/templates/consensus-demo-graph.png" width="920" alt="Actual Consensus interactive graph showing fictional query, result and source-site nodes with an evidence panel"></a>
-
 ## Install
 
-Choose an installation option below.
+The Windows install bundle is recommended for most users. It sets up Python and the required dependencies automatically.
 
-**Quick install on Windows — no coding needed**
+### Windows quick install — no coding needed
 
 1. **Download:** open [Releases](https://github.com/OSINT-Experts-Society/Consensus-OSINT/releases), find **Assets**, and save the `Consensus-<version>.zip` installer to your Downloads folder.
 2. **Extract it:** right-click the ZIP, select **Extract All**, then **Extract**.
@@ -141,14 +160,16 @@ Choose an installation option below.
 4. **Open Consensus:** choose **Launch Consensus** when prompted, or press the Windows key, type **Consensus**, and open the Start menu shortcut.
 5. **Start searching:** choose **Username**, **Email** or **Phone**, then enter what you want to look up.
 
-For macOS, Linux or other installation methods, use the options below.
+### Other installation options
+
+For macOS, Linux or a terminal-based installation, use the options below.
 
 | Platform | Double-click installer | Install from terminal | Install from source |
 | --- | --- | --- | --- |
 | **Windows** | **Install.cmd** | Run `.\Install.cmd` in CMD or PowerShell. | [Git + Python instructions](#install-from-source) |
 | **macOS / Linux** | Use the terminal option. | Run `sh install.sh`. | [Git + Python instructions](#install-from-source) |
 
-**Recommended: the install bundle.** Both installer options set up Python and dependencies for you. Run terminal commands from the extracted folder. Internet access is required.
+Both bundle options set up Python and dependencies for you. Run terminal commands from the extracted folder. Internet access is required.
 
 After a bundle install, open a new terminal:
 
@@ -180,8 +201,10 @@ Explore more with `consensus --help` or `consensus examples`.
 
 </details>
 
+## Manage your installation
+
 <details>
-<summary>Updates, repair and migration</summary>
+<summary><strong>Updates, repair and migration</strong></summary>
 
 Open **Settings → Installation & updates** to check versions, install updates, restart or recover an installation.
 
@@ -199,7 +222,9 @@ A manual update resumes upgrades after rollback. Set `CONSENSUS_AUTO_UPDATE=0` f
 
 </details>
 
-## Install from source
+## Advanced installation
+
+### Install from source
 
 Requires [Python 3.10+](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads).
 
@@ -231,10 +256,22 @@ To update a source install, run `git pull`, then repeat its pip command above.
 
 ## Join the community
 
-**Want your OSINT project included?** [Contact the Society](https://osint.ngo) for evaluation.
+<p align="center"><strong>Want your OSINT project evaluated for inclusion?</strong><br><a href="https://osint.ngo">Contact the OSINT Experts Society</a></p>
 
-[Website](https://osint.ngo) · [LinkedIn](https://www.linkedin.com/groups/13047129/) · [Reddit](https://www.reddit.com/r/OSINTExperts/) · [Report an issue](https://github.com/OSINT-Experts-Society/Consensus-OSINT/issues)
+<p align="center">
+  <a href="https://osint.ngo"><img src="consensus_osint/templates/consensus-badge-website.svg" alt="Visit the OSINT Experts Society website" height="24"></a>
+  <a href="https://www.linkedin.com/groups/13047129/"><img src="consensus_osint/templates/consensus-badge-linkedin.svg" alt="Join our LinkedIn community" height="24"></a>
+  <a href="https://www.reddit.com/r/OSINTExperts/"><img src="consensus_osint/templates/consensus-badge-reddit.svg" alt="Join our Reddit community" height="24"></a>
+</p>
 
-Use responsibly. Shared details are leads, not proof of identity; verify important matches at their source.
+<p align="center">
+  <a href="CONTRIBUTING.md"><img src="consensus_osint/templates/consensus-badge-prs.svg" alt="PRs welcome" height="24"></a>
+  <a href="LICENSE"><img src="consensus_osint/templates/consensus-badge-license.svg" alt="Licence: GPL-3.0-or-later" height="24"></a>
+</p>
 
-[GPL-3.0-or-later](LICENSE) · [Third-party credits](THIRD_PARTY_NOTICES.txt) · [Legal & privacy](LEGAL.md)
+<p align="center"><a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/issues">Report an issue</a></p>
+
+> [!IMPORTANT]
+> Use responsibly. Shared details are leads, not proof of identity; verify important matches at their source.
+
+<p align="center"><sub><a href="THIRD_PARTY_NOTICES.txt">Third-party credits</a> &middot; <a href="LEGAL.md">Legal &amp; privacy</a></sub></p>

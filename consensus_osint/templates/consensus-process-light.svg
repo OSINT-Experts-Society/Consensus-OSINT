@@ -1,124 +1,75 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="920" height="880" viewBox="0 0 920 880" role="img" aria-labelledby="title desc">
-<title id="title">From 19 projects to Consensus, maintained weekly</title>
-<desc id="desc">Source catalogues list 12,356 modules and rules including overlaps, with Mailcat separate and SherlockV2 unverified. Expert evaluation feeds Consensus, whose current inventory has 7,989 enabled modules and rules. These are inventory snapshots, not measured batch throughput. Weekly process: horizon scan, identify new modules, expert review, update Consensus. Default queries select one search per site and produce unified results.</desc>
-<rect width="920" height="880" rx="18" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="630" viewBox="0 0 920 630" role="img" aria-labelledby="title desc">
+<title id="title">How Consensus combines and maintains 19 source projects</title>
+<desc id="desc">Nineteen source projects list 12,356 modules and rules including overlaps. Expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts scan sources, identify changes, review candidates and update Consensus weekly. A default query selects relevant modules, removes duplicate routes and presents unified results.</desc>
+<rect width="920" height="630" rx="18" fill="#ffffff"/>
 <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#c65316" stroke-width="1.5"/></marker></defs>
 <g font-family="Segoe UI, Helvetica, Arial, sans-serif">
-<text x="24" y="32" font-size="14" fill="#c65316" font-weight="700" text-anchor="start">HOW WE BUILD CONSENSUS</text>
-<rect x="24" y="62" width="340" height="326" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
-<text x="40" y="93" font-size="20" fill="#18212b" font-weight="650" text-anchor="start">19 open-source projects</text>
-<text x="40" y="116" font-size="14" fill="#526171" font-weight="400" text-anchor="start">Listed modules / rules</text>
-<text x="40.0" y="144" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Sherlock</text>
-<text x="181.0" y="144" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">481</text>
-<text x="40.0" y="166" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Maigret</text>
-<text x="181.0" y="166" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">5,483</text>
-<text x="40.0" y="188" font-size="13" fill="#526171" font-weight="400" text-anchor="start">WhatsMyName</text>
-<text x="181.0" y="188" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">716</text>
-<text x="40.0" y="210" font-size="13" fill="#526171" font-weight="400" text-anchor="start">User Scanner</text>
-<text x="181.0" y="210" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">2,722</text>
-<text x="40.0" y="232" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Holehe</text>
-<text x="181.0" y="232" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">123</text>
-<text x="40.0" y="254" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Ignorant</text>
-<text x="181.0" y="254" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">3</text>
-<text x="40.0" y="276" font-size="13" fill="#526171" font-weight="400" text-anchor="start">SherlockV2</text>
-<text x="181.0" y="276" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">?</text>
-<text x="40.0" y="298" font-size="13" fill="#526171" font-weight="400" text-anchor="start">DetectDee</text>
-<text x="181.0" y="298" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">382*</text>
-<text x="40.0" y="320" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Aliens Eye</text>
-<text x="181.0" y="320" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">840</text>
-<text x="40.0" y="342" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Nexfil</text>
-<text x="181.0" y="342" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">328</text>
-<text x="210.0" y="144" font-size="13" fill="#526171" font-weight="400" text-anchor="start">GoSearch</text>
-<text x="351.0" y="144" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">306</text>
-<text x="210.0" y="166" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Vesper</text>
-<text x="351.0" y="166" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">299</text>
-<text x="210.0" y="188" font-size="13" fill="#526171" font-weight="400" text-anchor="start">FindMe</text>
-<text x="351.0" y="188" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">412</text>
-<text x="210.0" y="210" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Linkook</text>
-<text x="351.0" y="210" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">64</text>
-<text x="210.0" y="232" font-size="13" fill="#526171" font-weight="400" text-anchor="start">UserJoo</text>
-<text x="351.0" y="232" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">29</text>
-<text x="210.0" y="254" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Sreg</text>
-<text x="351.0" y="254" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">151*</text>
-<text x="210.0" y="276" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Socialscan</text>
-<text x="351.0" y="276" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">12</text>
-<text x="210.0" y="298" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Numint</text>
-<text x="351.0" y="298" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">5</text>
-<text x="210.0" y="320" font-size="13" fill="#526171" font-weight="400" text-anchor="start">Mailcat</text>
-<text x="351.0" y="320" font-size="13" fill="#18212b" font-weight="600" text-anchor="end">26*</text>
-<rect x="450" y="62" width="210" height="326" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
-<text x="468" y="96" font-size="22" fill="#18212b" font-weight="650" text-anchor="start">Expert review</text>
-<text x="468" y="138" font-size="13" fill="#c65316" font-weight="700" text-anchor="start">01</text>
-<text x="498" y="138" font-size="15" fill="#18212b" font-weight="400" text-anchor="start">Test &amp; improve</text>
-<text x="468" y="170" font-size="13" fill="#c65316" font-weight="700" text-anchor="start">02</text>
-<text x="498" y="170" font-size="15" fill="#18212b" font-weight="400" text-anchor="start">Standardise results</text>
-<text x="468" y="202" font-size="13" fill="#c65316" font-weight="700" text-anchor="start">03</text>
-<text x="498" y="202" font-size="15" fill="#18212b" font-weight="400" text-anchor="start">Remove duplicates</text>
-<text x="468" y="234" font-size="13" fill="#c65316" font-weight="700" text-anchor="start">04</text>
-<text x="498" y="234" font-size="15" fill="#18212b" font-weight="400" text-anchor="start">Integrate modules</text>
-<text x="468" y="310" font-size="14" fill="#526171" font-weight="400" text-anchor="start">Evaluate candidates</text>
-<text x="468" y="334" font-size="14" fill="#526171" font-weight="400" text-anchor="start">Keep suitable modules</text>
-<rect x="740" y="62" width="156" height="326" rx="12" fill="#f6f8fa" stroke="#c65316" stroke-width="2"/>
-<g transform="translate(783 91) scale(0.62)">  <g fill="none" stroke="#c65316" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M22 25h17c18 0 18 31 36 31M22 56h53M22 87h17c18 0 18-31 36-31"/>
-    <circle cx="85" cy="56" r="10"/>
-  </g>  <g fill="#c65316">
-    <circle cx="19" cy="25" r="5"/>
-    <circle cx="19" cy="56" r="5"/>
-    <circle cx="19" cy="87" r="5"/>
-  </g></g>
-<text x="818.0" y="191" font-size="22" fill="#18212b" font-weight="650" text-anchor="middle">Consensus</text>
-<text x="818.0" y="245" font-size="36" fill="#c65316" font-weight="700" text-anchor="middle">7,989</text>
-<text x="818.0" y="272" font-size="16" fill="#526171" font-weight="400" text-anchor="middle">enabled</text>
-<text x="818.0" y="296" font-size="15" fill="#526171" font-weight="400" text-anchor="middle">modules / rules</text>
-<text x="818.0" y="349" font-size="13" fill="#18212b" font-weight="600" text-anchor="middle">One maintained tool</text>
-<path d="M374 221L440 221" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
-<text x="407.0" y="203" font-size="16" fill="#c65316" font-weight="700" text-anchor="middle">12,356</text>
-<text x="407.0" y="245" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">listed*</text>
-<path d="M670 221L730 221" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
-<text x="700.0" y="203" font-size="16" fill="#c65316" font-weight="700" text-anchor="middle">7,989</text>
-<text x="700.0" y="245" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">enabled*</text>
-<text x="24" y="419" font-size="12" fill="#526171" font-weight="400" text-anchor="start">* Source counts include overlaps and declared routes. Mailcat: 26 separate mailbox checks; SherlockV2: unverified.</text>
-<text x="24" y="441" font-size="12" fill="#526171" font-weight="400" text-anchor="start">Inventories as of 3 Oct 2026, not a measured batch-conversion rate. Full count definitions in the comparison below.</text>
-<rect x="24" y="476" width="872" height="190" rx="12" fill="#fff4eb" stroke="#c65316" stroke-width="2"/>
-<text x="460" y="510" font-size="21" fill="#c65316" font-weight="700" text-anchor="middle">REVIEWED &amp; UPDATED WEEKLY BY OUR EXPERTS</text>
-<rect x="40" y="537" width="192" height="78" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
-<text x="52" y="565" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">01</text>
-<text x="144.0" y="565" font-size="14" fill="#18212b" font-weight="600" text-anchor="middle">Horizon scan</text>
-<text x="136.0" y="590" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">Monitor source projects</text>
-<path d="M237 576L249 576" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="256" y="537" width="192" height="78" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
-<text x="268" y="565" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">02</text>
-<text x="360.0" y="565" font-size="14" fill="#18212b" font-weight="600" text-anchor="middle">Identify new modules</text>
-<text x="352.0" y="590" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">Find additions &amp; changes</text>
-<path d="M453 576L465 576" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="472" y="537" width="192" height="78" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
-<text x="484" y="565" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">03</text>
-<text x="576.0" y="565" font-size="14" fill="#18212b" font-weight="600" text-anchor="middle">Expert review</text>
-<text x="568.0" y="590" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">Test, improve &amp; deduplicate</text>
-<path d="M669 576L681 576" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="688" y="537" width="192" height="78" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
-<text x="700" y="565" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">04</text>
-<text x="792.0" y="565" font-size="14" fill="#18212b" font-weight="600" text-anchor="middle">Update Consensus</text>
-<text x="784.0" y="590" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">Integrate &amp; retire modules</text>
-<text x="460" y="644" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">New modules integrated. Broken modules retired.</text>
-<text x="24" y="705" font-size="14" fill="#c65316" font-weight="700" text-anchor="start">HOW YOUR QUERY RUNS</text>
-<text x="896" y="705" font-size="14" fill="#526171" font-weight="400" text-anchor="end">Default deduplicated search</text>
-<rect x="24" y="729" width="194" height="92" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
-<text x="121.0" y="764" font-size="18" fill="#18212b" font-weight="600" text-anchor="middle">Your query</text>
-<text x="121.0" y="790" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">Username / email / phone</text>
-<path d="M225 776L241 776" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="250" y="729" width="194" height="92" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
-<text x="347.0" y="764" font-size="18" fill="#18212b" font-weight="600" text-anchor="middle">Consensus</text>
-<text x="347.0" y="790" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">Relevant modules selected</text>
-<path d="M451 776L467 776" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="476" y="729" width="194" height="92" rx="12" fill="#f6f8fa" stroke="#c65316" stroke-width="2"/>
-<text x="573.0" y="764" font-size="18" fill="#c65316" font-weight="600" text-anchor="middle">One search per site</text>
-<text x="573.0" y="790" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">Duplicate routes removed</text>
-<path d="M677 776L693 776" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="702" y="729" width="194" height="92" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
-<text x="799.0" y="764" font-size="18" fill="#18212b" font-weight="600" text-anchor="middle">Unified results</text>
-<text x="799.0" y="790" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">One consistent view</text>
-<text x="460.0" y="856" font-size="16" fill="#c65316" font-weight="600" text-anchor="middle">Combined expertise. One unified search.</text>
+<text x="24" y="32" font-size="14" fill="#c65316" font-weight="700" text-anchor="start">HOW CONSENSUS WORKS</text>
+<rect x="24" y="56" width="244" height="178" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<rect x="338" y="56" width="244" height="178" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<rect x="652" y="56" width="244" height="178" rx="12" fill="#f6f8fa" stroke="#c65316" stroke-width="2"/>
+<text x="146" y="91" font-size="20" fill="#18212b" font-weight="650" text-anchor="middle">19 source projects</text>
+<text x="146" y="143" font-size="36" fill="#c65316" font-weight="700" text-anchor="middle">12,356</text>
+<text x="146" y="169" font-size="14" fill="#526171" font-weight="400" text-anchor="middle">listed modules and rules*</text>
+<text x="146" y="202" font-size="13" fill="#526171" font-weight="400" text-anchor="middle">Includes overlapping routes</text>
+<text x="356" y="90" font-size="20" fill="#18212b" font-weight="650" text-anchor="start">Expert review</text>
+<text x="356" y="122" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">01</text>
+<text x="385" y="122" font-size="14" fill="#18212b" font-weight="400" text-anchor="start">Test and improve</text>
+<text x="356" y="149" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">02</text>
+<text x="385" y="149" font-size="14" fill="#18212b" font-weight="400" text-anchor="start">Standardise results</text>
+<text x="356" y="176" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">03</text>
+<text x="385" y="176" font-size="14" fill="#18212b" font-weight="400" text-anchor="start">Remove duplicates</text>
+<text x="356" y="203" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">04</text>
+<text x="385" y="203" font-size="14" fill="#18212b" font-weight="400" text-anchor="start">Integrate modules</text>
+<text x="774" y="91" font-size="20" fill="#18212b" font-weight="650" text-anchor="middle">Consensus</text>
+<text x="774" y="143" font-size="36" fill="#c65316" font-weight="700" text-anchor="middle">7,989</text>
+<text x="774" y="169" font-size="14" fill="#526171" font-weight="400" text-anchor="middle">enabled modules and rules</text>
+<text x="774" y="202" font-size="13" fill="#18212b" font-weight="600" text-anchor="middle">One maintained tool</text>
+<path d="M280 145L326 145" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="303" y="128" font-size="11" fill="#526171" font-weight="400" text-anchor="middle">evaluate</text>
+<path d="M594 145L640 145" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="617" y="128" font-size="11" fill="#526171" font-weight="400" text-anchor="middle">integrate</text>
+<text x="24" y="262" font-size="12" fill="#526171" font-weight="400" text-anchor="start">* Counts include overlaps and declared routes; Mailcat is separate and SherlockV2 is unverified.</text>
+<text x="896" y="262" font-size="12" fill="#526171" font-weight="400" text-anchor="end">Inventory snapshot: 3 October 2026</text>
+<rect x="24" y="287" width="872" height="145" rx="12" fill="#fff4eb" stroke="#c65316" stroke-width="2"/>
+<text x="460" y="318" font-size="19" fill="#c65316" font-weight="700" text-anchor="middle">REVIEWED AND UPDATED WEEKLY BY OUR EXPERTS</text>
+<rect x="40" y="339" width="192" height="70" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="52" y="364" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">01</text>
+<text x="144" y="364" font-size="14" fill="#18212b" font-weight="600" text-anchor="middle">Horizon scan</text>
+<text x="136" y="389" font-size="11" fill="#526171" font-weight="400" text-anchor="middle">Monitor source projects</text>
+<path d="M237 374L249 374" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="256" y="339" width="192" height="70" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="268" y="364" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">02</text>
+<text x="360" y="364" font-size="14" fill="#18212b" font-weight="600" text-anchor="middle">Identify changes</text>
+<text x="352" y="389" font-size="11" fill="#526171" font-weight="400" text-anchor="middle">Find additions and updates</text>
+<path d="M453 374L465 374" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="472" y="339" width="192" height="70" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="484" y="364" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">03</text>
+<text x="576" y="364" font-size="14" fill="#18212b" font-weight="600" text-anchor="middle">Expert review</text>
+<text x="568" y="389" font-size="11" fill="#526171" font-weight="400" text-anchor="middle">Test, improve, deduplicate</text>
+<path d="M669 374L681 374" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="688" y="339" width="192" height="70" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="700" y="364" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">04</text>
+<text x="792" y="364" font-size="14" fill="#18212b" font-weight="600" text-anchor="middle">Update Consensus</text>
+<text x="784" y="389" font-size="11" fill="#526171" font-weight="400" text-anchor="middle">Integrate and retire modules</text>
+<text x="460" y="423" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">New modules integrated. Broken modules retired.</text>
+<text x="24" y="468" font-size="14" fill="#c65316" font-weight="700" text-anchor="start">HOW YOUR QUERY RUNS</text>
+<text x="896" y="468" font-size="13" fill="#526171" font-weight="400" text-anchor="end">Default deduplicated search</text>
+<rect x="24" y="490" width="194" height="78" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="121" y="521" font-size="17" fill="#18212b" font-weight="600" text-anchor="middle">Your query</text>
+<text x="121" y="547" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">Username, email or phone</text>
+<path d="M225 529L241 529" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="250" y="490" width="194" height="78" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="347" y="521" font-size="17" fill="#18212b" font-weight="600" text-anchor="middle">Select</text>
+<text x="347" y="547" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">Relevant modules chosen</text>
+<path d="M451 529L467 529" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="476" y="490" width="194" height="78" rx="12" fill="#f6f8fa" stroke="#c65316" stroke-width="2"/>
+<text x="573" y="521" font-size="17" fill="#c65316" font-weight="600" text-anchor="middle">Deduplicate</text>
+<text x="573" y="547" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">One route per site</text>
+<path d="M677 529L693 529" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="702" y="490" width="194" height="78" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
+<text x="799" y="521" font-size="17" fill="#18212b" font-weight="600" text-anchor="middle">Unified results</text>
+<text x="799" y="547" font-size="12" fill="#526171" font-weight="400" text-anchor="middle">One consistent view</text>
+<text x="460" y="610" font-size="16" fill="#c65316" font-weight="600" text-anchor="middle">Combined expertise. One unified search.</text>
 </g>
 </svg>
