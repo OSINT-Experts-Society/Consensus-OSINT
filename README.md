@@ -10,7 +10,7 @@
 
 <p align="center">By the <a href="https://osint.ngo">OSINT Experts Society</a></p>
 
-<p align="center"><strong>7,900+ lookup modules, standardised and reviewed weekly by our experts.</strong></p>
+<p align="center">A unified lookup tool combining 7,900+ modules from 19 open-source projects, reviewed and updated weekly by our experts.</p>
 
 <p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a> &middot; <a href="#see-consensus-in-action">See it in action</a></p>
 
