@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-wordmark-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="consensus_osint/templates/consensus-wordmark-light.svg">
-    <img src="consensus_osint/templates/consensus-wordmark-light.svg" width="460" alt="Consensus">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg">
+    <img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg" width="460" alt="Consensus">
   </picture>
 </p>
 
@@ -15,23 +15,23 @@
 <p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#see-consensus-in-action">See it in action</a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a></p>
 
 <p align="center">
-  <a href="#compare"><img src="consensus_osint/templates/consensus-badge-projects.svg" alt="19 projects combined" height="24"></a>
-  <a href="#key-features"><img src="consensus_osint/templates/consensus-badge-modules.svg" alt="7,900+ lookup modules" height="24"></a>
-  <a href="#why-consensus"><img src="consensus_osint/templates/consensus-badge-review.svg" alt="Expert review: weekly" height="24"></a>
+  <a href="#compare"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-projects.svg" alt="19 projects combined" height="24"></a>
+  <a href="#key-features"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-modules.svg" alt="7,900+ lookup modules" height="24"></a>
+  <a href="#why-consensus"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-review.svg" alt="Expert review: weekly" height="24"></a>
 </p>
 
 <p align="center">
-  <a href="consensus_osint/templates/consensus-home-redacted.png"><img src="consensus_osint/templates/consensus-home-redacted.png" width="920" alt="Consensus application start screen with username, email, phone and bulk search options"></a>
+  <a href="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-home-redacted.png"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-home-redacted.png" width="920" alt="Consensus application start screen with username, email, phone and bulk search options"></a>
 </p>
 
 ## Why Consensus
 
 <p align="center">
   <picture>
-    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark-mobile.svg">
-    <source media="(max-width: 600px)" srcset="consensus_osint/templates/consensus-process-light-mobile.svg">
-    <source media="(prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-process-dark.svg">
-    <img src="consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus works: 19 source projects list 12,356 modules and rules including overlaps; expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts review and update Consensus weekly. Default searches select relevant modules, remove duplicate routes and present unified results.">
+    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-dark-mobile.svg">
+    <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-light-mobile.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-dark.svg">
+    <img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus works: 19 source projects list 12,356 modules and rules including overlaps; expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts review and update Consensus weekly. Default searches select relevant modules, remove duplicate routes and present unified results.">
   </picture>
 </p>
 
@@ -56,7 +56,7 @@
     <tr><th align="left">Tool</th><th align="center">Username</th><th align="center">Email</th><th align="center">Phone</th><th align="center">Duplicate<br>ratio</th><th align="center">Update<br>frequency</th><th align="center">Last&nbsp;module<br>update</th></tr>
   </thead>
   <tbody>
-    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="consensus_osint/templates/consensus-wordmark-dark.svg"><img src="consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches</sub></td><td align="center"><strong>Weekly<br>expert review</strong></td><td align="center">02&nbsp;Oct&nbsp;2026</td></tr>
+    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-dark.svg"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches</sub></td><td align="center"><strong>Weekly<br>expert review</strong></td><td align="center">02&nbsp;Oct&nbsp;2026</td></tr>
     <tr><td align="left"><a href="https://github.com/soxoj/maigret/tree/b6642744988e7e6c2d21f75db60ec3093019ba25">Maigret</a></td><td align="center">5,483</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>40.8%</strong><br><sub>5,482/5,483&nbsp;mapped</sub></td><td align="center">Every&nbsp;2&nbsp;days</td><td align="center"><a href="https://github.com/soxoj/maigret/commit/3d2b613cfd9a18bebc9d65bb22bcf8af13aa18ef">25&nbsp;Sep&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b">User Scanner</a></td><td align="center">2,511</td><td align="center">211</td><td align="center">—</td><td align="center"><strong>68.9%</strong><br><sub>2,575/2,722&nbsp;mapped</sub></td><td align="center">Every&nbsp;1&nbsp;day</td><td align="center"><a href="https://github.com/kaifcodec/user-scanner/commit/8f4de8e7b3e68672c50ba318b2d15a9d2b4617e9">29&nbsp;Sep&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/arxhr007/Aliens_eye/tree/b1316648fe0e648469d30512bb0535ebc8c4bbc7">Aliens Eye</a></td><td align="center">840</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>65.4%</strong><br><sub>837/840&nbsp;mapped</sub></td><td align="center">Too few updates</td><td align="center"><a href="https://github.com/arxhr007/Aliens_eye/commit/eb10623492e1e171ff2d7d9cfc043a4a0a0e493a">10&nbsp;Jun&nbsp;2026</a></td></tr>
@@ -114,24 +114,24 @@ Follow a search from query to evidence. Click any image to enlarge. Console scre
     <td width="50%" valign="top">
       <strong>1. Start a search</strong><br>
       <sub>Username, email, phone and bulk searches from one menu.</sub><br><br>
-      <a href="consensus_osint/templates/consensus-home-redacted.png"><img src="consensus_osint/templates/consensus-home-redacted.png" width="440" alt="Consensus console home screen with search options and personal details redacted"></a>
+      <a href="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-home-redacted.png"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-home-redacted.png" width="440" alt="Consensus console home screen with search options and personal details redacted"></a>
     </td>
     <td width="50%" valign="top">
       <strong>2. Follow your search</strong><br>
       <sub>See progress, matches and enrichment; preview, pause or stop at any time.</sub><br><br>
-      <a href="consensus_osint/templates/consensus-search-redacted.png"><img src="consensus_osint/templates/consensus-search-redacted.png" width="440" alt="Consensus username search in progress, showing progress and result counts with personal details redacted"></a>
+      <a href="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-search-redacted.png"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-search-redacted.png" width="440" alt="Consensus username search in progress, showing progress and result counts with personal details redacted"></a>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <strong>3. Review the report</strong><br>
       <sub>Search findings, profile details and source coverage.</sub><br><br>
-      <a href="consensus_osint/templates/consensus-demo-report.png"><img src="consensus_osint/templates/consensus-demo-report.png" width="440" alt="Actual Consensus HTML report showing fictional profile findings, filters and returned details"></a>
+      <a href="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-demo-report.png"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-demo-report.png" width="440" alt="Actual Consensus HTML report showing fictional profile findings, filters and returned details"></a>
     </td>
     <td width="50%" valign="top">
       <strong>4. Explore the evidence graph</strong><br>
       <sub>Follow connections and inspect the supporting evidence.</sub><br><br>
-      <a href="consensus_osint/templates/consensus-demo-graph.png"><img src="consensus_osint/templates/consensus-demo-graph.png" width="440" alt="Actual Consensus interactive graph showing fictional query, result and source-site nodes with an evidence panel"></a>
+      <a href="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-demo-graph.png"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-demo-graph.png" width="440" alt="Actual Consensus interactive graph showing fictional query, result and source-site nodes with an evidence panel"></a>
     </td>
   </tr>
 </table>
@@ -249,14 +249,14 @@ To update a source install, run `git pull`, then repeat its pip command above.
 <p align="center"><strong>Want your OSINT project evaluated for inclusion?</strong><br><a href="https://osint.ngo">Contact the OSINT Experts Society</a></p>
 
 <p align="center">
-  <a href="https://osint.ngo"><img src="consensus_osint/templates/consensus-badge-website.svg" alt="Visit the OSINT Experts Society website" height="24"></a>
-  <a href="https://www.linkedin.com/groups/13047129/"><img src="consensus_osint/templates/consensus-badge-linkedin.svg" alt="Join our LinkedIn community" height="24"></a>
-  <a href="https://www.reddit.com/r/OSINTExperts/"><img src="consensus_osint/templates/consensus-badge-reddit.svg" alt="Join our Reddit community" height="24"></a>
+  <a href="https://osint.ngo"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-website.svg" alt="Visit the OSINT Experts Society website" height="24"></a>
+  <a href="https://www.linkedin.com/groups/13047129/"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-linkedin.svg" alt="Join our LinkedIn community" height="24"></a>
+  <a href="https://www.reddit.com/r/OSINTExperts/"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-reddit.svg" alt="Join our Reddit community" height="24"></a>
 </p>
 
 <p align="center">
-  <a href="CONTRIBUTING.md"><img src="consensus_osint/templates/consensus-badge-prs.svg" alt="PRs welcome" height="24"></a>
-  <a href="LICENSE"><img src="consensus_osint/templates/consensus-badge-license.svg" alt="Licence: GPL-3.0-or-later" height="24"></a>
+  <a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/blob/main/CONTRIBUTING.md"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-prs.svg" alt="PRs welcome" height="24"></a>
+  <a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/blob/main/LICENSE"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-license.svg" alt="Licence: GPL-3.0-or-later" height="24"></a>
 </p>
 
 <p align="center"><a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/issues">Report an issue</a></p>
@@ -264,4 +264,4 @@ To update a source install, run `git pull`, then repeat its pip command above.
 > [!IMPORTANT]
 > Use responsibly. Shared details are leads, not proof of identity; verify important matches at their source.
 
-<p align="center"><sub><a href="THIRD_PARTY_NOTICES.txt">Third-party credits</a> &middot; <a href="LEGAL.md">Legal &amp; privacy</a></sub></p>
+<p align="center"><sub><a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/blob/main/THIRD_PARTY_NOTICES.txt">Third-party credits</a> &middot; <a href="https://github.com/OSINT-Experts-Society/Consensus-OSINT/blob/main/LEGAL.md">Legal &amp; privacy</a></sub></p>

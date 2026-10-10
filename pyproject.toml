@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "consensus-osint"
-version = "0.4.1"
+version = "0.4.2"
 description = "Expert-maintained username, email and phone intelligence with 7,900+ standardised lookup modules from 19 open-source projects."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -55,8 +55,9 @@ all = ["consensus-osint[modules,pdf,browser,mcp]"]
 consensus = "consensus_osint.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/OSINT-Experts-Society/Consensus-OSINT"
+Homepage = "https://osint.ngo"
 Repository = "https://github.com/OSINT-Experts-Society/Consensus-OSINT"
+Documentation = "https://github.com/OSINT-Experts-Society/Consensus-OSINT#readme"
 Issues = "https://github.com/OSINT-Experts-Society/Consensus-OSINT/issues"
 
 [tool.setuptools]

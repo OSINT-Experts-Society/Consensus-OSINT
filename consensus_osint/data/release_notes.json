@@ -2,6 +2,15 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.2",
+      "previous_version": "0.4.1",
+      "new_modules": [],
+      "bug_fixes": [],
+      "other_changes": [
+        "public-package-presentation: Make PyPI images and documentation links resolve correctly, and link package metadata and release notes directly to the OSINT Experts Society."
+      ]
+    },
+    {
       "version": "0.4.1",
       "previous_version": "0.4.0",
       "new_modules": [],
