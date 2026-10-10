@@ -6,13 +6,13 @@
   </picture>
 </p>
 
+<h3 align="center">Usernames. Emails. Phone Numbers. 19 Projects. One Tool.</h3>
+
 <p align="center">By the <a href="https://osint.ngo">OSINT Experts Society</a></p>
 
-<h3 align="center">7,900+ lookup modules. 19 open-source projects. One tool.</h3>
+<p align="center"><strong>7,900+ lookup modules, standardised and reviewed weekly by our experts.</strong></p>
 
 <p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a> &middot; <a href="#see-consensus-in-action">See it in action</a></p>
-
-<p align="center">Username, email and phone intelligence, standardised into one tool.<br>Our experts review and update the modules weekly: finding new sources, testing and improving additions, and retiring those that no longer work.</p>
 
 <p align="center">
   <picture>
