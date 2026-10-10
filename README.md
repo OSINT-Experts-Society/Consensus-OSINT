@@ -20,6 +20,10 @@
   <a href="#why-consensus"><img src="consensus_osint/templates/consensus-badge-review.svg" alt="Expert review: weekly" height="24"></a>
 </p>
 
+<p align="center">
+  <a href="consensus_osint/templates/consensus-home-redacted.png"><img src="consensus_osint/templates/consensus-home-redacted.png" width="920" alt="Consensus application start screen with username, email, phone and bulk search options"></a>
+</p>
+
 ## Why Consensus
 
 <p align="center">
