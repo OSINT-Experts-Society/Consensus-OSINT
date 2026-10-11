@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="630" viewBox="0 0 920 630" role="img" aria-labelledby="title desc">
 <title id="title">How Consensus combines and maintains 19 source projects</title>
-<desc id="desc">Nineteen source projects list 12,356 modules and rules including overlaps. Expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts scan sources, identify changes, review candidates and update Consensus weekly. A default query selects relevant modules, removes duplicate routes and presents unified results.</desc>
+<desc id="desc">Nineteen source projects list 12,356 modules and rules including overlaps. Expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts scan sources, identify changes, review candidates and update Consensus, targeting a weekly review cadence. A default query selects relevant modules, removes duplicate routes and presents unified results.</desc>
 <rect width="920" height="630" rx="18" fill="#0d1117"/>
 <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#f58a45" stroke-width="1.5"/></marker></defs>
 <g font-family="Segoe UI, Helvetica, Arial, sans-serif">
@@ -32,7 +32,7 @@
 <text x="24" y="262" font-size="12" fill="#a8b3c0" font-weight="400" text-anchor="start">* Counts include overlaps and declared routes; Mailcat is separate and SherlockV2 is unverified.</text>
 <text x="896" y="262" font-size="12" fill="#a8b3c0" font-weight="400" text-anchor="end">Inventory snapshot: 3 October 2026</text>
 <rect x="24" y="287" width="872" height="145" rx="12" fill="#261d17" stroke="#f58a45" stroke-width="2"/>
-<text x="460" y="318" font-size="19" fill="#f58a45" font-weight="700" text-anchor="middle">REVIEWED AND UPDATED WEEKLY BY OUR EXPERTS</text>
+<text x="460" y="318" font-size="19" fill="#f58a45" font-weight="700" text-anchor="middle">EXPERT REVIEW · WEEKLY TARGET</text>
 <rect x="40" y="339" width="192" height="70" rx="12" fill="#161b22" stroke="#30363d" stroke-width="1"/>
 <text x="52" y="364" font-size="12" fill="#f58a45" font-weight="700" text-anchor="start">01</text>
 <text x="144" y="364" font-size="14" fill="#f0f3f6" font-weight="600" text-anchor="middle">Horizon scan</text>

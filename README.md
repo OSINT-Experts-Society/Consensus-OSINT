@@ -10,14 +10,14 @@
 
 <p align="center">By the <a href="https://osint.ngo">OSINT Experts Society</a></p>
 
-<p align="center">A unified lookup tool combining 7,900+ modules from 19 open-source projects, reviewed and updated weekly by our experts.</p>
+<p align="center">A unified lookup tool combining 7,900+ modules from 19 open-source projects, maintained by our experts, with a weekly review target.</p>
 
 <p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#see-consensus-in-action">See it in action</a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a></p>
 
 <p align="center">
   <a href="#compare"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-projects.svg" alt="19 projects combined" height="24"></a>
   <a href="#key-features"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-modules.svg" alt="7,900+ lookup modules" height="24"></a>
-  <a href="#why-consensus"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-review.svg" alt="Expert review: weekly" height="24"></a>
+  <a href="#why-consensus"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-review.svg" alt="Expert review: weekly target" height="24"></a>
 </p>
 
 <p align="center">
@@ -31,7 +31,7 @@
     <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-dark-mobile.svg">
     <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-light-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-dark.svg">
-    <img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus works: 19 source projects list 12,356 modules and rules including overlaps; expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts review and update Consensus weekly. Default searches select relevant modules, remove duplicate routes and present unified results.">
+    <img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus works: 19 source projects list 12,356 modules and rules including overlaps; expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts aim to review sources weekly; the latest completed review is dated below. Default searches select relevant modules, remove duplicate routes and present unified results.">
   </picture>
 </p>
 
@@ -56,7 +56,7 @@
     <tr><th align="left">Tool</th><th align="center">Username</th><th align="center">Email</th><th align="center">Phone</th><th align="center">Duplicate<br>ratio</th><th align="center">Update<br>frequency</th><th align="center">Last&nbsp;module<br>update</th></tr>
   </thead>
   <tbody>
-    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-dark.svg"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches</sub></td><td align="center"><strong>Weekly<br>expert review</strong></td><td align="center">02&nbsp;Oct&nbsp;2026</td></tr>
+    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-dark.svg"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches</sub></td><td align="center"><strong>Weekly review<br>target</strong></td><td align="center">02&nbsp;Oct&nbsp;2026</td></tr>
     <tr><td align="left"><a href="https://github.com/soxoj/maigret/tree/b6642744988e7e6c2d21f75db60ec3093019ba25">Maigret</a></td><td align="center">5,483</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>40.8%</strong><br><sub>5,482/5,483&nbsp;mapped</sub></td><td align="center">Every&nbsp;2&nbsp;days</td><td align="center"><a href="https://github.com/soxoj/maigret/commit/3d2b613cfd9a18bebc9d65bb22bcf8af13aa18ef">25&nbsp;Sep&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b">User Scanner</a></td><td align="center">2,511</td><td align="center">211</td><td align="center">—</td><td align="center"><strong>68.9%</strong><br><sub>2,575/2,722&nbsp;mapped</sub></td><td align="center">Every&nbsp;1&nbsp;day</td><td align="center"><a href="https://github.com/kaifcodec/user-scanner/commit/8f4de8e7b3e68672c50ba318b2d15a9d2b4617e9">29&nbsp;Sep&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/arxhr007/Aliens_eye/tree/b1316648fe0e648469d30512bb0535ebc8c4bbc7">Aliens Eye</a></td><td align="center">840</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>65.4%</strong><br><sub>837/840&nbsp;mapped</sub></td><td align="center">Too few updates</td><td align="center"><a href="https://github.com/arxhr007/Aliens_eye/commit/eb10623492e1e171ff2d7d9cfc043a4a0a0e493a">10&nbsp;Jun&nbsp;2026</a></td></tr>
@@ -86,7 +86,7 @@
 
 ### Coverage and maintenance
 
-- **Expert review, every week.** Our team reviews all 19 source projects weekly and evaluates new OSINT projects as they emerge. Suitable modules are tested, improved and integrated; broken modules are retired.
+- **Expert-maintained coverage.** Our team aims to review all 19 source projects weekly and evaluates new OSINT projects as they emerge. The latest completed review is dated above. Suitable modules are tested, improved and integrated; broken modules are retired.
 - **Keep investigations current.** Search newly added lookup sources, or recheck saved identifiers and see newly discovered matches, changed details and inconclusive results.
 - **Quick first results.** Username menu searches start with up to 300 site and module lookups. Continue the full search while retaining completed results.
 - **Automatic update checks.** Managed installs check for updates at startup and notify you when an update is available or ready to use. Repair and rollback are built in.
@@ -259,6 +259,46 @@ Use `python3` above if required, then:
 ```
 
 Add `mcp` to the extras for AI integration, for example `".[modules,pdf,mcp]"`. PDF support is included in managed installs.
+
+## Use Consensus with AI assistants
+
+<details>
+<summary><strong>Connect an assistant using Model Context Protocol (MCP)</strong></summary>
+
+Install the MCP extra in your Python environment:
+
+```console
+python -m pip install --upgrade "consensus-osint[modules,pdf,mcp]"
+```
+
+For clients using an `mcpServers` configuration, add:
+
+```json
+{
+  "mcpServers": {
+    "consensus": {
+      "command": "consensus",
+      "args": ["mcp", "--transport", "stdio"]
+    }
+  }
+}
+```
+
+Use the full path to the installed `consensus` executable if your assistant cannot find it. Client configuration screens vary; select a local stdio server and use the same command and arguments.
+
+The server provides username, email and phone lookups, paginated results and detailed evidence. Example request: **“Use Consensus to search my username YOUR_USERNAME across up to 20 sources, then summarise the matches and inconclusive results.”** Lookups contact external services; review your assistant's tool permissions before running them. Returned profile text is evidence, not instructions.
+
+</details>
+
+## Common questions
+
+**What does Consensus search?** Usernames, email addresses and phone numbers using the installed lookup catalogue. Coverage varies by identifier type, enabled modules and available provider access.
+
+**How are the 19 projects combined?** Their lookup modules and rules are standardised into one catalogue. Default searches reconcile overlapping lookup routes before presenting unified results; Consensus does not simply run 19 complete searches.
+
+**Are results just found or not found?** Available evidence can include profile names, biographies and linked accounts, alongside each result's status. A match is a lead, not proof of a person's identity; errors and inconclusive responses do not establish absence.
+
+**How do I install and update it?** Choose the [installer or PyPI](#install), then follow the [update instructions for your installation](#update-consensus).
 
 ## Join the community
 
