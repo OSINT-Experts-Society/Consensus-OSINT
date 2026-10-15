@@ -14,6 +14,7 @@ from pathlib import Path
 from . import install_manager as manager
 
 _message = ""
+_checked_release = None
 _errors = (OSError, ValueError, KeyError, TypeError, AttributeError, RuntimeError,
            RecursionError, http.client.HTTPException)
 
@@ -21,6 +22,25 @@ _errors = (OSError, ValueError, KeyError, TypeError, AttributeError, RuntimeErro
 def notification():
     """UI-only read: a slow check may finish after the first screen is drawn."""
     return _message
+
+
+def checked_release(version=None, checked_at=None):
+    """Record a successful release check, or clear an unknown/failed result."""
+    global _checked_release
+    _checked_release = None
+    if version is not None and checked_at is not None:
+        manager.stable_version(version)
+        _checked_release = (version, float(checked_at))
+
+
+def is_latest(version):
+    """Read-only render state: equality, not merely the absence of an update."""
+    result = _checked_release
+    try:
+        return bool(result and 0 <= time.time() - result[1] < 3600
+                    and manager.stable_version(version) == manager.stable_version(result[0]))
+    except _errors:
+        return False
 
 
 def notice_root(root):
@@ -169,6 +189,7 @@ def startup_notice(*, disabled=False, auto_install=False) -> None:
     """
     global _message
     _message = ""
+    checked_release()
     if (disabled or os.environ.get("CONSENSUS_NO_UPDATE_CHECK", "").lower() in ("1", "true", "yes")
             or not sys.stdin.isatty() or not sys.stdout.isatty() or not sys.stderr.isatty()):
         return
@@ -194,6 +215,10 @@ def startup_notice(*, disabled=False, auto_install=False) -> None:
         instruction = update_instruction(managed=managed)
 
         def notice(value):
+            if value:
+                checked_release(value.get("version"), value.get("checked_at"))
+            else:
+                checked_release()
             newer = ""
             if value and value.get("version") and manager.stable_version(value["version"]) > manager.stable_version(selected):
                 newer = f"Update available: Consensus {value['version']}. {instruction}"
@@ -201,6 +226,11 @@ def startup_notice(*, disabled=False, auto_install=False) -> None:
 
         now = time.time()
         cached = _cached(cache_root, now)
+        # A package-manager upgrade may leave a still-fresh cache from the old
+        # version. Check again instead of hiding the new version's latest label.
+        if (cached and cached.get("version")
+                and manager.stable_version(cached["version"]) < manager.stable_version(selected)):
+            cached = None
         _message = notice(cached)
         if cached is None:
             def refresh():
