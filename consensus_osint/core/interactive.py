@@ -1,6 +1,7 @@
 """Persistent, line-based terminal session over the existing CLI commands."""
 from __future__ import annotations
 
+import argparse
 import os
 import re
 import shlex
@@ -20,10 +21,10 @@ CHOICES = (
     ("6", "Save latest report", "save"), ("7", "Settings", "settings"),
     ("8", "Investigations", "investigations"), ("9", "Help", "help"), ("0", "Exit", "exit"),
 )
-_DEFAULTS = {"details": False, "all": False, "fast": True, "no_breach": False, "timeout": None}
+_DEFAULTS = {"details": False, "all": False, "fast": True, "top": None, "no_breach": False, "timeout": None}
 _SETTINGS = (
     ("details", "Expand comparison evidence"), ("all", "Show all outcomes"),
-    ("fast", "Quick username search"), ("no_breach", "Exclude breach lookups"),
+    ("search_size", "Default search size (username/email)"), ("no_breach", "Exclude breach lookups"),
     ("timeout", "Site timeout"),
 )
 _COMMANDS = {"scan", "user", "username", "email", "phone", "sites", "modules", "report", "version", "update"}
@@ -73,16 +74,16 @@ class Session:
         self.restart_requested = False
         self._return_home = False
 
-    def back_prompt(self, question, *, zero=False):
+    def back_prompt(self, question, *, zero=False, escape_value=""):
         """Give menu/form input an explicit Escape action without submitting it."""
         ui = self.printer.terminal_ui
         if ui:
-            ui.update(back_enabled=True, zero_back=zero)
+            ui.update(back_enabled=True, zero_back=zero, back_response=escape_value)
         try:
             return self.read(question)
         finally:
             if ui:
-                ui.update(back_enabled=False, zero_back=False)
+                ui.update(back_enabled=False, zero_back=False, back_response="")
 
     def clear_menu(self):
         if self.printer.terminal_ui and self.printer.console:
@@ -92,7 +93,7 @@ class Session:
         p = self.preferences
         return (f"Returned fields: all · Comparisons: {'expanded' if p['details'] else 'summary'} · "
                 f"Results: {'all outcomes' if p['all'] else 'matches'} · "
-                f"Username: {'quick' if p['fast'] else 'full'} · "
+                f"Username/email default: {self.search_size_label()} · "
                 f"Breaches: {'excluded' if p['no_breach'] else 'eligible checks only'} · "
                 f"Timeout: {str(p['timeout']) + 's' if p['timeout'] is not None else 'configured default'}")
 
@@ -102,6 +103,48 @@ class Session:
             self.printer.message(f"Latest search: {len(self.latest.queries)} queries · {len(self.latest.findings)} results. "
                                  "Use last to view or save to export.", "dim")
         self.printer.message("Or type a username, email or phone — we detect its type. / shows commands; /config opens settings.", "dim")
+        self.printer.message("Username and email searches offer Quick (300), Custom or Full. Settings changes the session default.", "dim")
+
+    def search_size_label(self):
+        if self.preferences['top'] is not None:
+            return f"Custom — up to {self.preferences['top']} checks"
+        return "Quick — up to 300 checks" if self.preferences['fast'] else "Full — all eligible checks"
+
+    def choose_search_size(self):
+        """Return explicit per-search flags; never change session preferences."""
+        from ..cli import _positive_int
+
+        default = "2" if self.preferences['top'] is not None else "1" if self.preferences['fast'] else "3"
+        while True:
+            self.printer.message("How many sites and modules should we check?\n"
+                                 "1 Quick — up to 300 checks\n2 Custom — enter a number\n"
+                                 "3 Full — all eligible checks\n0 Back")
+            self.printer.message("Counts lookup checks, not individual requests. Email domain analysis is separate.", "dim")
+            self.printer.message("Limited searches aim for 50/50 sites/modules; unused slots go to the other group.", "dim")
+            answer = self.back_prompt(f"Search size [{default}; Enter = {self.search_size_label()}; Esc = back]: ",
+                                      zero=True, escape_value="back").strip().lower()
+            if answer in _LEAVE_WORDS:
+                return None
+            if not answer:
+                return (["--top", str(self.preferences['top'])] if default == "2"
+                        else ["--fast"] if default == "1" else ["--full"])
+            if answer in {"1", "quick"}:
+                return ["--fast"]
+            if answer in {"3", "full"}:
+                return ["--full"]
+            if answer not in {"2", "custom"}:
+                self.printer.message("Choose 1, 2, 3 or 0 to go back.", "yellow")
+                continue
+            while True:
+                value = self.back_prompt("Maximum checks (positive whole number; Enter / Esc = back): ").strip()
+                if not value or value.lower() in _LEAVE_WORDS:
+                    break
+                try:
+                    count = _positive_int(value)
+                except argparse.ArgumentTypeError:
+                    self.printer.message("Enter a positive whole number, such as 500 or 3000.", "yellow")
+                    continue
+                return ["--top", str(count)]
 
     def remember(self, summary):
         # Retain only the latest scan; never add findings from earlier people.
@@ -127,8 +170,9 @@ class Session:
         if not self.animate and "--no-animation" not in tokens and tokens[0] in {"scan", "user", "username", "email", "phone"}:
             tokens = [tokens[0], "--no-animation", *tokens[1:]]
         defaults = dict(self.preferences)
-        if continuation:
-            defaults["fast"] = False
+        options = tokens[:tokens.index("--")] if "--" in tokens else tokens
+        if continuation or any(t in {"--fast", "--full", "--top"} or t.startswith("--top=") for t in options):
+            defaults.update(fast=False, top=None)
         extra = {"continuation": continuation} if continuation else {}
         code = main(tokens, scan_defaults=defaults, on_summary=self.remember, in_session=True, **extra)
         if code:
@@ -144,7 +188,16 @@ class Session:
             if self._leaves_prompt(value, f"{command} {value}"):
                 return
         if value:
-            flags = ["--fast"] if command == "user" and self.preferences["fast"] else []
+            flags = []
+            if command in {"user", "email"}:
+                flags = self.choose_search_size()
+                if flags is None:
+                    return
+                size = (f"Up to {flags[1]} checks" if flags[0] == "--top"
+                        else "Up to 300 checks" if flags[0] == "--fast" else "All eligible checks")
+                self.printer.message(f"Searching {value} · {size} · Enrichment eligible")
+                example = (f"--top {flags[1]}" if flags[0] == "--top" else flags[0])
+                self.printer.message(f"Shortcut next time: {command} {shlex.quote(value)} {example}", "dim")
             phone_value = re.sub(r"^tel:", "", value.lstrip(), flags=re.I).lstrip()
             if command == "phone" and not phone_value.startswith(("+", "00")):
                 from ..cli import _phone_region
@@ -153,7 +206,8 @@ class Session:
                 if not region or region.lower() in _LEAVE_WORDS:
                     return
                 flags = ["--phone-region", _phone_region(region)]
-            self.printer.message(self.active_settings(), "dim")
+            if command not in {"user", "email"}:
+                self.printer.message(self.active_settings(), "dim")
             self.execute([command, *flags, "--", value], remember=True)
 
     def _leaves_prompt(self, value, instead):
@@ -255,7 +309,7 @@ class Session:
             self.printer.report_saved(saved, graph_path=graph)
 
     def change_setting(self, name, value):
-        from ..cli import _positive_float
+        from ..cli import _positive_float, _positive_int
 
         if name in {"animation", "animations"}:
             if value.lower() not in {"on", "true", "yes", "off", "false", "no"}:
@@ -265,12 +319,20 @@ class Session:
                 ui = self.printer.terminal_ui
                 ui.update(animate=self.animate)
             return
-        if name not in _DEFAULTS:
-            raise ValueError("Settings: details, all, fast, no_breach, timeout, animation.")
-        if name == "timeout":
+        if name in {"search_size", "top"}:
+            size = value.lower()
+            if size in {"quick", "full"}:
+                self.preferences.update(fast=size == "quick", top=None)
+            else:
+                self.preferences.update(fast=False, top=_positive_int(value))
+        elif name not in _DEFAULTS:
+            raise ValueError("Settings: search_size (quick, full or a number), details, all, fast, no_breach, timeout, animation.")
+        elif name == "timeout":
             self.preferences[name] = None if value.lower() in ("default", "reset") else _positive_float(value)
         elif value.lower() in ("on", "true", "yes", "off", "false", "no"):
             self.preferences[name] = value.lower() in ("on", "true", "yes")
+            if name == "fast":
+                self.preferences['top'] = None
         else:
             raise ValueError("Use on or off for this setting.")
         self.printer.message("Setting changed for this session. " + self.active_settings(), "dim")
@@ -279,7 +341,8 @@ class Session:
         self.clear_menu()
         while True:
             self.printer.summary_table([["Choose", "Setting", "Current"]] + [
-                [str(i), label, "configured default" if self.preferences[name] is None
+                [str(i), label, self.search_size_label() if name == "search_size"
+                 else "configured default" if self.preferences[name] is None
                  else str(self.preferences[name]) if name == "timeout"
                  else "on" if self.preferences[name] else "off"]
                 for i, (name, label) in enumerate(_SETTINGS, 1)
@@ -316,7 +379,12 @@ class Session:
                 self.printer.message("Choose a setting number or 0 to go back.", "yellow")
                 continue
             name = _SETTINGS[int(choice) - 1][0]
-            if name == "timeout":
+            if name == "search_size":
+                flags = self.choose_search_size()
+                if flags:
+                    self.change_setting("search_size", flags[1] if flags[0] == "--top"
+                                        else "quick" if flags[0] == "--fast" else "full")
+            elif name == "timeout":
                 value = self.back_prompt("Seconds per site, or default (Esc cancels): ").strip()
                 if value and value.lower() not in _LEAVE_WORDS:
                     self.change_setting(name, value)
@@ -341,13 +409,15 @@ class Session:
         self.printer.message("Paste an email address, phone number or username directly to detect the search type. "
                              "Local phone numbers ask for a country; use user VALUE to force a numeric username.")
         self.printer.message("Choose 1–4 for guided searches, or type commands such as:", f"bold {ACCENT}")
-        self.printer.message('  email "YOUR_EMAIL" --details\n  user "YOUR_USERNAME" --fast\n'
+        self.printer.message('  email "YOUR_EMAIL" --top 500\n  user "YOUR_USERNAME" --top 500\n'
                              '  phone "+COUNTRY_CODE_NUMBER"\n  scan -i "queries.txt" --compare-queries\n'
                              '  report "scan.json" -o "report.html"\n  set details on\n  set timeout 20')
         self.printer.message("last = review latest results · save [PATH] = export · settings = preferences · "
                              "reset = reset session · info = paths and version · about = project details · menu = home · exit = close")
         self.printer.message("Use email --help for scan options. Quote paths containing spaces; backslashes stay literal.", "dim")
-        self.printer.message("Username menu searches start quick. Use Continue full search under I Follow up in results.\n"
+        self.printer.message("Username and email searches offer Quick (300), Custom or Full. Settings selects the session default.\n"
+                             "Use --top N, --fast or --full for one command; set search_size 500 changes the session default.\n"
+                             "Use Continue full search under I Follow up in results.\n"
                              "8 Investigations saves named cases, notes and decisions. /new-sources searches additions; "
                              "/recheck compares a fresh search; /changes shows differences.")
         if self.printer.terminal_ui:
