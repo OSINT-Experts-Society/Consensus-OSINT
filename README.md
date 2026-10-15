@@ -89,6 +89,7 @@
 - **Expert-maintained coverage.** Our team aims to review all 19 source projects weekly and evaluates new OSINT projects as they emerge. The latest completed review is dated above. Suitable modules are tested, improved and integrated; broken modules are retired.
 - **Keep investigations current.** Search newly added lookup sources, or recheck saved identifiers and see newly discovered matches, changed details and inconclusive results.
 - **Quick first results.** Username menu searches start with up to 300 site and module lookups. Continue the full search while retaining completed results.
+- **Choose your search size.** In the interface, `username "HANDLE" --top 500` selects up to 500 combined site and module checks per username, retaining eligible enrichment modules. Any positive limit is supported; available stored ranks come first, then unranked checks. These are not verified current popularity rankings.
 - **Automatic update checks.** Managed installs check for updates at startup and notify you when an update is available or ready to use. Repair and rollback are built in.
 
 ### Investigation workflow

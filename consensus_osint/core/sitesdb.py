@@ -36,6 +36,17 @@ DEFAULT_FILES = [DATA_DIR / "sites.json", DATA_DIR / "sites_wmn.json", DATA_DIR 
 
 # Reviewed request contracts; overrides cannot make these ambiguous probes valid.
 _AUDIT_RESTRICTIONS = MappingProxyType({
+    "amperka": 'Unavailable in this release.',
+    "aqa": 'Unavailable in this release.',
+    "esportal-com": 'Unavailable in this release.',
+    "redtube-channels": 'Unavailable in this release.',
+    "redtube-pornstars": 'Unavailable in this release.',
+    "site-docin-com": 'Unavailable in this release.',
+    "southklad": 'Unavailable in this release.',
+    "spotifycommunity": 'Unavailable in this release.',
+    "upwork": 'Unavailable in this release.',
+    "upwork-upwork-com": 'Unavailable in this release.',
+    "zapravdu": 'Unavailable in this release.',
     "magnific": 'Unavailable in this release.',
     "npm-package": 'Unavailable in this release.',
     "codex-wordpress-org": 'Unavailable in this release.',

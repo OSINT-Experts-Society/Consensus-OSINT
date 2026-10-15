@@ -110,7 +110,7 @@ def build_server():
 
     @mcp.tool()
     async def scan_username(username: str, top: int = 0, recursive: bool = False, nsfw: bool = False) -> str:
-        """Check username signals; return the first result page. `top` limits searched sites (0 = all), not returned evidence."""
+        """Check username signals; return the first result page. `top` caps combined site/module checks per username (0 = all)."""
         return await scan_page("user", username, top or None, recursive, False, nsfw)
 
     @mcp.tool()

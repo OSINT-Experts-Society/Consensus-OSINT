@@ -134,6 +134,8 @@ class TerminalUI:
         self.scan_tips = list(_SCAN_TIPS)
         self.tip_started = None
         self.phase_label = ""
+        self.scan_started = None
+        self.scan_elapsed = None
 
     def refresh_network(self, proxy=None):
         if not self.network_enabled or self.loop is None:
@@ -224,6 +226,8 @@ class TerminalUI:
     def begin_scan(self):
         random.shuffle(self.scan_tips)
         self.tip_started = time.monotonic()
+        self.scan_started = self.tip_started
+        self.scan_elapsed = None
         self.update("Preparing search", preparing=True, found=0, enriched=0, phase_label="",
                     completed=0, total=0, sources=(), preview=None, last_hit=0.0)
 
@@ -236,6 +240,9 @@ class TerminalUI:
     def attach_scan(self, control, owner, printer):
         from .scan_preview import HitPreview
 
+        if self.scan_started is None:
+            self.scan_started = time.monotonic()
+            self.scan_elapsed = None
         if self.tip_started is None:
             random.shuffle(self.scan_tips)
             self.tip_started = time.monotonic()
@@ -246,9 +253,16 @@ class TerminalUI:
             self.key("s")
 
     def detach_scan(self):
+        self.finish_scan()
         self.tip_started = None
         self.update("Preparing results", controller=None, preparing=False, stop_requested=False,
                     preview=None, last_hit=0.0, phase_label="")
+
+    def finish_scan(self):
+        with self.lock:
+            if self.scan_started is not None:
+                self.scan_elapsed = max(0, time.monotonic() - self.scan_started)
+                self.scan_started = None
 
     def toggle_preview(self):
         with self.lock:
@@ -311,6 +325,8 @@ class TerminalUI:
             return prefix + [bar + (" " + counter if counter else "")]
 
         with self.lock:
+            elapsed = (max(0, time.monotonic() - self.scan_started) if self.scan_started is not None
+                       else self.scan_elapsed)
             status = self.activity
             moving = self.animate and self.activity not in ("Paused", "Stopping")
             frame = int(time.monotonic() * 3) if moving else 0
@@ -354,6 +370,8 @@ class TerminalUI:
             lines.append(fit(version + " │ " + path_text(max(1, width - len(version) - 3)), width))
         else:
             lines = [fit(status, width), fit(version + " │ " + path_text(max(1, width - len(version) - 3)), width)]
+        if elapsed is not None:
+            lines.append(fit(f"Elapsed: {int(elapsed)}s", width))
         network = self.network
         left = "Public IP: " + network.public_ip
         right = "Proxy: off" if network.proxy_status == "off" else "Proxy IP: " + network.proxy_ip + " · " + network.proxy_status
