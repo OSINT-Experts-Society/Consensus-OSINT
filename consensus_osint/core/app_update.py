@@ -50,7 +50,8 @@ def notice_root(root):
 
 
 def update_instruction(*, managed=False):
-    return "Run consensus update to install."
+    return ("Close Consensus, then run 'consensus update' in Command Prompt or PowerShell "
+            "(Terminal on macOS/Linux). Do not enter it at the Consensus prompt.")
 
 
 def _save(path, value):
