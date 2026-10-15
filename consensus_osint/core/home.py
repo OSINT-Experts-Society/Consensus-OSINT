@@ -116,6 +116,10 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None, 
 
     title = Text("Consensus", style="bold default")
     title.append(" v" + clean(version), style="dim")
+    from .app_update import is_latest
+
+    if is_latest(version):
+        title.append(" (latest)", style="dim")
     if wide and budget < 16:
         # A shallow window keeps a compact mark without sacrificing the menu.
         header = Text(" ╭─ ", style="dim")
@@ -201,6 +205,10 @@ def _small_home(info, *, width, budget, version, has_results=False):
     title = Text("●─◎ ", style=ACCENT)
     title.append("Consensus", style="bold default")
     title.append(" v" + clean(version), style="dim")
+    from .app_update import is_latest
+
+    if is_latest(version):
+        title.append(" (latest)", style="dim")
     if width >= 36 and budget >= 10:
         rows = [title]
         if budget >= 11:

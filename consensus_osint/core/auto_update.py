@@ -47,6 +47,7 @@ def _text(event):
 def start():
     """Called only after startup's terminal, opt-out and proxy checks."""
     global _message, _started
+    from .app_update import checked_release
     with _guard:
         if _started:
             return
@@ -56,6 +57,7 @@ def start():
         from .. import __version__
 
         state = manager.active_install(root)
+        checked_release()
         if manager.stable_version(state["version"]) > manager.stable_version(__version__):
             _message = _text({"state": "installed", "version": state["version"], "summary": state.get("summary")})
             return
@@ -76,10 +78,14 @@ def start():
         try:
             with child.stdout:
                 for line in child.stdout:
-                    _message = _text(json.loads(line))
+                    event = json.loads(line)
+                    _message = _text(event)
+                    checked_release(event.get("version"), event.get("checked_at"))
             if child.wait():
+                checked_release()
                 _message = _text({"state": "failed"})
         except _errors:
+            checked_release()
             _message = _text({"state": "failed"})
             child.wait()
 
@@ -105,11 +111,13 @@ def perform(root, emit):
         if version:
             manager.stable_version(version)
         if cached.get("state") == "installed" and version == __version__:
-            emit({"state": "ready", "version": version, "summary": cached.get("summary")})
+            emit({"state": "ready", "version": version, "summary": cached.get("summary"),
+                  "checked_at": cached.get("checked_at")})
             manager.atomic_json(cache_path, dict(cached, state="current"))
             return
         if 0 <= now - float(cached["checked_at"]) < CHECK_INTERVAL:
-            emit({"state": "current"})
+            emit({"state": "current", "version": version if cached.get("state") == "current" else None,
+                  "checked_at": cached["checked_at"]})
             return
     except _errors:
         pass

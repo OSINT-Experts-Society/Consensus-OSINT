@@ -137,6 +137,8 @@ class TerminalUI:
         self.phase_label = ""
         self.scan_started = None
         self.scan_elapsed = None
+        self.home_refresh = None
+        self.home_status = False
 
     def refresh_network(self, proxy=None):
         if not self.network_enabled or self.loop is None:
@@ -512,10 +514,30 @@ class TerminalUI:
             if self.closing:
                 raise EOFError
             self.loop.call_soon_threadsafe(lambda: asyncio.create_task(self._show_input(question)))
-        response = self.responses.get()
+        response = None
+        try:
+            while True:
+                try:
+                    response = self.responses.get(timeout=.3)
+                    break
+                except queue.Empty:
+                    self.refresh_home_status(question)
+        finally:
+            # Empty Enter leaves the home page in place; a command or another
+            # prompt takes ownership of the screen and ends home-only redraws.
+            if question != "consensus> " or not isinstance(response, str) or response.strip():
+                self.home_refresh = None
         if isinstance(response, BaseException):
             raise response
         return response
+
+    def refresh_home_status(self, question):
+        """Redraw only the waiting home page; preserve the active input buffer."""
+        from .app_update import is_latest
+
+        if (question == "consensus> " and self.home_refresh is not None
+                and not self.closing and is_latest(self.info.version) != self.home_status):
+            self.home_refresh()
 
     async def _show_input(self, question):
         from prompt_toolkit.history import DummyHistory

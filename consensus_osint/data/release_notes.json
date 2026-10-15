@@ -2,6 +2,15 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.7",
+      "previous_version": "0.4.6",
+      "new_modules": [],
+      "bug_fixes": [],
+      "other_changes": [
+        "confirmed-latest-version: Show (latest) beside the home-screen version after a successful current-version check, including delayed checks, while retaining update and restart notices. Unknown, failed, disabled and stale checks do not claim the application is current."
+      ]
+    },
+    {
       "version": "0.4.6",
       "previous_version": "0.4.5",
       "new_modules": [],

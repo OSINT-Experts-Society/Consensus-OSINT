@@ -140,6 +140,13 @@ class Printer:
         from .session_info import SessionInfo
 
         info = self.terminal_ui.info if self.terminal_ui else SessionInfo.current()
+        from .app_update import is_latest
+
+        if self.terminal_ui:
+            self.terminal_ui.home_status = is_latest(version)
+            self.terminal_ui.home_refresh = lambda: self.home(
+                version, has_results=has_results, saved_report=saved_report,
+                graph_report=graph_report, reset_screen=True)
         if saved_report and self.terminal_ui:
             self.terminal_ui.update("Report saved", last_report=Path(saved_report).resolve())
         if self.console:
@@ -160,7 +167,8 @@ class Printer:
             if saved_report:
                 self.report_saved(saved_report, graph_path=graph_report, compact_width=width)
         else:
-            self.message(f"[OES] CONSENSUS {version} · By {ORGANIZATION}\n{SLOGAN}\n"
+            suffix = " (latest)" if is_latest(version) else ""
+            self.message(f"[OES] CONSENSUS {version}{suffix} · By {ORGANIZATION}\n{SLOGAN}\n"
                          "Weekly catalogue updates from major lookup repositories.\n"
                          "1 Username   2 Email   3 Phone   4 Bulk search\n"
                          "5 View results   6 Save report   7 Settings\n"
