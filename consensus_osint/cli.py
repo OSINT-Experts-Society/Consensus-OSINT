@@ -189,9 +189,12 @@ def add_scan_options(p: argparse.ArgumentParser, *, full_help: bool = False) -> 
     s.add_argument("--exclude", type=_nonempty_selector, action=_JoinedSelector, help="skip these sites (comma-separated)")
     s.add_argument("--tags", type=_nonempty_selector, action=_JoinedSelector, help="only sites with these tags/categories (comma-separated), e.g. social,coding")
     s.add_argument("--exclude-tags", type=_nonempty_selector, action=_JoinedSelector, help="skip sites with these tags")
-    s.add_argument("--top", type=_positive_int, help="maximum combined site/module checks per username, ordered by available stored ranks")
-    s.add_argument("--fast", action="store_true",
-                   help="start with up to 300 username site and module lookups; --top overrides this limit")
+    s.add_argument("--top", type=_positive_int, help="maximum checks per username/email; aim for 50/50 sites/modules, filling unused slots; background analysis is separate")
+    speed = s.add_mutually_exclusive_group()
+    speed.add_argument("--fast", action="store_true",
+                       help="up to 300 username/email lookups; --top overrides this limit")
+    speed.add_argument("--full", action="store_false", dest="fast",
+                       help="all eligible username/email checks (no Quick limit)")
     s.add_argument("--nsfw", action="store_true", help="include NSFW sites and modules")
     s.add_argument("--all-sites", action="store_true", help="also list disabled sites, as skipped results with the reason; they are not contacted")
     s.add_argument("--source", type=_nonempty_selector, action=_JoinedSelector, help="only sites from these upstream lists (sherlock,maigret,wmn,...)")
@@ -223,7 +226,7 @@ def add_scan_options(p: argparse.ArgumentParser, *, full_help: bool = False) -> 
 
     if not full_help:
         common = {"help", "help_all", "queries", "output", "all", "quiet", "verbose", "details", "no_color", "compare_queries",
-                  "site", "fast", "proxy", "timeout", "input"}
+                  "site", "top", "fast", "proxy", "timeout", "input"}
         for action in p._actions:
             if action.dest not in common:
                 action.help = argparse.SUPPRESS
@@ -688,6 +691,11 @@ class Scanner:
             self.printer.warn("disposable e-mail domain")
         if modules is None:
             modules = self.select_modules("email")
+        limit = getattr(self.args, "top", None) or (300 if getattr(self.args, "fast", False) else None)
+        if limit:
+            from .core.modules import limit_plan
+
+            _, modules = limit_plan([], modules, limit, self.sites_db().sites)
         self.printer.activity("Scanning", self._tool_names([], modules))
         self.printer.message(f"   {len(modules)} sites being scanned for this email", "cyan")
         self.printer.start_progress(len(modules), f"checking {email}")
