@@ -2,6 +2,19 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.3",
+      "previous_version": "0.4.2",
+      "new_modules": [],
+      "bug_fixes": [
+        "combined-scan-limit: Apply --top to the combined site and module checks per username, keeping enrichment eligible and existing safety restrictions in force.",
+        "custom-limit-label: Show the requested scan limit instead of an inherited Quick label, and keep site and module ranking identifiers separate.",
+        "false-positive-checks: Disable eleven site checks that returned positive signals for synthetic negative controls. Protonmail remains available."
+      ],
+      "other_changes": [
+        "elapsed-seconds: Show elapsed seconds in the status bar, retain the final duration after completion or stopping, and reset it for the next search."
+      ]
+    },
+    {
       "version": "0.4.2",
       "previous_version": "0.4.1",
       "new_modules": [],
