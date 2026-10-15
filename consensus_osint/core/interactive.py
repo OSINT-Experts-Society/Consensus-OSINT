@@ -72,6 +72,7 @@ class Session:
         self._saved_report = None
         self._saved_graph_report = None
         self.restart_requested = False
+        self.update_requested = False
         self._return_home = False
 
     def back_prompt(self, question, *, zero=False, escape_value=""):
@@ -175,6 +176,19 @@ class Session:
             defaults.update(fast=False, top=None)
         extra = {"continuation": continuation} if continuation else {}
         code = main(tokens, scan_defaults=defaults, on_summary=self.remember, in_session=True, **extra)
+        from . import update_backend
+
+        if update_backend.pending():
+            self.printer.message("Updating closes this session so its files can be replaced safely. Save any results you need first.")
+            try:
+                approved = self.back_prompt("Close and update now? [y/N]: ").strip().lower() in {"y", "yes"}
+            except (EOFError, KeyboardInterrupt):
+                approved = False
+            if approved:
+                self.update_requested = True
+            else:
+                update_backend.cancel()
+                self.printer.message("Update cancelled. Your session and results are unchanged.")
         if code:
             self.printer.message("Search stopped; collected results are retained." if code == 130
                                  else "Command did not complete successfully. You can correct it and try again.", "yellow")
@@ -361,7 +375,7 @@ class Session:
                 from .installation_ui import screen
 
                 screen(self)
-                if self.restart_requested:
+                if self.restart_requested or self.update_requested:
                     return
                 self.clear_menu()
                 continue
@@ -623,7 +637,7 @@ class Session:
                     tokens = tokens[1:]
                 if tokens and not self.dispatch(tokens):
                     break
-                if self.restart_requested:
+                if self.restart_requested or self.update_requested:
                     break
                 self.results_actions()
                 ui = self.printer.terminal_ui
@@ -706,6 +720,10 @@ def start_session(*, color=True, footer=True, animate=True):
         session = Session(color=color, animate=animate)
         sessions.append(session)
         result = session.run()
+    if sessions and sessions[0].update_requested:
+        from .update_backend import run_pending
+
+        return run_pending()
     if sessions and sessions[0].restart_requested:
         from .installation_ui import restart
 

@@ -22,7 +22,7 @@ def status(root):
 
     rows = [["Running version", __version__], ["Installed version", state["version"] if managed else __version__],
             ["Installation", "Managed" if managed else "Source / Python environment"],
-            ["Update source", state.get("channel", "Public releases") if managed else "Public releases (notifications only)"],
+            ["Update source", state.get("channel", "Public releases") if managed else "Existing package manager / source checkout"],
             ["Lookup database", dict(SessionInfo.current().rows())["Lookup database updated"]]]
     latest, checked = None, 0
     cache_root = root if managed else notice_root(root)
@@ -102,7 +102,7 @@ def screen(session):
         session.printer.summary_table([["Updates", "Details"], *status(root)], "Installation & updates")
         managed = manager.managed_install(root)
         session.printer.message("1 Check now · 2 Install update · 3 Restart\n4 Repair · 5 Restore previous · 6 Choose bundle"
-                                if managed else "1 Check public release · 6 Switch to managed installation")
+                                if managed else "1 Check public release · 2 Install update · 6 Switch to managed installation")
         session.printer.message("0 / Esc Back")
         choice = session.back_prompt("Updates: ", zero=True).strip().lower()
         if choice in ("", "0", "back", "cancel"):
@@ -138,6 +138,10 @@ def screen(session):
                     if session.back_prompt("Switch to it now? [y/N]: ").strip().lower() in ("y", "yes"):
                         session.restart_requested = True
                         return
+            elif not managed and choice == "2":
+                session.execute(["update"])
+                if session.update_requested:
+                    return
             elif managed and choice == "2":
                 result = manager.install_release(root)
                 state = manager.active_install(root)

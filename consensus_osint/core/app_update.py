@@ -5,12 +5,10 @@ import hashlib
 import http.client
 import json
 import os
-import shlex
 import subprocess
 import sys
 import threading
 import time
-from importlib import metadata
 from pathlib import Path
 
 from . import install_manager as manager
@@ -32,28 +30,7 @@ def notice_root(root):
 
 
 def update_instruction(*, managed=False):
-    if managed:
-        return "Run consensus update to install."
-    package = Path(__file__).resolve().parents[1]
-    # A source checkout (including editable installs) must not be replaced by pip.
-    if (package.parent / "pyproject.toml").is_file() or (package.parent / ".git").exists():
-        return "Update this source checkout using your existing Git/source workflow."
-    try:
-        dist = metadata.distribution(manager.PACKAGE)
-        direct = json.loads(dist.read_text("direct_url.json") or "{}")
-        if direct.get("dir_info", {}).get("editable"):
-            return "Update this editable checkout using your existing Git/source workflow."
-    except (metadata.PackageNotFoundError, *_errors):
-        return "Get the release at https://github.com/OSINT-Experts-Society/Consensus-OSINT/releases/latest."
-    parts = [part.lower() for part in Path(sys.prefix).parts]
-    if "pipx" in parts and "venvs" in parts:
-        return "Run pipx upgrade consensus-osint to install."
-    if "uv" in parts and "tools" in parts:
-        return "Run uv tool upgrade consensus-osint to install."
-    command = [sys.executable, "-m", "pip", "install", "--upgrade", manager.PACKAGE]
-    if os.name == "nt":
-        return f"In PowerShell, run & {subprocess.list2cmdline(command)} to install."
-    return f"Run {shlex.join(command)} to install."
+    return "Run consensus update to install."
 
 
 def _save(path, value):
@@ -110,6 +87,9 @@ def network_problem(exc: Exception) -> str:
 
 def command(args) -> int:
     from .. import __version__
+    from . import update_backend
+
+    update_backend.cancel()
 
     check = getattr(args, "check", False) or getattr(args, "json", False)
     try:
@@ -134,9 +114,16 @@ def command(args) -> int:
                     print(f"This session is running {__version__}. Restart Consensus to use {selected}.")
             return 0
         if not manager.managed_install(root):
-            print("This copy is not managed by the Consensus installer. Run the installer from the README "
-                  "to enable consensus update. For a development checkout, update with Git and your environment's package manager.", file=sys.stderr)
-            return 2
+            if any(getattr(args, flag, False) for flag in ("repair", "rollback", "feed")):
+                print("Repair, rollback and private bundles require installer-managed snapshots. "
+                      "Use consensus update without those options to update this installation.", file=sys.stderr)
+                return 2
+            print("Checking for a Consensus update...", file=sys.stderr)
+            if update_backend.prepare():
+                print("Update ready. The existing installation method and optional capabilities will be retained.")
+            else:
+                print(f"Consensus {__version__} is already installed; no newer public release is available.")
+            return 0
         print("Checking for a Consensus update...", file=sys.stderr)
         if getattr(args, "rollback", False):
             result = manager.rollback(root)
