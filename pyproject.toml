@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "consensus-osint"
-version = "0.4.3"
+version = "0.4.4"
 description = "Expert-maintained username, email and phone intelligence with 7,900+ standardised lookup modules from 19 open-source projects."
 readme = "README.md"
 requires-python = ">=3.10"

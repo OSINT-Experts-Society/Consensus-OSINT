@@ -88,8 +88,8 @@
 
 - **Expert-maintained coverage.** Our team aims to review all 19 source projects weekly and evaluates new OSINT projects as they emerge. The latest completed review is dated above. Suitable modules are tested, improved and integrated; broken modules are retired.
 - **Keep investigations current.** Search newly added lookup sources, or recheck saved identifiers and see newly discovered matches, changed details and inconclusive results.
-- **Quick first results.** Username menu searches start with up to 300 site and module lookups. Continue the full search while retaining completed results.
-- **Choose your search size.** In the interface, `username "HANDLE" --top 500` selects up to 500 combined site and module checks per username, retaining eligible enrichment modules. Any positive limit is supported; available stored ranks come first, then unranked checks. These are not verified current popularity rankings.
+- **Choose your search size.** Guided username and email searches offer **Quick** (up to 300 checks), **Custom** (enter a number) and **Full** (all eligible checks). Settings changes the default for this session; each search can override it. Eligible enrichment stays enabled, and email domain analysis is separate.
+- **Balanced limited searches.** `--top 500` and Quick aim for 50/50 site checks and modules, filling unused slots from the other group. Limits apply per username/email after exclusions; email's module-only plan uses the available modules. Stored ranks order each group, not verified current popularity. Modules do not guarantee returned enrichment. Continue the full search to add remaining coverage, or use `--full`.
 - **Automatic update checks.** Managed installs check for updates at startup and notify you when an update is available or ready to use. Repair and rollback are built in.
 
 ### Investigation workflow

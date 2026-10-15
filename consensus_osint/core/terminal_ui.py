@@ -100,6 +100,7 @@ class TerminalUI:
         self.reading = False
         self.back_enabled = False
         self.zero_back = False
+        self.back_response = ""
         self.closing = False
         self.completed = 0
         self.total = 0
@@ -647,7 +648,7 @@ class TerminalUI:
             and self.session.default_buffer.complete_state is None))
         def back(event):
             event.current_buffer.reset()
-            self.respond("")
+            self.respond(self.back_response)
 
         @keys.add("0", eager=True, filter=Condition(
             lambda: self.reading and self.back_enabled and self.zero_back

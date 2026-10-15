@@ -373,12 +373,16 @@ def reconcile_plan(sites: list, modules: list, *, ctx: Context | None = None, qu
 
 
 def limit_plan(sites, modules, limit, catalogue, pairs=()):
-    """Cap the reconciled plan, sharing stored service ranks with code checks.
+    """Cap the reconciled plan with equal site/module shares where available.
 
-    Unknown ranks sort last. Replacement checks inherit their catalogue
-    alternative's rank, including aliases whose hosts differ. No live ranking
-    lookup is made, and this does not change any execution restrictions.
+    Rank within each share, not across competing pools. The best-ranked head
+    gets the odd slot; once one pool runs out, the other fills remaining slots.
+    Unknown ranks sort last within their pool. Replacement checks inherit their
+    catalogue alternative's rank, including aliases whose hosts differ. Code
+    modules are not guaranteed enrichment. Execution restrictions are unchanged.
     """
+    from itertools import islice, zip_longest
+
     ranks, services = {}, {}
     for site in catalogue:
         if site.rank and site.rank > 0:
@@ -395,7 +399,12 @@ def limit_plan(sites, modules, limit, catalogue, pairs=()):
     candidates = [("site", s) for s in sites] + [("module", m) for m in modules]
     candidates.sort(key=lambda item: (ranks.get((item[0], item[1].id), float("inf")),
                                       -len(getattr(item[1], "sources", ())), item[1].id, item[0]))
-    chosen = candidates[:limit]
+    by_kind = {kind: [item for item in candidates if item[0] == kind] for kind in ("site", "module")}
+    first = candidates[0][0] if candidates else "site"
+    second = "module" if first == "site" else "site"
+    balanced = (item for pair in zip_longest(by_kind[first], by_kind[second])
+                for item in pair if item is not None)
+    chosen = list(islice(balanced, min(limit, len(candidates))))
     return ([item for kind, item in chosen if kind == "site"],
             [item for kind, item in chosen if kind == "module"])
 

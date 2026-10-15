@@ -2,6 +2,19 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.4",
+      "previous_version": "0.4.3",
+      "new_modules": [],
+      "bug_fixes": [
+        "email-scan-limit: Apply custom and Quick limits to email lookup modules as well as username checks, retaining separate email domain analysis and existing safety restrictions.",
+        "3dcadforums-false-positive: Disable the 3DCADForums check after it returned account matches for both synthetic negative usernames."
+      ],
+      "other_changes": [
+        "guided-search-size: Offer Quick, Custom and Full choices before guided username and email searches, with a session default in Settings and visible command shortcuts.",
+        "balanced-scan-limits: Aim for equal site and module shares in limited searches, filling unused slots from the other group without exceeding the chosen total."
+      ]
+    },
+    {
       "version": "0.4.3",
       "previous_version": "0.4.2",
       "new_modules": [],

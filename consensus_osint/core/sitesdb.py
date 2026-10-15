@@ -36,6 +36,7 @@ DEFAULT_FILES = [DATA_DIR / "sites.json", DATA_DIR / "sites_wmn.json", DATA_DIR 
 
 # Reviewed request contracts; overrides cannot make these ambiguous probes valid.
 _AUDIT_RESTRICTIONS = MappingProxyType({
+    "3dcadforums": 'Unavailable in this release.',
     "amperka": 'Unavailable in this release.',
     "aqa": 'Unavailable in this release.',
     "esportal-com": 'Unavailable in this release.',

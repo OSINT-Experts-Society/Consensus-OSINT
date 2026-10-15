@@ -69,7 +69,7 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
         out.print(Text(("Full search: " if filters else "") +
                        f"{len(matches)} found · {sum(has_details(f) for f in matches)} enriched · {len(findings)} outcomes"))
         if summary.options.get("top"):
-            out.print(Text(f"Search limit: up to {summary.options['top']} checks per username · "
+            out.print(Text(f"Search limit: up to {summary.options['top']} checks per username/email · "
                            "I Follow up → Continue full search keeps completed results.", style=f"bold {ACCENT}"))
         elif summary.options.get("fast"):
             out.print(Text("Quick search · I Follow up → Continue full search keeps completed results.", style=f"bold {ACCENT}"))
