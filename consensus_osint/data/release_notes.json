@@ -2,6 +2,18 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.5",
+      "previous_version": "0.4.4",
+      "new_modules": [],
+      "bug_fixes": [
+        "late-update-notice: Show background update results in the interface even when the check finishes after startup."
+      ],
+      "other_changes": [
+        "universal-update-notices: Notify Python, pipx, uv and source installations about new releases without changing their installation method, with appropriate update instructions in Settings and explicit checks.",
+        "unmanaged-change-summary: Show a one-time bundled change summary when a Python or source installation first runs a new version."
+      ]
+    },
+    {
       "version": "0.4.4",
       "previous_version": "0.4.3",
       "new_modules": [],

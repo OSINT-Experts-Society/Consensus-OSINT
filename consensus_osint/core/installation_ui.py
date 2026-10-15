@@ -16,17 +16,19 @@ from . import install_manager as manager
 def status(root):
     managed = manager.managed_install(root)
     state = manager.active_install(root) if managed else None
+    from .app_update import notice_root, update_instruction
     from .auto_update import notification
     from .session_info import SessionInfo
 
     rows = [["Running version", __version__], ["Installed version", state["version"] if managed else __version__],
             ["Installation", "Managed" if managed else "Source / Python environment"],
-            ["Update source", state.get("channel", "Public releases") if managed else "Switch to managed installation to enable updates"],
+            ["Update source", state.get("channel", "Public releases") if managed else "Public releases (notifications only)"],
             ["Lookup database", dict(SessionInfo.current().rows())["Lookup database updated"]]]
     latest, checked = None, 0
-    for name in ("update-check.json", "auto-update.json"):
+    cache_root = root if managed else notice_root(root)
+    for name in (("update-check.json", "auto-update.json") if managed else ("update-check.json",)):
         try:
-            value = json.loads((root / name).read_text(encoding="utf-8"))
+            value = json.loads((cache_root / name).read_text(encoding="utf-8"))
             when = float(value.get("checked_at", 0))
             if checked < when <= time.time() + 300:
                 checked, latest = when, value.get("version")
@@ -42,6 +44,8 @@ def status(root):
                      "Notify only" if os.environ.get("CONSENSUS_AUTO_UPDATE") == "0" else "On at startup"])
         if state.get("summary"):
             rows.append(["Changes", manager.summary_text(state["summary"], state["version"])])
+    if not managed:
+        rows.append(["How to update", update_instruction()])
     return rows
 
 
@@ -105,9 +109,14 @@ def screen(session):
             return
         try:
             if choice == "1":
+                from .app_update import notice_root, update_instruction
+
                 release = manager.release_for(root) if managed else manager.latest_release()
-                manager.atomic_json(root / "update-check.json", {"checked_at": time.time(), "version": release["version"]})
+                cache_root = root if managed else notice_root(root)
+                manager.atomic_json(cache_root / "update-check.json", {"checked_at": time.time(), "version": release["version"]})
                 session.printer.message("Available version: " + release["version"])
+                if not managed:
+                    session.printer.message(update_instruction())
             elif choice == "6":
                 bundle = session.back_prompt("Extracted install bundle folder (Enter cancels): ").strip().strip('"')
                 if not bundle:
