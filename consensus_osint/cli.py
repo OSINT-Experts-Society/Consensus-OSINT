@@ -189,7 +189,7 @@ def add_scan_options(p: argparse.ArgumentParser, *, full_help: bool = False) -> 
     s.add_argument("--exclude", type=_nonempty_selector, action=_JoinedSelector, help="skip these sites (comma-separated)")
     s.add_argument("--tags", type=_nonempty_selector, action=_JoinedSelector, help="only sites with these tags/categories (comma-separated), e.g. social,coding")
     s.add_argument("--exclude-tags", type=_nonempty_selector, action=_JoinedSelector, help="skip sites with these tags")
-    s.add_argument("--top", type=_positive_int, help="only the N most popular sites")
+    s.add_argument("--top", type=_positive_int, help="maximum combined site/module checks per username, ordered by available stored ranks")
     s.add_argument("--fast", action="store_true",
                    help="start with up to 300 username site and module lookups; --top overrides this limit")
     s.add_argument("--nsfw", action="store_true", help="include NSFW sites and modules")
@@ -502,10 +502,9 @@ class Scanner:
         if self.args.no_sites:
             return []
         db = self.sites_db()
-        top = self.args.top or (300 if getattr(self.args, "fast", False) else None)
         return db.select(ids=self._csv(self.args.site), exclude=self._csv(self.args.exclude), tags=self._csv(self.args.tags),
                          exclude_tags=self._csv(self.args.exclude_tags), include_nsfw=self.args.nsfw,
-                         include_disabled=self.args.all_sites, top=top, id_type=id_type,
+                         include_disabled=self.args.all_sites, id_type=id_type,
                          sources=self._csv(self.args.source), tor=self.tor)
 
     def select_modules(self, kind: str) -> list:
@@ -568,6 +567,7 @@ class Scanner:
 
     # ------------------------------------------------------------- scans
     async def scan_username(self, username: str, depth: int = 0, parent: str | None = None, id_type: str = "username") -> list:
+        from .core.modules import limit_plan
         from .core.runner import run_all
 
         sites = self.select_sites(id_type=id_type)
@@ -578,13 +578,13 @@ class Scanner:
             from .core.modules import reconcile_plan
 
             sites, modules, paired = reconcile_plan(sites, modules, ctx=self.ctx, query=username)
-        if getattr(self.args, "fast", False) and not self.args.top:
-            sites = sites[:300]
-            modules = modules[:max(0, 300 - len(sites))]
         if self.continuation:
             sites = self.continuation.select(username, id_type, sites, "site:")
             modules = self.continuation.select(username, id_type, modules, "module:")
             sites, modules = self.continuation.exclude_completed_alternatives(username, id_type, sites, modules, paired)
+        limit = self.args.top or (300 if getattr(self.args, "fast", False) else None)
+        if limit:
+            sites, modules = limit_plan(sites, modules, limit, self.sites_db().sites, paired)
         total = len(sites) + len(modules)
         # Switching every check off (--no-sites --no-modules) is a deliberate dry run;
         # a filter that happens to select nothing is a mistake worth explaining.

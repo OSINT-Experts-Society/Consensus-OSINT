@@ -372,6 +372,32 @@ def reconcile_plan(sites: list, modules: list, *, ctx: Context | None = None, qu
     return [s for s in sites if id(s) not in drop_sites], kept_modules, paired
 
 
+def limit_plan(sites, modules, limit, catalogue, pairs=()):
+    """Cap the reconciled plan, sharing stored service ranks with code checks.
+
+    Unknown ranks sort last. Replacement checks inherit their catalogue
+    alternative's rank, including aliases whose hosts differ. No live ranking
+    lookup is made, and this does not change any execution restrictions.
+    """
+    ranks, services = {}, {}
+    for site in catalogue:
+        if site.rank and site.rank > 0:
+            ranks[site.id] = site.rank
+            key = _site_service_key(site)
+            if key:
+                services[key] = min(services.get(key, float("inf")), site.rank)
+    for module in modules:
+        ranks[module.id] = services.get(_service_key(module.url_main), float("inf"))
+    for kept, alternative in pairs:
+        ranks[kept] = min(ranks.get(kept, float("inf")), ranks.get(alternative, float("inf")))
+    candidates = [("site", s) for s in sites] + [("module", m) for m in modules]
+    candidates.sort(key=lambda item: (ranks.get(item[1].id, float("inf")),
+                                      -len(getattr(item[1], "sources", ())), item[1].id, item[0]))
+    chosen = candidates[:limit]
+    return ([item for kind, item in chosen if kind == "site"],
+            [item for kind, item in chosen if kind == "module"])
+
+
 def kind_for(query_type: QueryType) -> str:
     return {QueryType.USERNAME: "username", QueryType.EMAIL: "email", QueryType.PHONE: "phone"}.get(query_type, "username")
 
