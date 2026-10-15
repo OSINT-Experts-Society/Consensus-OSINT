@@ -382,16 +382,18 @@ def limit_plan(sites, modules, limit, catalogue, pairs=()):
     ranks, services = {}, {}
     for site in catalogue:
         if site.rank and site.rank > 0:
-            ranks[site.id] = site.rank
+            ranks[("site", site.id)] = site.rank
             key = _site_service_key(site)
             if key:
                 services[key] = min(services.get(key, float("inf")), site.rank)
     for module in modules:
-        ranks[module.id] = services.get(_service_key(module.url_main), float("inf"))
+        ranks[("module", module.id)] = services.get(_service_key(module.url_main), float("inf"))
     for kept, alternative in pairs:
-        ranks[kept] = min(ranks.get(kept, float("inf")), ranks.get(alternative, float("inf")))
+        key = ("module", kept)
+        if key in ranks:
+            ranks[key] = min(ranks[key], ranks.get(("site", alternative), float("inf")))
     candidates = [("site", s) for s in sites] + [("module", m) for m in modules]
-    candidates.sort(key=lambda item: (ranks.get(item[1].id, float("inf")),
+    candidates.sort(key=lambda item: (ranks.get((item[0], item[1].id), float("inf")),
                                       -len(getattr(item[1], "sources", ())), item[1].id, item[0]))
     chosen = candidates[:limit]
     return ([item for kind, item in chosen if kind == "site"],

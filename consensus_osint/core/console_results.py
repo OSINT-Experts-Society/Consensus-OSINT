@@ -68,7 +68,10 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
                            + ". F changes or clears filters. Saving keeps every outcome.", style=f"bold {ACCENT}"))
         out.print(Text(("Full search: " if filters else "") +
                        f"{len(matches)} found · {sum(has_details(f) for f in matches)} enriched · {len(findings)} outcomes"))
-        if summary.options.get("fast"):
+        if summary.options.get("top"):
+            out.print(Text(f"Search limit: up to {summary.options['top']} checks per username · "
+                           "I Follow up → Continue full search keeps completed results.", style=f"bold {ACCENT}"))
+        elif summary.options.get("fast"):
             out.print(Text("Quick search · I Follow up → Continue full search keeps completed results.", style=f"bold {ACCENT}"))
         if summary.options.get("continuation"):
             retained = summary.options["continuation"].get("retained_results", 0)
