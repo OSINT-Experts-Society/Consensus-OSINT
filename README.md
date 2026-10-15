@@ -90,7 +90,7 @@
 - **Keep investigations current.** Search newly added lookup sources, or recheck saved identifiers and see newly discovered matches, changed details and inconclusive results.
 - **Choose your search size.** Guided username and email searches offer **Quick** (up to 300 checks), **Custom** (enter a number) and **Full** (all eligible checks). Settings changes the default for this session; each search can override it. Eligible enrichment stays enabled, and email domain analysis is separate.
 - **Balanced limited searches.** `--top 500` and Quick aim for 50/50 site checks and modules, filling unused slots from the other group. Limits apply per username/email after exclusions; email's module-only plan uses the available modules. Stored ranks order each group, not verified current popularity. Modules do not guarantee returned enrichment. Continue the full search to add remaining coverage, or use `--full`.
-- **Automatic update checks.** Managed installs check for updates at startup and notify you when an update is available or ready to use. Repair and rollback are built in.
+- **Automatic update checks.** Interactive launches notify you about new releases. Use `consensus update` with your existing installation; installer-managed copies also support automatic installation, repair and rollback.
 
 ### Investigation workflow
 
@@ -205,18 +205,16 @@ Explore more with `consensus --help` or `consensus examples`.
 
 ## Update Consensus
 
-| Installed with | How to update |
-| --- | --- |
-| **Windows, macOS or Linux installer** | Run `consensus update`. |
-| **PyPI** | Run `python -m pip install --upgrade "consensus-osint[modules,pdf]"`. |
-| **Git / source** | Run `git pull`, then repeat the platform install command under [Install from source](#install-from-source). |
+Run `consensus update`, or choose **Settings → Installation & updates → Install update**. The command uses your existing installer, pip, pipx, uv tool, or clean Git checkout—no migration required. It retains installed optional capability groups and verifies the updated version and catalogue signature. The interactive interface asks before closing so you can save results first.
 
-Restart Consensus after updating. Interactive launches show update notices for every installation method; no reinstall or migration is needed. Python/source installs show the appropriate update instructions, while installer-based copies retain automatic updates by default. New-version change summaries appear once. Checks run in the background, use a one-hour cache and stay off for redirected output, proxy/Tor sessions or `--no-update-check`.
+Restart Consensus after updating. Source updates fast-forward the checkout's configured branch; installed source copies are reinstalled in the same environment. Local edits, pins, locked projects and OS-managed Python are protected: if an automatic update is unsafe, the command explains what needs attention rather than forcing it.
+
+Interactive launches show public-release notices and one-time new-version summaries. Installer-based copies retain automatic updates by default; other installations update only when requested. Checks run in the background, use a one-hour cache and stay off for redirected output, proxy/Tor sessions or `--no-update-check`.
 
 <details>
 <summary><strong>Repair, rollback and update controls</strong></summary>
 
-Open **Settings → Installation & updates** to check versions, install updates, restart or recover an installation.
+Open **Settings → Installation & updates** to check versions and install updates. Restart, repair, rollback and bundle selection require an installer-managed copy with saved environments.
 
 To update from an installer ZIP, extract it, then select **Choose bundle** in Settings and choose the extracted folder, or run its installer. Restart to apply changes.
 

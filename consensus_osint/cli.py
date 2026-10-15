@@ -373,8 +373,8 @@ def build_parser(*, full_help: bool = False, color: bool = True, scan_defaults=N
     upd.add_argument("--catalogue", action="store_true", help="check the signed catalogue build without installing")
     upd.add_argument("--json", action="store_true", help="check only; return version information as JSON")
     recovery = upd.add_mutually_exclusive_group()
-    recovery.add_argument("--repair", action="store_true", help="reinstall the active version using its verified cached wheel")
-    recovery.add_argument("--rollback", action="store_true", help="restore the previous validated version")
+    recovery.add_argument("--repair", action="store_true", help="repair an installer-managed copy using its verified cached wheel")
+    recovery.add_argument("--rollback", action="store_true", help="restore the previous validated installer-managed version")
     recovery.add_argument("--feed", help="install from a private bundle directory")
     return p
 
@@ -1754,6 +1754,13 @@ def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_se
                            or bool(getattr(args, "proxy", None)) or bool(getattr(args, "tor", False)), **update_options)
         if cmd in ("scan", "user", "email", "phone"):
             return cmd_scan(args, on_summary=on_summary, in_session=in_session)
+        if cmd == "update":
+            from .core import update_backend
+
+            code = cmd_update(args)
+            if not in_session and code == 0 and update_backend.pending():
+                return update_backend.run_pending()
+            return code
         if cmd == "shell":
             from .core.interactive import start_session
 
