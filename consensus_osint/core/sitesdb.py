@@ -41,6 +41,7 @@ _AUDIT_RESTRICTIONS = MappingProxyType({
     "aqa": 'Unavailable in this release.',
     "esportal-com": 'Unavailable in this release.',
     "forum-centrala-termica-ro": 'Unavailable in this release.',
+    "forums-bluemoon-mcfc": 'Unavailable in this release.',
     "ramblerdating": 'Unavailable in this release.',
     "redtube-channels": 'Unavailable in this release.',
     "redtube-pornstars": 'Unavailable in this release.',

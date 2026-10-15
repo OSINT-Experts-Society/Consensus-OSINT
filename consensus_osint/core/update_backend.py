@@ -15,6 +15,7 @@ import subprocess
 import sys
 import sysconfig
 import tempfile
+import time
 from contextlib import contextmanager
 from importlib import metadata
 from pathlib import Path
@@ -26,7 +27,6 @@ _pending = None
 _FEATURES = {
     "modules": ("aiohttp", "trio", "lxml", "curl_cffi", "socid-extractor", "requests", "termcolor", "colorama"),
     "pdf": ("reportlab", "pillow"), "browser": ("playwright",), "mcp": ("mcp", "PyJWT"),
-    "registry": ("SQLAlchemy", "PyMySQL"),
 }
 
 
@@ -163,6 +163,9 @@ def plan_update():
     plan = {"kind": kind, "commands": [], "python": sys.executable,
             "package_parent": str(package_directory().parent), "environment": {},
             "previous": __version__, "target": None}
+    if os.name == "nt":
+        scripts = sysconfig.get_path("scripts", **({"scheme": "nt_user"} if owner.get("user") else {}))
+        plan["launcher"] = str(Path(scripts) / "consensus.exe")
     if kind == "source":
         git, folder = _tool("git"), owner["directory"]
         branch, upstream = _git_preflight(git, folder)
@@ -239,6 +242,8 @@ def run_pending():
     plan, _pending = _pending, None
     print("Updating Consensus using the existing installation method. Please wait…", flush=True)
     try:
+        if _windows_launcher() is not None:
+            return _handoff_windows(plan)
         with _update_lock(plan):
             return execute_plan(plan)
     except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
@@ -249,16 +254,147 @@ def run_pending():
         return 130
 
 
-def execute_plan(plan):
+def _windows_launcher():
+    if os.name != "nt":
+        return None
+    path = Path(sys.argv[0]).resolve()
+    # pip console wrappers strip .exe from argv[0] before calling main().
+    if path.name.lower() == "consensus":
+        path = path.with_suffix(".exe")
+    return path if path.name.lower() == "consensus.exe" and path.is_file() else None
+
+
+def _handoff_windows(plan):
+    """Release the console launcher before a standalone worker runs pip/uv."""
+    folder = Path(tempfile.mkdtemp(prefix="consensus-update-handoff-"))
+    script = folder / "worker.py"
+    shutil.copyfile(__file__, script)
+    plan.update(wait_pid=os.getpid(), launcher=str(_windows_launcher()))
+    (folder / "plan.json").write_text(json.dumps(plan), encoding="utf-8")
+    # Inherit this terminal; never open another window or import code that pip
+    # is replacing. Retain diagnostics and a final result in the temporary folder.
+    # uv may recreate its tool environment. Keep the helper's interpreter
+    # outside that environment too; installation/probes still use plan[python].
+    helper_python = getattr(sys, "_base_executable", None) or sys.executable
+    if not Path(helper_python).is_file():
+        raise ValueError("The base Python interpreter is unavailable; no installation was attempted.")
+    child = subprocess.Popen([helper_python, "-I", str(script), "--finish-update", str(folder)],
+                             stdin=subprocess.DEVNULL)
+    try:
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
+            if (folder / "ready").is_file():
+                print("Consensus is closing to release its Windows launcher. The update will continue here.\n"
+                      "Wait for the completion message before reopening Consensus.\n"
+                      f"Update log and final result: {folder}", flush=True)
+                return 0  # Handoff accepted, NOT an installation-success claim.
+            if child.poll() is not None:
+                raise ValueError(f"The update helper could not start. No installation was attempted. See {folder}")
+            time.sleep(.05)
+        raise ValueError("The update helper did not become ready; no installation was attempted.")
+    except BaseException:
+        # Cancelling the parent must not leave a worker that installs on exit.
+        if child.poll() is None:
+            child.terminate()
+            child.wait()
+        raise
+
+
+def _windows_parent_handle(pid):
+    import ctypes
+    from ctypes import wintypes
+
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    kernel.OpenProcess.restype = wintypes.HANDLE
+    kernel.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+    kernel.WaitForSingleObject.restype = wintypes.DWORD
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.CloseHandle.restype = wintypes.BOOL
+    handle = kernel.OpenProcess(0x00100000, False, pid)  # SYNCHRONIZE only.
+    if not handle:
+        raise ctypes.WinError(ctypes.get_last_error())
+    return kernel, handle
+
+
+def _wait_for_launcher(path, timeout=30):
+    """Fail before uninstall if another session/scanner still denies access."""
+    import ctypes
+    from ctypes import wintypes
+
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                                  wintypes.LPVOID, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    kernel.CreateFileW.restype = wintypes.HANDLE
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.CloseHandle.restype = wintypes.BOOL
+    deadline = time.monotonic() + timeout
+    while True:
+        # Request read/delete access without sharing; don't actually modify it.
+        handle = kernel.CreateFileW(str(path), 0x80010000, 0, None, 3, 0, None)
+        if handle != wintypes.HANDLE(-1).value:
+            kernel.CloseHandle(handle)
+            return
+        error = ctypes.get_last_error()
+        if error == 2:  # No launcher to replace.
+            return
+        if error not in (5, 32, 33) or time.monotonic() >= deadline:
+            raise OSError(f"Windows still blocks the Consensus launcher (error {error}). "
+                          "Close all Consensus windows and retry; no installation was attempted.")
+        time.sleep(.1)
+
+
+def _finish_windows(folder):
+    """Standalone stdlib-only worker, outside the package being replaced."""
+    folder = Path(folder).resolve()
+    code = 1
+    log_path = folder / "update.log"
+    with log_path.open("a", encoding="utf-8") as log:
+        def report(message):
+            print(message, file=log, flush=True)
+            try:
+                print(message, flush=True)
+            except (OSError, UnicodeError):
+                pass
+        try:
+            plan = json.loads((folder / "plan.json").read_text(encoding="utf-8"))
+            (folder / "plan.json").unlink()
+            kernel, handle = _windows_parent_handle(plan["wait_pid"])
+            try:
+                (folder / "ready").touch()
+                if kernel.WaitForSingleObject(handle, 30000) != 0:
+                    raise ValueError("Consensus did not exit; no installation was attempted.")
+            finally:
+                kernel.CloseHandle(handle)
+            with _update_lock(plan):
+                _wait_for_launcher(plan["launcher"])
+                report("Installing the update. Please wait…")
+                code = execute_plan(plan, output=log, report=report)
+        except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
+            report(f"Consensus update did not complete: {exc}. See {log_path}. "
+                   "No automatic rollback was attempted.")
+        except KeyboardInterrupt:
+            code = 130
+            report(f"Update interrupted. Check {log_path} before reopening Consensus.")
+        finally:
+            (folder / "result.json").write_text(json.dumps({"returncode": code}), encoding="utf-8")
+            (folder / "worker.py").unlink(missing_ok=True)
+    return code
+
+
+def execute_plan(plan, *, output=None, report=print):
     """Never import replaced application code or claim success without verification."""
     if plan["kind"] == "source":
         if _git_preflight(plan["git"], plan["directory"]) != (plan["branch"], plan["upstream"]):
             raise ValueError("The source branch changed after confirmation; no update was attempted.")
+    if os.name == "nt" and plan.get("launcher"):
+        _wait_for_launcher(plan["launcher"])
     environment = dict(os.environ, **plan["environment"])
     environment["PIP_NO_INPUT"] = "1"
     environment["UV_NO_PROGRESS"] = "1"
     for command in plan["commands"]:
-        subprocess.run(command, env=environment, check=True)
+        subprocess.run(command, env=environment, check=True,
+                       **({"stdout": output, "stderr": subprocess.STDOUT} if output is not None else {}))
     # A new interpreter avoids stale imported modules and stale dist-info caches.
     probe = ("import sys; sys.path.insert(0, sys.argv[1]); "
              "from consensus_osint import __version__; "
@@ -269,5 +405,11 @@ def execute_plan(plan):
         raise ValueError("The updated installation did not return a valid version.")
     if plan["target"] and tuple(map(int, version.split("."))) < tuple(map(int, plan["target"].split("."))):
         raise ValueError(f"The package manager retained {version}. Check its pins/constraints; the requested update was not applied.")
-    print(f"Consensus {version} is installed and verified. Restart Consensus to use it.")
+    report(f"Consensus {version} is installed and verified. Restart Consensus to use it.")
     return 0
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3 or sys.argv[1] != "--finish-update" or os.name != "nt":
+        raise SystemExit("This helper is started by consensus update.")
+    raise SystemExit(_finish_windows(sys.argv[2]))

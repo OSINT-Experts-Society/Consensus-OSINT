@@ -40,7 +40,9 @@ def _text(event):
                     + " Restart Consensus to use it.")
         return f"Updated to Consensus {version}. " + manager.summary_text(event.get("summary"), version)
     if state == "failed":
-        return "Automatic update could not finish. Run consensus update to retry."
+        from .app_update import update_instruction
+
+        return "Automatic update could not finish. " + update_instruction()
     return ""
 
 

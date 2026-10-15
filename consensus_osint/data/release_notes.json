@@ -2,6 +2,19 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.8",
+      "previous_version": "0.4.7",
+      "new_modules": [],
+      "bug_fixes": [
+        "windows-update-handoff: Release the running Windows launcher before replacing the installation, check for remaining locks before uninstalling, and retain update logs and verified completion or failure reporting.",
+        "supported-update-extras: Stop requesting the unavailable registry extra when updating the public package.",
+        "bluemoon-false-positive: Disable the Bluemoon MCFC Forums check after it reported an account for a synthetic negative username."
+      ],
+      "other_changes": [
+        "clear-update-instructions: Tell users to close Consensus and run consensus update in Command Prompt, PowerShell or their system terminal, not at the Consensus prompt."
+      ]
+    },
+    {
       "version": "0.4.7",
       "previous_version": "0.4.6",
       "new_modules": [],
