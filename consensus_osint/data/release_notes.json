@@ -2,6 +2,19 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.6",
+      "previous_version": "0.4.5",
+      "new_modules": [],
+      "bug_fixes": [
+        "existing-install-update: Allow consensus update to update supported Python, pipx, uv and Git installations using their existing method, preserving optional capabilities and protecting local changes and installation ownership.",
+        "negative-control-false-positives: Disable the forum.centrala-termica.ro and RamblerDating checks after they reported accounts for synthetic negative usernames."
+      ],
+      "other_changes": [
+        "shared-update-action: Offer Install update in Settings for Python and source copies, with confirmation before closing the session and verified completion or clear failure reporting.",
+        "consistent-update-guidance: Use the same consensus update instruction across installation methods and explain which recovery options require installer-managed snapshots."
+      ]
+    },
+    {
       "version": "0.4.5",
       "previous_version": "0.4.4",
       "new_modules": [],
