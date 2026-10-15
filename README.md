@@ -211,7 +211,7 @@ Explore more with `consensus --help` or `consensus examples`.
 | **PyPI** | Run `python -m pip install --upgrade "consensus-osint[modules,pdf]"`. |
 | **Git / source** | Run `git pull`, then repeat the platform install command under [Install from source](#install-from-source). |
 
-Restart Consensus after updating. Installer-based installations also check for updates when Consensus starts and install them automatically by default.
+Restart Consensus after updating. Interactive launches show update notices for every installation method; no reinstall or migration is needed. Python/source installs show the appropriate update instructions, while installer-based copies retain automatic updates by default. New-version change summaries appear once. Checks run in the background, use a one-hour cache and stay off for redirected output, proxy/Tor sessions or `--no-update-check`.
 
 <details>
 <summary><strong>Repair, rollback and update controls</strong></summary>

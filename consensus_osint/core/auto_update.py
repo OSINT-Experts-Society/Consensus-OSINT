@@ -21,7 +21,9 @@ _errors = (OSError, ValueError, KeyError, TypeError, RuntimeError,
 
 def notification():
     """Read-only UI status; never performs network or disk work during redraw."""
-    return _message
+    from .app_update import notification as check_notice
+
+    return " ".join(part for part in (_message, check_notice()) if part)
 
 
 def _text(event):
