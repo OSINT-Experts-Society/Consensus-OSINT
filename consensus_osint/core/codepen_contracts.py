@@ -38,6 +38,13 @@ query ProfileOwner($ownerUsername: String!, $ownerType: OwnerEnum!) {
 """
 
 
+def profile_request(url, **kwargs):
+    from consensus_osint.vendor.user_scanner.core.impersonate import impersonate_request
+
+    kwargs["allow_redirects"] = kwargs.pop("follow_redirects", False)
+    return impersonate_request(url, **kwargs)
+
+
 def process(response, user, url, owner_type, request):
     issue, reason = http_issue(response.status_code, response.headers, response.text)
     if issue is not None:

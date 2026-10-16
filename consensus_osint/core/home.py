@@ -131,8 +131,15 @@ def home_page(info, *, width, height, version, history=False, footer_rows=None, 
     else:
         rows.append((Text(" ╭" + "─" * (frame_width - 2) + "╮", style="dim"), 0))
         labels = [title, text(ORGANIZATION), text(SLOGAN if wide else "Many sources. One tool.", "dim")]
-        for mark, label in zip(TERMINAL_MARK.splitlines(), labels, strict=True):
-            row = Text(mark + "  ", style=ACCENT)
+        marks = [mark + "  " for mark in TERMINAL_MARK.splitlines()]
+        # Longer version numbers must not clip the confirmed update status.
+        # Compact the decorative mark before sacrificing any identity text.
+        if any(cell_len(mark) + label.cell_len > content_width for mark, label in zip(marks, labels, strict=True)):
+            marks = ["●  ", "│  ", "◎  "]
+        if any(cell_len(mark) + label.cell_len > content_width for mark, label in zip(marks, labels, strict=True)):
+            marks = ["", "", ""]
+        for mark, label in zip(marks, labels, strict=True):
+            row = Text(mark, style=ACCENT)
             row.append(label)
             add(row, framed=True)
     location("Working", info.working_folder)

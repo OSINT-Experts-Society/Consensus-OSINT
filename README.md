@@ -10,13 +10,13 @@
 
 <p align="center">By the <a href="https://osint.ngo">OSINT Experts Society</a></p>
 
-<p align="center">A unified lookup tool combining 7,900+ modules from 19 open-source projects, maintained by our experts, with a weekly review target.</p>
+<p align="center">A unified lookup tool combining 9,700+ modules and site rules from 19 open-source projects, maintained by our experts, with a weekly review target.</p>
 
 <p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#see-consensus-in-action">See it in action</a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a></p>
 
 <p align="center">
   <a href="#compare"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-projects.svg" alt="19 projects combined" height="24"></a>
-  <a href="#key-features"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-modules.svg" alt="7,900+ lookup modules" height="24"></a>
+  <a href="#key-features"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-modules.svg" alt="9,700+ lookup modules and site rules" height="24"></a>
   <a href="#why-consensus"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-review.svg" alt="Expert review: weekly target" height="24"></a>
 </p>
 
@@ -31,12 +31,12 @@
     <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-dark-mobile.svg">
     <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-light-mobile.svg">
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-dark.svg">
-    <img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus works: 19 source projects list 12,356 modules and rules including overlaps; expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts aim to review sources weekly; the latest completed review is dated below. Default searches select relevant modules, remove duplicate routes and present unified results.">
+    <img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-process-light.svg" width="920" alt="How Consensus works: 19 source projects feed expert review, testing and integration. Consensus has 9,778 enabled modules and site rules in the 16 October inventory; the source-count snapshot is dated 3 October. Default searches select relevant modules, remove duplicate routes and present unified results.">
   </picture>
 </p>
 
 <!-- maintenance-summary:start -->
-<p align="center"><sub>Last expert review: <strong>02 October 2026</strong> &middot; Latest intake: <strong>1,181 modules + 668 site rules added</strong></sub></p>
+<p align="center"><sub>Last expert review: <strong>16 October 2026</strong> &middot; Latest accepted intake: <strong>13 modules + 1,782 site rules added</strong> &middot; 11 module and 161 site candidates remain disabled with specific acceptance holds</sub></p>
 <!-- maintenance-summary:end -->
 
 ## Compare
@@ -56,7 +56,7 @@
     <tr><th align="left">Tool</th><th align="center">Username</th><th align="center">Email</th><th align="center">Phone</th><th align="center">Duplicate<br>ratio</th><th align="center">Update<br>frequency</th><th align="center">Last&nbsp;module<br>update</th></tr>
   </thead>
   <tbody>
-    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-dark.svg"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches</sub></td><td align="center"><strong>Weekly review<br>target</strong></td><td align="center">02&nbsp;Oct&nbsp;2026</td></tr>
+    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-dark.svg"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches</sub></td><td align="center"><strong>Weekly review<br>target</strong></td><td align="center">16&nbsp;Oct&nbsp;2026</td></tr>
     <tr><td align="left"><a href="https://github.com/soxoj/maigret/tree/b6642744988e7e6c2d21f75db60ec3093019ba25">Maigret</a></td><td align="center">5,483</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>40.8%</strong><br><sub>5,482/5,483&nbsp;mapped</sub></td><td align="center">Every&nbsp;2&nbsp;days</td><td align="center"><a href="https://github.com/soxoj/maigret/commit/3d2b613cfd9a18bebc9d65bb22bcf8af13aa18ef">25&nbsp;Sep&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b">User Scanner</a></td><td align="center">2,511</td><td align="center">211</td><td align="center">—</td><td align="center"><strong>68.9%</strong><br><sub>2,575/2,722&nbsp;mapped</sub></td><td align="center">Every&nbsp;1&nbsp;day</td><td align="center"><a href="https://github.com/kaifcodec/user-scanner/commit/8f4de8e7b3e68672c50ba318b2d15a9d2b4617e9">29&nbsp;Sep&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/arxhr007/Aliens_eye/tree/b1316648fe0e648469d30512bb0535ebc8c4bbc7">Aliens Eye</a></td><td align="center">840</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>65.4%</strong><br><sub>837/840&nbsp;mapped</sub></td><td align="center">Too few updates</td><td align="center"><a href="https://github.com/arxhr007/Aliens_eye/commit/eb10623492e1e171ff2d7d9cfc043a4a0a0e493a">10&nbsp;Jun&nbsp;2026</a></td></tr>
@@ -208,6 +208,8 @@ Explore more with `consensus --help` or `consensus examples`.
 Run `consensus update`, or choose **Settings → Installation & updates → Install update**. The command uses your existing installer, pip, pipx, uv tool, or clean Git checkout—no migration required. It retains installed optional capability groups and verifies the updated version and catalogue signature. The interactive interface asks before closing so you can save results first.
 
 Restart Consensus after updating. Source updates fast-forward the checkout's configured branch; installed source copies are reinstalled in the same environment. Local edits, pins, locked projects and OS-managed Python are protected: if an automatic update is unsafe, the command explains what needs attention rather than forcing it.
+
+If a Consensus scan proxy or Tor default is configured, update checks and downloads will not silently connect directly. Manual updates explain this limitation; use your existing installation tool with its own proxy configuration. Installer-managed rollback remains available locally.
 
 Interactive launches show public-release notices and one-time new-version summaries. Installer-based copies retain automatic updates by default; other installations update only when requested. Checks run in the background, use a one-hour cache and stay off for redirected output, proxy/Tor sessions or `--no-update-check`.
 

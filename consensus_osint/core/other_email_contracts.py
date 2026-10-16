@@ -25,7 +25,7 @@ def outcome(response, site, email):
     ):
         return unknown
     if site == "dollarfix":
-        if data.get("msg") == "The user does not exist.":
+        if data.get("msg") in ("The user does not exist.", "用户不存在。", "用户不存在"):
             return Status.NOT_FOUND, {}, None
     elif site == "secondline":
         user, account = data.get("has_user"), data.get("has_account")

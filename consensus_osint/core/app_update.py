@@ -84,7 +84,9 @@ def _whats_new(root, version):
                 return ""
             counts[key] = len(set(items))
         summary = manager.valid_summary(dict(from_version=release["previous_version"],
-                                             to_version=version, **counts), version)
+                                             to_version=version,
+                                             new_checks=manager.check_counts(release["new_modules"]),
+                                             **counts), version)
         if summary is None:
             return ""
         _save(path, {"version": version})
@@ -114,6 +116,17 @@ def command(args) -> int:
 
     check = getattr(args, "check", False) or getattr(args, "json", False)
     try:
+        # Scan routes do not configure urllib, Git, pip, uv or pipx together.
+        # Until every update backend supports that route, fail before networking
+        # rather than silently exposing a direct connection. Rollback is local.
+        from .config import get_config
+
+        defaults = get_config().get("defaults", {})
+        if ((check or not getattr(args, "rollback", False))
+                and (os.environ.get("CONSENSUS_PROXY") or defaults.get("proxy") or defaults.get("tor"))):
+            raise ValueError("Automatic update routing does not support the configured scan proxy/Tor. "
+                             "No update network request was made. Use your existing installation tool "
+                             "with its own proxy configuration to update Consensus.")
         root = manager.install_root()
         if check:
             latest = (manager.release_for(root) if manager.managed_install(root) else manager.latest_release())["version"]
