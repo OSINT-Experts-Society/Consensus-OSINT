@@ -49,8 +49,10 @@ import concurrent.futures
 import contextvars
 import copy
 import functools
+import hashlib
 import importlib
 import inspect
+import json
 import logging
 import math
 import re
@@ -58,6 +60,7 @@ import sys
 import threading
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 from types import ModuleType
 from typing import Any
 
@@ -122,12 +125,14 @@ _LOAD_LOCK = threading.Lock()
 
 
 def load_modules() -> list:
-    """Import every vendored ``user_scan`` / ``email_scan`` module and wrap it (cached)."""
+    """Discover checks using verified metadata; import providers when run (cached)."""
     global _MODULES
     if _MODULES is None:
         with _LOAD_LOCK:
             if _MODULES is None:
-                _MODULES = _discover()
+                _MODULES = _indexed_modules()
+                if _MODULES is None:
+                    _MODULES = _discover()
     return list(_MODULES)
 
 
@@ -223,6 +228,87 @@ def _discover() -> list:
                 out.append(module)
     log.debug("user-scanner adapter: %d modules, %d import failures", len(out), len(_IMPORT_FAILURES))
     return out
+
+
+def _indexed_modules() -> list | None:
+    """Read build-validated metadata without importing every provider.
+
+    Compare actual file bytes (not mtimes) and the complete file inventory.
+    Edited, added, removed or unrecognised sources use normal discovery instead.
+    Private and exported source hashes differ only through the reviewed exporter.
+    Execution still loads the real adapter and enforces its current policy.
+    """
+    package = Path(__file__).resolve().parents[1]
+    index_path = package / 'data/user_scanner_index.json'
+    try:
+        raw = index_path.read_bytes()
+        if len(raw) > 2 * 1024 * 1024:
+            return None
+        index = json.loads(raw)
+        if type(index.get('schema')) is not int or index['schema'] != 1:
+            return None
+        files = index['files']
+        def matches(digest, allowed):
+            return (isinstance(allowed, list) and 1 <= len(allowed) <= 2
+                    and all(isinstance(value, str) and re.fullmatch('[0-9a-f]{64}', value) for value in allowed)
+                    and digest in allowed)
+        # Bind extraction rules as well as provider files. These files are always
+        # named locally, never taken from an index-controlled filesystem path.
+        dependencies = ('adapters/user_scanner_adapter.py', 'core/selected_profile_guards.py')
+        for name in dependencies:
+            digest = hashlib.sha256((package / name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
+            if not matches(digest, index['dependencies'][name]):
+                return None
+        from .rules_adapter import replaced_ids
+
+        replaced = replaced_ids()
+        descriptions = []
+        seen = set()
+        helpers = _helpers()
+        for is_email, folder in ((False, 'user_scan'), (True, 'email_scan')):
+            for category, directory in sorted(helpers.load_categories(is_email=is_email).items()):
+                for path in sorted(directory.glob('*.py')):
+                    if path.name == '__init__.py' or _module_id(category, path.stem, is_email) in replaced:
+                        continue
+                    name = f'{folder}/{category}/{path.name}'
+                    seen.add(name)
+                    row = files[name]
+                    digest = hashlib.sha256(path.read_bytes().replace(b'\r\n', b'\n')).hexdigest()
+                    if not matches(digest, row['sha256']) or not (row['url_main'] is None or isinstance(row['url_main'], str)):
+                        return None
+                    descriptions.append((folder, category, path.stem, is_email, row['url_main']))
+        if seen != files.keys():
+            return None
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        return None
+
+    def lazy(folder, category, stem, is_email, url):
+        dotted = f'{VENDOR_PKG}.{folder}.{category}.{stem}'
+        name = helpers.get_site_name(ModuleType(dotted))
+        resolved = None
+
+        async def check(query, ctx):
+            nonlocal resolved
+            if resolved is None:
+                try:
+                    resolved = build_module(importlib.import_module(dotted), category, is_email)
+                    if resolved is None or resolved.url_main != url:
+                        raise ValueError('Provider metadata differs from the installed index')
+                except Exception as exc:
+                    resolved = None
+                    _IMPORT_FAILURES.append((dotted, f'{type(exc).__name__}: {exc}'))
+                    return Finding.error_result(query, 'email' if is_email else 'username', name,
+                                                _module_id(category, stem, is_email), str(exc), source=SOURCE,
+                                                category=category, url=url, method=METHOD)
+            return await resolved.check(query, ctx)
+
+        return Module(id=_module_id(category, stem, is_email), name=name,
+                      kind='email' if is_email else 'username', check=check,
+                      category=category, source=SOURCE, url_main=url,
+                      loud=bool(helpers.is_loud(name, is_email)), nsfw=category == 'adult', method=METHOD)
+
+    _IMPORT_FAILURES.clear()
+    return [lazy(*description) for description in descriptions]
 
 
 @dataclass(frozen=True)

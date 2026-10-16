@@ -528,7 +528,7 @@ class Scanner:
         for m in mods:
             if m.disabled_reason and not only and not getattr(self.args, "all_sites", False):
                 continue
-            keys = _module_keys(m)
+            keys = _module_keys(m) if only or skip else set()
             if only and not (keys & only):
                 continue
             if keys & skip:
@@ -1186,12 +1186,22 @@ def cmd_scan(args: argparse.Namespace, *, on_summary=None, in_session=False) -> 
 
     async def go():
         nonlocal solver_line, scanner
+        from concurrent.futures import ThreadPoolExecutor
+
         from .core.scan_control import scan_controls
 
         try:
             async with scan_controls(printer) as control:
                 try:
-                    scanner = Scanner(args, printer)
+                    # Catalogue parsing, module metadata and client TLS setup
+                    # are independent. Join both workers even if setup fails;
+                    # providers run only after preparation and verification.
+                    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="consensus-prepare") as preparation:
+                        database = preparation.submit(SiteDB.load)
+                        modules = preparation.submit(all_modules)
+                        scanner = Scanner(args, printer)
+                        scanner.db = database.result()
+                        modules.result()
                     prepare()
                     return await scanner.run(queries)
                 except asyncio.CancelledError:

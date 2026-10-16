@@ -204,6 +204,7 @@ def all_modules(kind: str | None = None, families: list | None = None) -> list:
 FAMILY_PRECEDENCE = ("socialscan", "holehe", "ignorant", "rules", "user-scanner", "extras", "numint")
 
 
+@functools.lru_cache(maxsize=16384)
 def _service_host(url: str | None) -> str:
     import re
     from urllib.parse import urlparse
@@ -221,6 +222,7 @@ _SHARED_API_HOSTS = frozenset({"googleapis.com", "identitytoolkit.googleapis.com
 _APP_STORE_HOST = "play.google.com"
 
 
+@functools.lru_cache(maxsize=16384)
 def _service_key(url: str | None) -> str:
     """Known provider/app identity; an unresolved shared host has no identity."""
     import re

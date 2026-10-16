@@ -18,6 +18,7 @@ class Restriction:
 
 
 RESTRICTIONS: Mapping[str, Restriction] = MappingProxyType({
+    "us-user-email-protonmail": Restriction(disabled_reason='Unavailable in this release.'),
     'us-email-jobs-dirbam': Restriction(disabled_reason='Unavailable in this release.'),
     'us-email-jobs-otsintood': Restriction(disabled_reason='Unavailable in this release.'),
     'us-email-jobs-visidarbi': Restriction(disabled_reason='Unavailable in this release.'),

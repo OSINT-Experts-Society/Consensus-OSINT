@@ -22,6 +22,8 @@
 #   2026-09-11  Yahoo validates its token and exact identifier error field;
 #               reserved identifiers remain inconclusive, returned identifiers
 #               must agree, and challenges retain their actual HTTP status.
+#   2026-10-16  Defer the aiohttp timeout import until transport use, preserving
+#               the default timeout and per-instance overrides during discovery.
 #   2026-09-11  Last.fm validates prerequisites and exact typed field outcomes;
 #               unrelated validation errors do not imply registration, and an
 #               unavailable username does not produce a constructed profile link.
@@ -33,8 +35,6 @@ import re
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from enum import Enum
-
-import aiohttp
 
 from consensus_osint.vendor.socialscan import __version__
 
@@ -92,6 +92,20 @@ class PrerequestRequired(metaclass=abc.ABCMeta):
             return self.token
 
 
+class _ClientTimeout:
+    """Load the transport only when a caller needs its default timeout."""
+
+    def __init__(self, duration):
+        self.duration = duration
+        self.value = None
+
+    def __get__(self, instance, owner):
+        if self.value is None:
+            import aiohttp
+            self.value = aiohttp.ClientTimeout(connect=self.duration)
+        return self.value
+
+
 class BasePlatform:
     # Default user agent taken from `odeialba/instagram-php-scraper`
     # https://github.com/odeialba/instagram-php-scraper/blob/39e8565e8446fa2c66dbcdee8807aa03fca2bbda/src/InstagramScraper/Instagram.php#L46
@@ -104,7 +118,7 @@ class BasePlatform:
     TOO_MANY_REQUEST_ERROR_MESSAGE = "Requests denied by platform due to excessive requests. Use a proxy or wait before trying again."
     TIMEOUT_DURATION = 15
 
-    client_timeout = aiohttp.ClientTimeout(connect=TIMEOUT_DURATION)
+    client_timeout = _ClientTimeout(TIMEOUT_DURATION)
 
     # 1: Be as explicit as possible in handling all cases
     # 2: Do not include any queries that will lead to side-effects on users (e.g. submitting sign up forms)
