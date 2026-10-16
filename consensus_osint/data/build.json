@@ -1,7 +1,7 @@
 {
- "build": 7,
- "date": "2026-10-02",
- "sites": 8832,
- "digest": "a056ae509a29f2b7f5fef6ce35de956d1ddd578f1a9ee64534c64b3375da4c36",
- "signature": "091d771b72b742d2d3f64dc45d2899f1ba72afd90787a0b6d3dfb74133db665b5afc1e41dd32b2c38065f512307ea2bfb5c0a39b88d199ba3331c6b5fee1040f"
+ "build": 10,
+ "date": "2026-10-16",
+ "sites": 10775,
+ "digest": "a67c2512931201e922ddebd47ff7c87abd3c919a276627a465284c8aa60efdcb",
+ "signature": "21c0f80e7859fc55c3a4819c8b6fe2a6cb898e89afbfb3baea6e12abd2b5bd7afacfa85b6442e83ed51553d8cc409de137451b1164132d31b476db2b154fa902"
 }

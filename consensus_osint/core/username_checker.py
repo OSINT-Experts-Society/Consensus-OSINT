@@ -23,6 +23,7 @@ impersonation as well.
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 
@@ -212,7 +213,56 @@ def evaluate(site: Site, resp: Response, username: str) -> tuple:
     return Status.FOUND, method, None
 
 
+def _site_deadline(http, retry_impersonate):
+    """Budget all transport/fallback stages, not just each individual request.
+
+    Keep the existing request timeout meaning. Solvers have separate bounded
+    budgets; this outer deadline also covers their queue/startup waits. Async
+    cancellation cannot pre-empt synchronous parsing or blocked native code.
+    """
+    from .http import _positive_timeout
+
+    def duration(resource, name, default):
+        value = getattr(resource, name, default)
+        return value if _positive_timeout(value) else default
+
+    budget = duration(http, "timeout", 15.0) * (2 if retry_impersonate else 1)
+    solver = getattr(http, "flaresolverr", None)
+    if solver is not None:
+        budget += duration(solver, "timeout", 75.0) + 15.0
+    browser = getattr(http, "browser", None)
+    if browser is not None:
+        budget += duration(browser, "timeout", 35.0) + duration(browser, "challenge_wait", 30.0)
+    return budget + 10.0
+
+
 async def check_site(
+    site: Site,
+    username: str,
+    http: Http,
+    *,
+    extract: bool = True,
+    query_type: str = "username",
+    retry_impersonate: bool = True,
+) -> Finding:
+    """Check one catalogue entry with an overall asynchronous deadline."""
+    started = time.perf_counter()
+    deadline = _site_deadline(http, retry_impersonate)
+    task = asyncio.create_task(_check_site(site, username, http, extract=extract,
+                                          query_type=query_type, retry_impersonate=retry_impersonate))
+    try:
+        return await asyncio.wait_for(task, timeout=deadline)
+    except asyncio.TimeoutError:
+        if not task.cancelled():
+            raise
+        return Finding(query=username, query_type=query_type, site=site.name,
+                       site_id=site.id, category=site.category, tags=list(site.tags),
+                       source="sites-db", nsfw=site.nsfw, url=site.profile_url(username),
+                       status=Status.ERROR, elapsed=round(time.perf_counter() - started, 3),
+                       error=f"site deadline exceeded after {deadline:g}s")
+
+
+async def _check_site(
     site: Site,
     username: str,
     http: Http,

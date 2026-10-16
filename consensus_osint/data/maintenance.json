@@ -1,10 +1,14 @@
 {
   "schema": 1,
-  "expert_review_date": "2026-10-02",
-  "catalogue_date": "2026-10-02",
-  "added_modules": 1181,
-  "added_site_rules": 668,
+  "expert_review_date": "2026-10-16",
+  "catalogue_date": "2026-10-16",
+  "added_modules": 13,
+  "added_site_rules": 1782,
   "repaired_modules": null,
   "retired_modules": null,
-  "scope": "Latest recorded catalogue intake; implementation counts, not unique websites."
+  "scope": "Accepted weekly intake; implementation counts, not unique websites. One changed eBay rule reaccepted.",
+  "source_review_date": "2026-10-15",
+  "held_module_candidates": 11,
+  "held_site_candidates": 161,
+  "enabled_implementations": 9778
 }
