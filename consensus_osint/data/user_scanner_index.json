@@ -4,7 +4,7 @@
    "a1fbf6048dba0d9d84314656bc818756f296d6e8b0b04b6a8ed806509dd908ce"
   ],
   "core/selected_profile_guards.py": [
-   "c1545e6bf287c73c1e892800ea39bbbd733c35092a71d2ea1d1bb994866e8a5d"
+   "e7a22fb235fdbb381da5a002365f9b9925ba1a58090c07258d94c50c6c3bb313"
   ]
  },
  "files": {
@@ -122,6 +122,12 @@
    ],
    "url_main": "https://www.quora.com"
   },
+  "email_scan/community/ravelry.py": {
+   "sha256": [
+    "b6f7a9bca75779c168ff6342713f245e2d3d46a5dd747d3a3ba35009ef06df82"
+   ],
+   "url_main": "https://www.ravelry.com/account/forgot"
+  },
   "email_scan/creator/adobe.py": {
    "sha256": [
     "d769f03bda16f4d7522bb8f163f616bc5e639964b9f80370776afbff8f27ea80"
@@ -194,6 +200,30 @@
    ],
    "url_main": "https://zoho.com"
   },
+  "email_scan/dating/date24.py": {
+   "sha256": [
+    "26cbc047d52a53f9c7824599f437194e53ba9397a127b5c3607c620e8a31fc72"
+   ],
+   "url_main": "https://date24.ee/password"
+  },
+  "email_scan/dating/ekontakti.py": {
+   "sha256": [
+    "715a618b8e35aa0d0fed11d5e8c862e652c6286e8241c3f02c47f58c25f26fcd"
+   ],
+   "url_main": "https://e-kontakti.fi/luo-tili"
+  },
+  "email_scan/dating/flirtic.py": {
+   "sha256": [
+    "d588fabeb8aedb34101fce1cbf9953228f62e4a7b1500515bb0119c08e694c68"
+   ],
+   "url_main": "https://www.flirtic.ee/lost_password"
+  },
+  "email_scan/dating/happypancake.py": {
+   "sha256": [
+    "7dcb3b4f108965017740dfe178dfc4184713b1ac93c2c5c8819f0c26f981cba3"
+   ],
+   "url_main": "https://www.happypancake.se/signup"
+  },
   "email_scan/dating/lespark.py": {
    "sha256": [
     "7942ba3dd344e94a501a468eb0d3a8f8a3d6943720d951945e00ec96f9e23b08"
@@ -206,6 +236,12 @@
    ],
    "url_main": "https://www.locanto.org"
   },
+  "email_scan/dating/meetnfly.py": {
+   "sha256": [
+    "2f4426765de473b2f0f83f2202b6bfd0f48f27794189ddc62acb1932504194a2"
+   ],
+   "url_main": "https://meetnfly.com/forgot-password"
+  },
   "email_scan/dating/okcupid.py": {
    "sha256": [
     "da68bd42b86bce737ffd1193056dede056ee222c7d6eab9674cab060185a7c44"
@@ -217,6 +253,18 @@
     "33d6e84d484d82d8f4e3da77d5a0c9946b9e69cfc3089236599aa943ba89ea52"
    ],
    "url_main": "https://www.skout.com"
+  },
+  "email_scan/dating/svenvaher.py": {
+   "sha256": [
+    "4d0be7bc5eb42e2045d9dffec026df45431ca78d753dfc4314acc693afb73952"
+   ],
+   "url_main": "https://svenvaher.ee/reset"
+  },
+  "email_scan/dating/tutvused.py": {
+   "sha256": [
+    "2bff7ed7479f73e95a1916795c0db8845dfcc994b0432f45d00bb18f6a9598d3"
+   ],
+   "url_main": "https://tutvused.net/"
   },
   "email_scan/dev/atlassian.py": {
    "sha256": [
@@ -292,7 +340,7 @@
   },
   "email_scan/dev/luarocks.py": {
    "sha256": [
-    "da8f8a6a7cb3352c86411fead6c6c3d87a4b570066b200225470db89eca0abb2"
+    "267f3fde5761841b1fa94ef71de8ba8cc69de62c5a1ca17daa0d310c492b0525"
    ],
    "url_main": "https://luarocks.org"
   },
@@ -748,7 +796,7 @@
   },
   "email_scan/other/firefox.py": {
    "sha256": [
-    "200400b81c4965da356385e5e3187fc3bdb4996e19c882b270b7bd72da992fb4"
+    "56ea06b7c6a76cf3170fe4b3be57376f049c221e9690269481b5d41a0d8a410b"
    ],
    "url_main": "https://firefox.com"
   },
@@ -877,6 +925,12 @@
     "78c5c2149c500218f5f85d1bc30c45e4546d1499f3b7878a26a661eb4ee64657"
    ],
    "url_main": "https://www.tindie.com"
+  },
+  "email_scan/shopping/trocvelo.py": {
+   "sha256": [
+    "16bd4a25296912645b6649c4afc401383cd4de60e5c35d6da6c52ed3add96bbe"
+   ],
+   "url_main": "https://www.troc-velo.com"
   },
   "email_scan/shopping/vivino.py": {
    "sha256": [
@@ -1549,6 +1603,12 @@
     "fd4bd2cc8d36b504baae0247229dc1a1ff039d1353ac3acd9b5451640113bc23"
    ],
    "url_main": "https://forum.comfy.org/u/{username}"
+  },
+  "user_scan/community/comicvine.py": {
+   "sha256": [
+    "43a063a563400bbc5c3701eb2b74981261ac033b2d602f7465f990e998eed95e"
+   ],
+   "url_main": "https://comicvine.gamespot.com/profile/{username}/"
   },
   "user_scan/community/comicwiki_dk.py": {
    "sha256": [
@@ -2840,6 +2900,12 @@
    ],
    "url_main": "https://community.raspberryshake.org/u/{username}"
   },
+  "user_scan/community/ravelry.py": {
+   "sha256": [
+    "df109c6e6c7f98f149f1bb024a6bee70b627c0eba6b64d9530491e896ac7ad01"
+   ],
+   "url_main": "https://www.ravelry.com/people/{username}"
+  },
   "user_scan/community/repebble.py": {
    "sha256": [
     "a0ea43758691b976fbbb46ac50472f7e3801dbfabfae146ac788e3176a9a0dfd"
@@ -3007,6 +3073,12 @@
     "0009bd69edebd7dee5d8fa04b8e1fe9bbd11dc7f2e5c0ca3c4024846082e86b6"
    ],
    "url_main": "https://forum.studmed.dk/u/{username}"
+  },
+  "user_scan/community/suomi24.py": {
+   "sha256": [
+    "f3457eb81109c00b854af5a239b473f18f21871e05a5193422ca2f2e7caecfb4"
+   ],
+   "url_main": "https://oma.suomi24.fi/rekisteroidy"
   },
   "user_scan/community/supermarches_cooperatifs.py": {
    "sha256": [
@@ -3392,6 +3464,12 @@
    ],
    "url_main": "https://community.abstract3d.com/u/{username}"
   },
+  "user_scan/creative/artbreeder.py": {
+   "sha256": [
+    "876aa0878293a7de3371193553c76b15613605ff25e4c8889fc45a3c354fb748"
+   ],
+   "url_main": "https://www.artbreeder.com/{username}"
+  },
   "user_scan/creative/artstation.py": {
    "sha256": [
     "45dea43d346fdbc341b9e3a7b2a0f1d80d011778a94d9fcfc32b08d364e4e5d1"
@@ -3487,6 +3565,18 @@
     "ac6e7defc4c86e24d8b9333027430eae5db235a2439c585a4f4be0194f29dac9"
    ],
    "url_main": "https://forum.creality.com/u/{username}"
+  },
+  "user_scan/creative/creativemarket.py": {
+   "sha256": [
+    "41e8709cd754b7e1849c654ae9f8fb397a635b752d791a16320ad9bee085661f"
+   ],
+   "url_main": "https://creativemarket.com/users/{username}"
+  },
+  "user_scan/creative/creativemarket_shop.py": {
+   "sha256": [
+    "d5fe87ca945736e8d1d2cc865d78717dd03e85543e8dda83ef73b524ba2df7ba"
+   ],
+   "url_main": "https://creativemarket.com/"
   },
   "user_scan/creative/custom_frame_forum.py": {
    "sha256": [
@@ -3908,6 +3998,12 @@
    ],
    "url_main": "https://www.zbrushcentral.com/u/{username}"
   },
+  "user_scan/creator/allpoetry.py": {
+   "sha256": [
+    "a00d8ebcf03ea3de7c2739325fcc3cabb4784fc91a9b9b1146fb392dc8a1e853"
+   ],
+   "url_main": "https://allpoetry.com/{quote"
+  },
   "user_scan/creator/beacons.py": {
    "sha256": [
     "49c22b61596d7c3278f16bd523eada923af2a2b1f4fc638e5b83cbcb9ef9635f"
@@ -4099,6 +4195,24 @@
     "bbda2c9d9a97dd822f6102ce343cea84bc6113956bc0220a78b5878c308d7f1b"
    ],
    "url_main": "https://www.amoremi.ee/user/{quote"
+  },
+  "user_scan/dating/deitti.py": {
+   "sha256": [
+    "e78d641fcc58cf84e35e0ecd5c020004f2dec7102d6aa6d59629f71b37eaaf32"
+   ],
+   "url_main": "https://www.deitti.net/tili/liity"
+  },
+  "user_scan/dating/ekontakti.py": {
+   "sha256": [
+    "8a17d158f29dcee9feda57faa080ef454a8cbe4dd1af6be935ba730ea4ce1222"
+   ],
+   "url_main": "https://e-kontakti.fi/luo-tili"
+  },
+  "user_scan/dating/happypancake.py": {
+   "sha256": [
+    "a9c750a4423b70d77006df289539d8ce17472b5e8dc1894c54200e010f880813"
+   ],
+   "url_main": "https://api.happypancake.se/accounts/validateusername/"
   },
   "user_scan/dating/neanky.py": {
    "sha256": [
@@ -4444,13 +4558,13 @@
   },
   "user_scan/dev/codepen.py": {
    "sha256": [
-    "776502ad04e993c52aae1594c2f269c44e29a45b8b076c4789cb9402163d026f"
+    "ad94a27a428e3a52eee47d948245c12dedf3d0e10aa897e2c6a5a93e481dc38c"
    ],
    "url_main": "https://codepen.io/"
   },
   "user_scan/dev/codepenteams.py": {
    "sha256": [
-    "500eafcdb3ca7f0eac965f854760db686d4257ab1979889368bc9581ac77c470"
+    "3b04a99dac6089b03be64413b223e4ec05212a8466f507b18fdf8415e7ea64bc"
    ],
    "url_main": "https://codepen.io/team/"
   },
@@ -5254,7 +5368,7 @@
   },
   "user_scan/dev/linuxquimper.py": {
    "sha256": [
-    "48f1b662e196affbf8bf96fdb8061474b9f9e989e0b7e0cc7b07367dab67efe0"
+    "63ad43bb9462bef5c5f3d0482a8c98274e3f24c29994b922984efae7b1f912d3"
    ],
    "url_main": "https://forum.linuxquimper.org/u/{username}"
   },
@@ -7070,6 +7184,12 @@
    ],
    "url_main": "https://forums.bluecherrydvr.com/u/{username}"
   },
+  "user_scan/gaming/boardgamegeek.py": {
+   "sha256": [
+    "97194a11ee82f9e8522c23c102604c871fc8582a23233d34a5b8a5f4fb0305aa"
+   ],
+   "url_main": "https://boardgamegeek.com/profile/{username}"
+  },
   "user_scan/gaming/chess_com.py": {
    "sha256": [
     "b00f9344246ff6570c9e03af99c2d84f2face0bc02f1cd2a284752723d0b3d54"
@@ -8582,6 +8702,12 @@
    ],
    "url_main": "https://lookmumnocomputer.discourse.group/u/{username}"
   },
+  "user_scan/music/metalarchives.py": {
+   "sha256": [
+    "919c808c9306296cc30bd12d39463ab8d98313cd98692a745c3350176d244b6c"
+   ],
+   "url_main": "https://www.metal-archives.com/users/{username}"
+  },
   "user_scan/music/midibox.py": {
    "sha256": [
     "d31ccf933a19580206e4bd510c9c52a440cde8532640384663193cadc2bd171f"
@@ -9002,6 +9128,12 @@
    ],
    "url_main": "https://www.tindie.com/accounts/signup/"
   },
+  "user_scan/shopping/trocvelo.py": {
+   "sha256": [
+    "2a6ab029c4e96ddac0477d554a228159b5b42d054447bdae4b68b306d4ba2d32"
+   ],
+   "url_main": "https://api.troc-velo.com/api/users"
+  },
   "user_scan/shopping/universal_robots.py": {
    "sha256": [
     "2720715fa492a842d9821c065e0279150bad8cbb78c5408d2201caa3dbc27909"
@@ -9067,6 +9199,12 @@
     "0e0caee2b180b760b5d1c0dba74fae5168ddfb32bcf027be4c8c0825ded4d9f6"
    ],
    "url_main": "https://anilist.co/user/{username}"
+  },
+  "user_scan/social/animeplanet.py": {
+   "sha256": [
+    "271f8e8d50bc12546ae988a8b931d0a91cdb31e37872a259436eaef212ef23f7"
+   ],
+   "url_main": "https://www.anime-planet.com/users/{username}"
   },
   "user_scan/social/anonup.py": {
    "sha256": [
@@ -9409,6 +9547,12 @@
     "ab9d7b860e52691a493f0d4d6d5f946e5b145cfc51f4761d290a29463e5702fc"
    ],
    "url_main": "https://letterboxd.com/{username}/"
+  },
+  "user_scan/social/librarything.py": {
+   "sha256": [
+    "725258cbd5812e5a8fc871f9dc7cd7078b1b1b02c4dd7c5e6673c1ad421e17ee"
+   ],
+   "url_main": "https://www.librarything.com/profile/{username}"
   },
   "user_scan/social/linkedin_company.py": {
    "sha256": [
