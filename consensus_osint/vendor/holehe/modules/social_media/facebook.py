@@ -1,7 +1,7 @@
 from consensus_osint.vendor.holehe.localuseragent import ua
 import random
 import string
-import requests  # Adjust if using a different HTTP library
+# Consensus: remove unused requests import; execution uses the supplied client.
 
 async def facebook(email, client, out):
     name = "Facebook"

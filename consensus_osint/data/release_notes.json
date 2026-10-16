@@ -2,6 +2,18 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.9",
+      "previous_version": "0.4.8",
+      "new_modules": [],
+      "bug_fixes": [
+        "large-search-startup: Reduce the loading delay before username searches, especially with large search sizes, while preserving search limits, enrichment and safety checks.",
+        "negative-control-holds: Disable the Proton Mail username-availability and G-news site checks after false-positive findings. Separate Proton email and public-key checks remain available."
+      ],
+      "other_changes": [
+        "lazy-provider-loading: Load native provider code when needed, using validated metadata for search preparation and falling back to normal discovery if that metadata is unavailable or out of date."
+      ]
+    },
+    {
       "version": "0.4.8",
       "previous_version": "0.4.7",
       "new_modules": [],

@@ -17,6 +17,7 @@ import re
 import tempfile
 from collections.abc import Iterable
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
 from urllib.parse import urlsplit
@@ -36,6 +37,7 @@ DEFAULT_FILES = [DATA_DIR / "sites.json", DATA_DIR / "sites_wmn.json", DATA_DIR 
 
 # Reviewed request contracts; overrides cannot make these ambiguous probes valid.
 _AUDIT_RESTRICTIONS = MappingProxyType({
+    "g-news": 'Unavailable in this release.',
     "3dcadforums": 'Unavailable in this release.',
     "amperka": 'Unavailable in this release.',
     "aqa": 'Unavailable in this release.',
@@ -146,6 +148,7 @@ def is_weak_rule(detect: dict | None, regex_check: str | None = None) -> bool:
 PLACEHOLDER_RE = re.compile(r"\{\}|\{username\}|\{account\}|\^USER\^", re.I)
 
 
+@lru_cache(maxsize=32768)
 def site_key(url: str) -> str:
     """Normalise a profile-URL pattern into a de-duplication key.
 
@@ -223,6 +226,8 @@ def _strength(s) -> int:
 
 
 def _request_parts(s) -> tuple:
+    if not s.headers and s.payload is None:
+        return (), "null"
     headers = {key.lower(): value for key, value in prepare_headers(s.headers, {}, s.payload).items()}
     payload = s.payload
     if isinstance(payload, (dict, list)):
@@ -266,10 +271,17 @@ def profile_key(s) -> tuple | None:
 
 
 def _dedupe_keys(s) -> set:
-    keys = {("request", request_key(s))}
-    profile = profile_key(s)
-    if profile is not None:
-        keys.add(profile)
+    # Compute the shared request parts once for both identities.
+    headers, payload = _request_parts(s)
+    method = s.method.upper()
+    probe = site_key(s.url_probe or s.url)
+    context = s.id_type, method, payload, headers, s.strip_chars, getattr(s, "payload_format", "simple")
+    keys = {("request", (context, probe))}
+    if "{username}" in s.url:
+        page = site_key(s.url)
+        if (s.url_probe and probe != page) or (method in {"GET", "HEAD"} and s.payload is None):
+            profile_headers = tuple((key, value) for key, value in headers if key != "content-type")
+            keys.add(("profile", s.id_type, s.strip_chars, profile_headers, page))
     return keys
 
 
@@ -301,37 +313,48 @@ def dedupe_sites(sites: list) -> list:
     # same request; either alone misses cases the other catches.  Both keys of a
     # group point at its current survivor.
     survivor_of: dict = {}
-    groups: list = []
-    for s in sites:
+    groups: dict = {}
+    parents: dict = {}
+
+    def root(group):
+        while parents[group] != group:
+            parents[group] = parents[parents[group]]
+            group = parents[group]
+        return group
+
+    for position, s in enumerate(sites):
         keys = _dedupe_keys(s)
         hits: list = []
         for k in keys:
             v = survivor_of.get(k)
-            if v is not None and all(v is not h for h in hits):
-                hits.append(v)
+            if v is not None:
+                v = root(v)
+                if v not in hits:
+                    hits.append(v)
         if not hits:
-            groups.append(s)
+            groups[position] = s
+            parents[position] = position
             for k in keys:
-                survivor_of[k] = s
+                survivor_of[k] = position
             continue
         # Everything that touched either key is one site - including two groups this
         # entry happens to bridge.  Fold them all into the strongest; on a tie the
         # entry seen first keeps its place.
-        members = hits + [s]
+        members = [groups[group] for group in hits] + [s]
         winner = max(members, key=_strength)
         for m in members:
             if m is not winner:
                 merge_site_metadata(winner, m)
-        first = next((i for i, g in enumerate(groups) if any(g is m for m in members)), len(groups))
-        groups = [g for g in groups if not any(g is m for m in members)]
-        groups.insert(first, winner)
-        losers = {id(m) for m in members if m is not winner}
-        for k, v in list(survivor_of.items()):
-            if id(v) in losers:
-                survivor_of[k] = winner
+        # Link only the groups touched by these keys. Previously every merge
+        # rescanned all groups and all keys, making catalogue loading quadratic.
+        first = min(hits)
+        for group in hits:
+            parents[group] = first
+            del groups[group]
+        groups[first] = winner
         for k in keys | _dedupe_keys(winner):
-            survivor_of[k] = winner
-    return groups
+            survivor_of[k] = first
+    return [groups[group] for group in sorted(groups)]
 
 
 @dataclass
@@ -414,8 +437,7 @@ class Site:
         for key in ("found_status", "missing_status"):
             if detect.get(key) is not None and (not isinstance(detect[key], list) or any(type(x) is not int or not 100 <= x <= 599 for x in detect[key])):
                 raise TypeError(f"site detect.{key} must be a list of HTTP status codes")
-        known = {f for f in cls.__dataclass_fields__ if not f.startswith("_")}
-        site = cls(**{k: v for k, v in d.items() if k in known})
+        site = cls(**{k: v for k, v in d.items() if k in cls.__dataclass_fields__ and not k.startswith("_")})
         site.detect = dict(site.detect)
         site.payload_format = payload_format
         if site.payload_format == "maigret" and not isinstance(site.payload, dict):
@@ -437,14 +459,13 @@ class Site:
             if isinstance(_v, list):
                 site.detect[_k] = [x for x in _v if isinstance(x, str) and x.strip()]
 
-        payload_part = json.dumps(site.payload or "")
-        if site.payload_format == "maigret" and not maigret_uses_username(site.payload):
-            payload_part = ""
-        request_parts = " ".join((site.url_probe or site.url or "", payload_part,
-                                  json.dumps(site.headers or {})))
-        if not site.disabled and "{username}" not in request_parts:
-            site.disabled = True
-            site.disabled_reason = "the request does not include the username"
+        if not site.disabled and "{username}" not in (site.url_probe or site.url or ""):
+            payload_part = json.dumps(site.payload or "")
+            if site.payload_format == "maigret" and not maigret_uses_username(site.payload):
+                payload_part = ""
+            if "{username}" not in payload_part and "{username}" not in json.dumps(site.headers or {}):
+                site.disabled = True
+                site.disabled_reason = "the request does not include the username"
         return site
 
     def to_dict(self) -> dict:
@@ -612,7 +633,7 @@ class SiteDB:
         xtags = {t.strip().lower() for t in exclude_tags} if exclude_tags else set()
         srcset = {s.strip().lower() for s in sources} if sources else None
         for s in self.sites:
-            keys = site_keys(s)
+            keys = site_keys(s) if want is not None or skip else set()
             if want is not None and not (keys & want):
                 continue
             if keys & skip:

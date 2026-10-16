@@ -31,7 +31,7 @@ from pathlib import Path
 from urllib.parse import quote_plus, urlencode, urlsplit
 
 import phonenumbers
-from phonenumbers import NumberParseException, PhoneNumberFormat, PhoneNumberType, carrier, geocoder, timezone
+from phonenumbers import NumberParseException, PhoneNumberFormat, PhoneNumberType
 
 from .config import get_key
 from .errors import detect_error_page
@@ -166,6 +166,9 @@ def _variants(info: dict) -> dict:
 
 
 def _describe(n: phonenumbers.PhoneNumber, raw: str) -> dict:
+    # Inventory/username searches need service names, not the large phone tables.
+    from phonenumbers import carrier, geocoder, timezone
+
     valid = phonenumbers.is_valid_number(n)
     fmt = lambda f: phonenumbers.format_number(n, f)  # noqa: E731
     info = {
