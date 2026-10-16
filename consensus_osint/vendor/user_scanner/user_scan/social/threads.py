@@ -1,22 +1,11 @@
-from consensus_osint.vendor.user_scanner.core.helpers import get_random_user_agent
-from consensus_osint.vendor.user_scanner.core.orchestrator import status_validate
+from consensus_osint.core.threads_contracts import result, valid_user
+from consensus_osint.vendor.user_scanner.core.impersonate import impersonate_validate
+from consensus_osint.vendor.user_scanner.core.result import Result
 
 
 def validate_threads(user):
-    url = "https://www.threads.net/api/v1/users/web_profile_info/"
-    show_url = f"https://www.threads.net/@{user}"
-
-    headers = {
-        "User-Agent": get_random_user_agent(),
-        "X-IG-App-ID": "936619743392459",
-        "Accept": "application/json, text/javascript, */*; q=0.01",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept-Language": "en-US,en;q=0.9",
-        "X-Requested-With": "XMLHttpRequest",
-        "Referer": f"https://www.threads.net/@{user}",
-    }
-
-    return status_validate(
-        url, 404, 200, show_url=show_url, headers=headers, http2=True,
-        params={"username": user},
-    )
+    if not valid_user(user):
+        return Result.error("Invalid Threads username")
+    url = f"https://www.threads.com/@{user}"
+    return impersonate_validate(url, lambda response: result(response, user),
+                                show_url=url, allow_redirects=False)
