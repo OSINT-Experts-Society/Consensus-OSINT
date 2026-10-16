@@ -31,7 +31,6 @@ import httpx
 from consensus_osint.core.models import Finding, Status
 from consensus_osint.core.modules import Context, Module
 from consensus_osint.vendor.numint.core.models import PresenceResult
-from consensus_osint.vendor.numint.core.parser import parse_number
 from consensus_osint.vendor.numint.presence import discover_presence
 from consensus_osint.vendor.numint.presence.base import CHROME_UAS
 
@@ -215,6 +214,7 @@ def _make_check(check_cls: type, info: SiteInfo, site_id: str,
     async def check(query: str, ctx: Context) -> Finding:
         try:
             from ..core.phone import parse_number as describe_number
+            from ..vendor.numint.core.parser import parse_number
 
             parsed_info = describe_number(query)
             if not parsed_info.get("valid"):

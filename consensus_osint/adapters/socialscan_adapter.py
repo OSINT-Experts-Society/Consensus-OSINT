@@ -25,8 +25,10 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections.abc import Awaitable, Callable
+from typing import TYPE_CHECKING
 
-import aiohttp
+if TYPE_CHECKING:
+    import aiohttp
 
 from consensus_osint.core.models import Finding, Status
 from consensus_osint.core.modules import Context, Module
@@ -66,6 +68,8 @@ _BLOCKED_STATUSES = {401, 403, 406, 407, 418, 451}
 # ---------------------------------------------------------------------------
 def _new_session(timeout: aiohttp.ClientTimeout) -> aiohttp.ClientSession:
     """Create a Socialscan session."""
+    import aiohttp
+
     return aiohttp.ClientSession(timeout=timeout)
 
 
@@ -123,6 +127,8 @@ def _failure(query: str, kind: str, site: str, site_id: str, category: str,
 def _make_check(cls: type, kind: str, site: str, site_id: str, category: str,
                 url_main: str | None) -> Callable[[str, Context], Awaitable[Finding]]:
     async def check(query: str, ctx: Context) -> Finding:
+        import aiohttp
+
         total = float(ctx.timeout or sp.BasePlatform.TIMEOUT_DURATION)
         timeout = aiohttp.ClientTimeout(total=total,
                                         connect=min(total, sp.BasePlatform.TIMEOUT_DURATION))
