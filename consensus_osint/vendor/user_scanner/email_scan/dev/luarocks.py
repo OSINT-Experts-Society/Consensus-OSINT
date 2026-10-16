@@ -8,7 +8,6 @@ from consensus_osint.vendor.user_scanner.core.result import Result
 
 
 async def _check(email: str) -> Result:
-    url_login = "https://luarocks.org/login"
     url_forgot = "https://luarocks.org/user/forgot_password"
     show_url = "https://luarocks.org"
 
@@ -29,8 +28,8 @@ async def _check(email: str) -> Result:
     try:
         async with httpx.AsyncClient(timeout=15.0, follow_redirects=False) as client:
 
-            # Hit login endpoint directly to grab token cookie and search form csrf
-            init_res = await client.get(url_login, headers=headers)
+            # The reset form owns its own CSRF token; do not reuse a login token.
+            init_res = await client.get(url_forgot, headers=headers)
             issue, reason = http_issue(init_res.status_code, init_res.headers, init_res.text)
             if issue is not None:
                 return Result.error(reason)

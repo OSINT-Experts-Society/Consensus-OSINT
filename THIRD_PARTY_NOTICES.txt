@@ -210,6 +210,9 @@ socialscan
 
 user-scanner
   Project: https://github.com/kaifcodec/user-scanner
+    Selected profile/enrichment repairs and 24 held intake modules additionally
+    adapted from 3518f8430219570f2717e305e1787ab34040918e (MIT).
+    New candidates remain disabled pending acceptance; notifying checks are loud.
   October 2026 community definitions and eight validation-only email wrappers
   additionally adapted from 780d077a468035c6afd6b4a0f987317db651528b.
   The shared implementation is consensus_osint/core/registration_checks.py.

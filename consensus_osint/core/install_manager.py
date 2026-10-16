@@ -33,6 +33,31 @@ MAX_WHEEL = 128 * 1024 * 1024
 EXTRAS = ["modules", "pdf"]
 VALIDATION_TIMEOUT = 30
 CHANGE_CATEGORIES = ("new_modules", "bug_fixes", "other_changes")
+CHECK_KINDS = ("username", "email", "phone", "other")
+
+
+def check_kind(item):
+    kind, separator, identifier = item.partition(":")
+    return kind if separator and identifier.strip() and kind in CHECK_KINDS else "other"
+
+
+def check_counts(items):
+    """Group stable change IDs by user input type, not implementation source."""
+    counts = {}
+    for item in set(items):
+        kind = check_kind(item)
+        counts[kind] = counts.get(kind, 0) + 1
+    return counts
+
+
+def check_summary_text(counts):
+    parts = []
+    for kind in CHECK_KINDS:
+        count = counts.get(kind, 0)
+        if count:
+            label = "check" if kind == "other" else f"{kind} check"
+            parts.append(f"{count:,} new {label}" + ("" if count == 1 else "s"))
+    return " · ".join(parts) if parts else "0 new checks"
 
 
 def valid_summary(value, version):
@@ -46,16 +71,26 @@ def valid_summary(value, version):
             return None
     except (ValueError, KeyError, TypeError):
         return None
-    return {key: value[key] for key in ("from_version", "to_version", *CHANGE_CATEGORIES)}
+    result = {key: value[key] for key in ("from_version", "to_version", *CHANGE_CATEGORIES)}
+    if "new_checks" in value:
+        counts = value["new_checks"]
+        if (not isinstance(counts, dict) or set(counts) - set(CHECK_KINDS)
+                or any(type(n) is not int or not 0 <= n <= 100000 for n in counts.values())
+                or sum(counts.values()) != result["new_modules"]):
+            return None
+        result["new_checks"] = dict(counts)
+    return result
 
 
 def summary_text(value, version):
     summary = valid_summary(value, version)
     if summary is None:
         return "Change summary unavailable."
-    labels = (("new_modules", "new module"), ("bug_fixes", "bug fix"), ("other_changes", "other change"))
-    return " · ".join(f"{summary[key]} {label}" + ("" if summary[key] == 1 else "es" if key == "bug_fixes" else "s")
-                      for key, label in labels) + "."
+    checks = check_summary_text(summary.get("new_checks", {"other": summary["new_modules"]}))
+    labels = (("bug_fixes", "bug fix"), ("other_changes", "other change"))
+    return checks + " · " + " · ".join(
+        f"{summary[key]:,} {label}" + ("" if summary[key] == 1 else "es" if key == "bug_fixes" else "s")
+        for key, label in labels) + "."
 
 
 def release_summary(wheel, previous, version):
@@ -95,6 +130,7 @@ def release_summary(wheel, previous, version):
                 changes[key].update(items)
             cursor = release["previous_version"]
         return valid_summary({"from_version": previous, "to_version": version,
+                              "new_checks": check_counts(changes["new_modules"]),
                               **{key: len(items) for key, items in changes.items()}}, version)
     except (OSError, ValueError, KeyError, TypeError, RecursionError, zipfile.BadZipFile):
         return None

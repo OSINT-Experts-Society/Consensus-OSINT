@@ -7,5 +7,5 @@ others) into one command-line tool.  See the README for the full list of
 upstream projects credited.
 """
 
-__version__ = "0.4.9"
+__version__ = "0.4.10"
 __all__ = ["__version__"]

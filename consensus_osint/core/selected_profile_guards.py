@@ -16,6 +16,13 @@ from .mailbox_contracts import http_issue
 from .provider_contracts import has_service_error
 
 PROFILE_TEMPLATES = {
+    "community.comicvine": "https://comicvine.gamespot.com/profile/{username}/",
+    "creative.artbreeder": "https://www.artbreeder.com/{username}",
+    "creative.creativemarket": "https://creativemarket.com/users/{username}",
+    "gaming.boardgamegeek": "https://boardgamegeek.com/profile/{username}",
+    "music.metalarchives": "https://www.metal-archives.com/users/{username}",
+    "social.animeplanet": "https://www.anime-planet.com/users/{username}",
+    "social.librarything": "https://www.librarything.com/profile/{username}",
     "dev.boot_dev": "https://boot.dev/u/{username}",
     "creator.cameo": "https://www.cameo.com/{username}",
     "creator.gumroad": "https://{username}.gumroad.com/",
@@ -43,6 +50,15 @@ def same_selected_profile(module, site):
     templates["rule-mssg_me"] = "https://mssg.me/{username}"
     expected = templates.get(module.id)
     source = "rules" if module.id == "rule-mssg_me" else "user-scanner"
+    if (module.id == 'us-user-social-animeplanet' and module.kind == 'username'
+            and module.source == 'user-scanner' and module.url_main == expected
+            and site.id == 'anime-planet' and site.id_type == 'username'
+            and site.url == expected and site.url_probe == 'https://www.anime-planet.com/api/validation/username'
+            and site.method == 'POST' and site.payload == '{"username":"{username}"}'
+            and site.headers == {'Content-Type': 'application/json'} and not site.strip_chars):
+        # This exact existing availability route checks the same handle. Prefer
+        # its accepted public-profile implementation for actual profile fields.
+        return True
     if (
         not expected
         or module.url_main != expected
@@ -55,7 +71,11 @@ def same_selected_profile(module, site):
         or any(k.lower() not in {"user-agent", "accept", "accept-language"} for k in site.headers)
     ):
         return False
-    return site.url.rstrip("/") == expected.rstrip("/")
+    urls = {expected.rstrip("/")}
+    if module.id == 'us-user-gaming-boardgamegeek':
+        # Same username namespace; retain the catalogue's old display route.
+        urls.add('https://boardgamegeek.com/user/{username}')
+    return site.url.rstrip("/") in urls
 
 
 def mssg_catalogue(site):

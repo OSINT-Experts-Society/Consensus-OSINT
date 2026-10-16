@@ -1,19 +1,22 @@
 import urllib.parse
 
-from consensus_osint.vendor.user_scanner.core.helpers import get_random_user_agent
+from consensus_osint.core.mailbox_contracts import http_issue
 from consensus_osint.vendor.user_scanner.core.orchestrator import Result, generic_validate
 
 
 def validate_linuxquimper(user: str) -> Result:
-    encoded_user = urllib.parse.quote(user)
+    encoded_user = urllib.parse.quote(user, safe="")
     url = f"https://forum.linuxquimper.org/u/{encoded_user}.json"
     show_url = f"https://forum.linuxquimper.org/u/{encoded_user}"
     headers = {
-        "User-Agent": get_random_user_agent(),
+        "User-Agent": "Consensus/0.4 (public profile lookup)",
         "Accept": "application/json",
     }
 
     def process(response) -> Result:
+        issue, reason = http_issue(response.status_code, response.headers, response.text, accepted=(200, 404))
+        if issue is not None:
+            return Result.error(reason)
         if response.status_code == 404:
             try:
                 data = response.json()
@@ -29,7 +32,9 @@ def validate_linuxquimper(user: str) -> Result:
             try:
                 data = response.json()
                 user_obj = data.get("user")
-                if user_obj and isinstance(user_obj, dict) and user_obj.get("username"):
+                if (isinstance(user_obj, dict) and isinstance(user_obj.get("username"), str)
+                        and user_obj["username"].casefold() == user.casefold()
+                        and type(user_obj.get("id")) is int and user_obj["id"] > 0):
                     extra: dict[str, str] = {}
                     media: dict[str, str] = {}
 
@@ -69,5 +74,5 @@ def validate_linuxquimper(user: str) -> Result:
         process,
         headers=headers,
         show_url=show_url,
-        follow_redirects=True,
+        follow_redirects=False,
     )

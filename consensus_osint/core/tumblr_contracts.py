@@ -88,6 +88,16 @@ def _find_blog(state, user):
         elif isinstance(value, dict):
             if has_service_error(value):
                 continue
+            key = value.get("queryKey")
+            if isinstance(key, list) and len(key) >= 2 and key[:2] == ["blog-info", user]:
+                query_state = value.get("state")
+                data = query_state.get("data") if isinstance(query_state, dict) else None
+                if (not isinstance(data, dict) or query_state.get("status") != "success"
+                        or has_service_error(query_state) or has_service_error(data)
+                        or not isinstance(data.get("name"), str) or data["name"].lower() != user):
+                    raise ValueError("Invalid matching blog query")
+                if data not in matches:
+                    matches.append(data)
             blog = value.get("blog")
             if isinstance(blog, dict) and isinstance(blog.get("name"), str) and blog["name"].lower() == user:
                 if has_service_error(blog):

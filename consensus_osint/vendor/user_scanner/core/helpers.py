@@ -25,8 +25,14 @@ _EMAIL_LABEL = r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
 EMAIL_RE = re.compile(rf"{_EMAIL_LOCAL}@(?:{_EMAIL_LABEL}\.)+[A-Za-z]{{2,63}}")
 
 LOUD_MODULES: Dict[str, List[str]] = {
-    "user": [],
+    "user": ["ravelry"],  # Failed-login probe can trigger account security controls.
     "email": [
+        "ravelry",
+        "date24",
+        "flirtic",
+        "meetnfly",
+        "svenvaher",
+        "tutvused",
         "leetcode",
         "netflix",
         "sexvid",

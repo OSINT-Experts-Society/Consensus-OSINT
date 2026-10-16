@@ -29,9 +29,14 @@ MAX_CONCURRENT_REQUESTS = 60
 _shared_executor = concurrent.futures.ThreadPoolExecutor(max_workers=max(MAX_CONCURRENT_REQUESTS * 2, 250))
 
 def set_concurrency(val: int):
+    if type(val) is not int or val < 1:
+        raise ValueError("Concurrency must be a positive integer")
     global MAX_CONCURRENT_REQUESTS, _shared_executor
+    replacement = concurrent.futures.ThreadPoolExecutor(max_workers=max(val * 2, 250))
+    previous = _shared_executor
     MAX_CONCURRENT_REQUESTS = val
-    _shared_executor = concurrent.futures.ThreadPoolExecutor(max_workers=max(val * 2, 250))
+    _shared_executor = replacement
+    previous.shutdown(wait=False)
 
 async def _async_worker(
     module: ModuleType,

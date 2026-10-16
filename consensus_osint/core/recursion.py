@@ -17,7 +17,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from urllib.parse import unquote
+from urllib.parse import parse_qsl, unquote, urlsplit
 
 from .models import INFO_CATEGORIES, Finding, QueryType, Status
 from .sitesdb import SiteDB
@@ -60,29 +60,89 @@ class Pivots:
 
 
 class LinkMatcher:
-    """Map arbitrary URLs back to (site, username) using the site templates."""
+    """Match profile URL components, never fetch a page-supplied destination.
+
+    Query ordering and tracking parameters do not change account identity, but
+    duplicated parameters, credentials and sibling navigation routes are not
+    unambiguous profile evidence.
+    """
 
     def __init__(self, db: SiteDB):
         self._patterns = []
+        self._reserved = {}
         for s in db.sites:
             if s.disabled or s.audit_disabled_reason:
                 continue
-            if s.id_type != "username" or "{username}" not in s.url:
+            if s.id_type != "username" or s.url.count("{username}") != 1:
                 continue
-            tpl = s.url.replace("{username}", "@@USER@@")
-            tpl = re.sub(r"^https?://(www\.)?", "", tpl, flags=re.I).rstrip("/")
-            esc = re.escape(tpl).replace("@@USER@@", r"(?P<u>[A-Za-z0-9_.\-]{2,60})")
             try:
-                self._patterns.append((s, re.compile(r"^(?:https?://)?(?:www\.|m\.|mobile\.)?" + esc + r"/?(?:[?#].*)?$", re.I)))
-            except re.error:
+                parts = self._parts(s.url.replace("{username}", "consensus-user-placeholder"))
+                if parts is None:
+                    continue
+                host, port, path, query = parts
+                token = "consensus-user-placeholder"
+                host = self._host(host) if token not in host else host
+                def pattern(value, token=token):
+                    return re.compile(re.escape(value).replace(re.escape(token), r"(?P<u>[A-Za-z0-9_.\-]{2,60})"), re.I)
+                first = path.strip("/").split("/", 1)[0]
+                if token not in host and first and token not in first:
+                    self._reserved.setdefault(host, set()).add(first.casefold())
+                weight = len(s.url) - len("{username}")
+                self._patterns.append((weight, s, pattern(host), port, pattern(path),
+                                       {key: pattern(value) for key, value in query.items()}, token in host))
+            except (ValueError, re.error):
                 continue
+        self._patterns.sort(key=lambda row: (-row[0], row[1].id))
+
+    @staticmethod
+    def _host(host):
+        return re.sub(r"^(www|m|mobile)\.", "", host, flags=re.I)
+
+    @staticmethod
+    def _parts(url):
+        if (not isinstance(url, str) or not url or "\\" in url
+                or any(c.isspace() or ord(c) < 32 or ord(c) == 127 for c in url)):
+            return None
+        parts = urlsplit(url if "://" in url else "https://" + url)
+        if (parts.scheme not in ("http", "https") or not parts.hostname
+                or parts.username is not None or parts.password is not None
+                or "%" in parts.hostname or parts.netloc.endswith(":")):
+            return None
+        if re.search(r"%(?:2f|5c|3f|23|0[0-9a-f]|1[0-9a-f]|7f)", parts.path, re.I):
+            return None  # Encoded separators must not change the template's structure.
+        port = parts.port
+        if port == (443 if parts.scheme == "https" else 80):
+            port = None
+        path = unquote(parts.path, errors="strict").rstrip("/")
+        pairs = parse_qsl(parts.query, keep_blank_values=True, strict_parsing=False,
+                          errors="strict", max_num_fields=64)
+        if len(dict(pairs)) != len(pairs):
+            return None
+        return parts.hostname.lower(), port, path, dict(pairs)
 
     def match(self, url: str) -> tuple | None:
-        u = unquote(url.strip())
-        for site, rx in self._patterns:
-            m = rx.match(u)
-            if m:
-                return site, m.group("u")
+        try:
+            parts = self._parts(url)
+        except (ValueError, UnicodeError):
+            return None
+        if parts is None:
+            return None
+        host, port, path, query = parts
+        for _, site, host_rx, expected_port, path_rx, query_rules, subdomain in self._patterns:
+            if port != expected_port:
+                continue
+            matches = [host_rx.fullmatch(host if subdomain else self._host(host)), path_rx.fullmatch(path)]
+            matches += [rx.fullmatch(query[key]) if key in query else None for key, rx in query_rules.items()]
+            if not all(matches):
+                continue
+            names = [match.group("u") for match in matches if "u" in match.re.groupindex]
+            if len(names) != 1:
+                continue
+            name = names[0]
+            if ((subdomain and "." in name) or name in (".", "..") or name.casefold() in RESERVED_SEGMENTS
+                    or name.casefold() in self._reserved.get(self._host(host), set())):
+                continue
+            return site, name
         return None
 
 

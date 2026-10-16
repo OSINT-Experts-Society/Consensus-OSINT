@@ -40,8 +40,8 @@
     "multiple"
    ],
    "id_type": "username",
-   "disabled": false,
-   "disabled_reason": null,
+   "disabled": true,
+   "disabled_reason": "Unavailable in this release.",
    "ignore_403": false,
    "fail_flags": {},
    "encoding": null,
@@ -1723,7 +1723,7 @@
      200
     ],
     "found_strings": [
-     "'s Page</title>"
+     "'s Profile</title>"
     ],
     "missing_status": [
      404
@@ -1753,7 +1753,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "babypips",
@@ -2514,13 +2515,13 @@
      200
     ],
     "found_strings": [
-     "full_name"
+     "\"full_name\":"
     ],
     "missing_status": [
      404
     ],
     "missing_strings": [
-     "No workspace with identifier"
+     "\"message\":\"No workspace with identifier"
     ]
    },
    "regex_check": null,
@@ -2530,7 +2531,9 @@
    "category": "coding",
    "nsfw": false,
    "rank": null,
-   "protection": [],
+   "protection": [
+    "other"
+   ],
    "id_type": "username",
    "disabled": true,
    "disabled_reason": "Unavailable in this release.",
@@ -2543,7 +2546,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "bitchute",
@@ -2664,7 +2668,7 @@
      200
     ],
     "found_strings": [
-     "class=\"mark\""
+     "Public marks from"
     ],
     "missing_status": [
      200
@@ -2691,7 +2695,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "blogspot",
@@ -4524,13 +4529,13 @@
      200
     ],
     "found_strings": [
-     "<span>Joined CNET</span>"
+     "class=\"author-header__stat-label\""
     ],
     "missing_status": [
      404
     ],
     "missing_strings": [
-     "class=\"c-error404_message\">"
+     "<title>Page Not Found - CNET"
     ]
    },
    "regex_check": "^[a-z].*$",
@@ -4567,7 +4572,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "coda",
@@ -5824,7 +5830,7 @@
      200
     ],
     "found_strings": [
-     "id=\"userData\""
+     "\"@type\":\"ProfilePage\""
     ],
     "missing_status": [
      404
@@ -5863,7 +5869,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "dailymotion-dailymotion-com",
@@ -6187,7 +6194,7 @@
      200
     ],
     "found_strings": [
-     "s Shop - Depop"
+     "{\"name\":\""
     ],
     "missing_status": [
      404
@@ -6224,7 +6231,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "designspriation",
@@ -6465,7 +6473,7 @@
      200
     ],
     "found_strings": [
-     " | DeviantArt</title>"
+     " on DeviantArt</title>"
     ],
     "missing_status": [
      404
@@ -6502,7 +6510,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "devrant",
@@ -7612,13 +7621,13 @@
      200
     ],
     "found_strings": [
-     "status\": \"success"
+     "\"user_id\":\""
     ],
     "missing_status": [
      200
     ],
     "missing_strings": [
-     "status\": \"username_not_found"
+     "\"status\":\"username_not_found"
     ]
    },
    "regex_check": null,
@@ -7641,7 +7650,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "dota2-ru",
@@ -8083,7 +8093,7 @@
   {
    "id": "ebay",
    "name": "eBay",
-   "url": "https://www.ebay.com/usr/{username}",
+   "url": "https://www.ebay.com/usr/{username}?_tab=about",
    "url_main": "https://ebay.com",
    "url_probe": null,
    "method": "GET",
@@ -8097,13 +8107,13 @@
      200
     ],
     "found_strings": [
-     "on eBay</title>"
+     "\"text\":\" followers\""
     ],
     "missing_status": [
      200
     ],
     "missing_strings": [
-     "The User ID you entered was not found"
+     "Sorry, this store was not found."
     ]
    },
    "regex_check": null,
@@ -8117,7 +8127,9 @@
    "category": "shopping",
    "nsfw": false,
    "rank": 41,
-   "protection": [],
+   "protection": [
+    "other"
+   ],
    "id_type": "username",
    "disabled": false,
    "disabled_reason": null,
@@ -8135,7 +8147,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "ebay-stores",
@@ -9054,8 +9067,8 @@
     "cf_firewall"
    ],
    "id_type": "username",
-   "disabled": false,
-   "disabled_reason": null,
+   "disabled": true,
+   "disabled_reason": "Unavailable in this release.",
    "ignore_403": false,
    "fail_flags": {},
    "encoding": null,
@@ -11378,8 +11391,8 @@
    "rank": null,
    "protection": [],
    "id_type": "username",
-   "disabled": false,
-   "disabled_reason": null,
+   "disabled": true,
+   "disabled_reason": "Unavailable in this release.",
    "ignore_403": false,
    "fail_flags": {},
    "encoding": null,
@@ -11741,7 +11754,9 @@
    "url_main": "https://gitlab.gnome.org",
    "url_probe": "https://gitlab.gnome.org/api/v4/users?username={username}",
    "method": "GET",
-   "headers": {},
+   "headers": {
+    "User-Agent": "curl/8.4.0"
+   },
    "payload": null,
    "follow_redirects": true,
    "strip_chars": "",
@@ -11769,7 +11784,8 @@
    "nsfw": false,
    "rank": 23208,
    "protection": [
-    "anubis"
+    "anubis",
+    "user-agent"
    ],
    "id_type": "username",
    "disabled": true,
@@ -11789,7 +11805,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "gnome-shell-extensions",
@@ -12104,13 +12121,13 @@
      200
     ],
     "found_strings": [
-     "entry"
+     "{\"entry\":"
     ],
     "missing_status": [
      404
     ],
     "missing_strings": [
-     "User not found"
+     "\"User not found\""
     ]
    },
    "regex_check": "^((?!\\.).)*$",
@@ -12147,7 +12164,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "greasy-fork",
@@ -12204,7 +12222,7 @@
   {
    "id": "gtainside-com",
    "name": "GTAinside.com",
-   "url": "https://www.gtainside.com/user/{username}",
+   "url": "https://www.gtainside.com/profile/{username}",
    "url_main": "https://gtainside.com",
    "url_probe": null,
    "method": "GET",
@@ -12218,13 +12236,13 @@
      200
     ],
     "found_strings": [
-     "userpage_user"
+     "class=\"user-profile-name\""
     ],
     "missing_status": [
-     200
+     404
     ],
     "missing_strings": [
-     "<h1>404 Not Found"
+     "<title>Page not found - 404</title>"
     ]
    },
    "regex_check": null,
@@ -12247,7 +12265,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "gumroad-x-gumroad-com",
@@ -13936,13 +13955,13 @@
      200
     ],
     "found_strings": [
-     "--profile-name-color"
+     "ProfilePage\",\"mainEntity"
     ],
     "missing_status": [
      404
     ],
     "missing_strings": [
-     "Page Not Found</h3>"
+     "<title>hoo.be</title>"
     ]
    },
    "regex_check": null,
@@ -13965,7 +13984,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "hostux-social-mastodon-instance",
@@ -17487,7 +17507,7 @@
      200
     ],
     "found_strings": [
-     "Add LINE Friends via QR Code"
+     "Add LINE friend"
     ],
     "missing_status": [
      404
@@ -17518,7 +17538,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "linktree",
@@ -17790,7 +17811,9 @@
    "category": "shopping",
    "nsfw": false,
    "rank": 14506,
-   "protection": [],
+   "protection": [
+    "other"
+   ],
    "id_type": "username",
    "disabled": true,
    "disabled_reason": "Unavailable in this release.",
@@ -17804,7 +17827,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "lobste-rs",
@@ -18230,13 +18254,13 @@
      200
     ],
     "found_strings": [
-     "Daily distance this week"
+     "class=\"profile-header\""
     ],
     "missing_status": [
-     302
+     200
     ],
     "missing_strings": [
-     "Outside together"
+     "Sorry, there is nothing to see here!"
     ]
    },
    "regex_check": null,
@@ -18261,7 +18285,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "mapstodon-space-mastodon-instance",
@@ -21239,8 +21264,8 @@
    "rank": null,
    "protection": [],
    "id_type": "username",
-   "disabled": false,
-   "disabled_reason": null,
+   "disabled": true,
+   "disabled_reason": "Unavailable in this release.",
    "ignore_403": false,
    "fail_flags": {},
    "encoding": null,
@@ -21269,13 +21294,13 @@
      200
     ],
     "found_strings": [
-     "class=\"MwbUserHeader\""
+     "user.profile\\\",\\\"login\\\":"
     ],
     "missing_status": [
      404
     ],
     "missing_strings": [
-     "class=\"MwbError\""
+     "User not found</span>"
     ]
    },
    "regex_check": null,
@@ -21288,8 +21313,8 @@
    "rank": 335081,
    "protection": [],
    "id_type": "username",
-   "disabled": false,
-   "disabled_reason": null,
+   "disabled": true,
+   "disabled_reason": "Unavailable in this release.",
    "ignore_403": false,
    "fail_flags": {},
    "encoding": null,
@@ -21300,7 +21325,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "naija-planet",
@@ -21430,7 +21456,7 @@
      200
     ],
     "found_strings": [
-     "All posts by"
+     "class=\"Headline\""
     ],
     "missing_status": [
      200
@@ -21461,7 +21487,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "naver",
@@ -22754,8 +22781,8 @@
    "rank": null,
    "protection": [],
    "id_type": "username",
-   "disabled": false,
-   "disabled_reason": null,
+   "disabled": true,
+   "disabled_reason": "Unavailable in this release.",
    "ignore_403": false,
    "fail_flags": {},
    "encoding": null,
@@ -23067,7 +23094,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "paragraph",
@@ -24521,7 +24549,7 @@
      200
     ],
     "found_strings": [
-     "on pixelfed</title>"
+     "- Pixelfed</title>"
     ],
     "missing_status": [
      404
@@ -24558,7 +24586,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "planoly",
@@ -24840,7 +24869,7 @@
      404
     ],
     "missing_strings": [
-     "Neexistujúci používateľ"
+     "profile--unknown_title\">Neexistujúci používateľ"
     ]
    },
    "regex_check": null,
@@ -24863,7 +24892,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "pokemonshowdown",
@@ -24930,7 +24960,7 @@
    "name": "Polarsteps",
    "url": "https://www.polarsteps.com/{username}",
    "url_main": "https://polarsteps.com",
-   "url_probe": "https://api.polarsteps.com/users/byusername/{username}",
+   "url_probe": null,
    "method": "GET",
    "headers": {},
    "payload": null,
@@ -24942,13 +24972,13 @@
      200
     ],
     "found_strings": [
-     "\"id\":"
+     "\"user-profile\""
     ],
     "missing_status": [
-     404
+     200
     ],
     "missing_strings": [
-     "<title>404 Not Found</title>"
+     "Ups! User not found."
     ]
    },
    "regex_check": null,
@@ -24986,7 +25016,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "polchat-pl",
@@ -25078,8 +25109,8 @@
     "cf_js_challenge"
    ],
    "id_type": "username",
-   "disabled": false,
-   "disabled_reason": null,
+   "disabled": true,
+   "disabled_reason": "Unavailable in this release.",
    "ignore_403": false,
    "fail_flags": {},
    "encoding": null,
@@ -25639,7 +25670,7 @@
      200
     ],
     "found_strings": [
-     "Российская социальная сеть (by mastodon)</title>"
+     "Социальная сеть - Правда (by mastodon)</title>"
     ],
     "missing_status": [
      404
@@ -25668,7 +25699,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "privacy-guides",
@@ -25687,7 +25719,7 @@
      200
     ],
     "found_strings": [
-     "assign_path"
+     "\"user_badges\":"
     ],
     "missing_status": [
      404
@@ -25716,7 +25748,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "producthunt",
@@ -26174,7 +26207,7 @@
      200
     ],
     "found_strings": [
-     "Ostatnio on-line"
+     " - Profile</title>"
     ],
     "missing_status": [
      404
@@ -26205,7 +26238,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "quitter-pl-2",
@@ -26242,8 +26276,8 @@
    "rank": null,
    "protection": [],
    "id_type": "username",
-   "disabled": false,
-   "disabled_reason": null,
+   "disabled": true,
+   "disabled_reason": "Unavailable in this release.",
    "ignore_403": false,
    "fail_flags": {},
    "encoding": null,
@@ -26568,9 +26602,9 @@
   {
    "id": "reddit",
    "name": "Reddit",
-   "url": "https://www.reddit.com/user/{username}",
+   "url": "https://www.reddit.com/user/{username}/",
    "url_main": "https://reddit.com",
-   "url_probe": "https://www.reddit.com/user/{username}/about.json",
+   "url_probe": null,
    "method": "GET",
    "headers": {},
    "payload": null,
@@ -26582,13 +26616,13 @@
      200
     ],
     "found_strings": [
-     "\"id\":"
+     "aria-label=\"Profile information"
     ],
     "missing_status": [
-     404
+     200
     ],
     "missing_strings": [
-     "\"error\":404"
+     "Sorry, nobody on Reddit goes by that name."
     ]
    },
    "regex_check": null,
@@ -26604,7 +26638,8 @@
    "nsfw": false,
    "rank": 21,
    "protection": [
-    "ip_reputation"
+    "ip_reputation",
+    "other"
    ],
    "id_type": "username",
    "disabled": true,
@@ -26628,7 +26663,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "redgifs",
@@ -29543,8 +29579,8 @@
    "rank": null,
    "protection": [],
    "id_type": "username",
-   "disabled": false,
-   "disabled_reason": null,
+   "disabled": true,
+   "disabled_reason": "Unavailable in this release.",
    "ignore_403": false,
    "fail_flags": {},
    "encoding": null,
@@ -31667,7 +31703,7 @@
      200
     ],
     "found_strings": [
-     "<h2 class=\"dcr-1ln6kec\">"
+     "content=\"&#x3C;p&#x3E;"
     ],
     "missing_status": [
      404
@@ -31696,7 +31732,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "themeforest",
@@ -33855,7 +33892,7 @@
      200
     ],
     "found_strings": [
-     "collection-hero__text-wrapper"
+     "data-collection-filters"
     ],
     "missing_status": [
      404
@@ -33884,7 +33921,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "vapenews",
@@ -34071,7 +34109,7 @@
      200
     ],
     "found_strings": [
-     "Profil på vibilagare.se"
+     "class=\"user-profile\""
     ],
     "missing_status": [
      404
@@ -34100,7 +34138,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "viewbug",
@@ -34119,7 +34158,7 @@
      200
     ],
     "found_strings": [
-     "class=\"top-profile-since\""
+     "class=\"top-profile-membership\""
     ],
     "missing_status": [
      404
@@ -34154,7 +34193,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "vimeo",
@@ -34844,7 +34884,7 @@
      200
     ],
     "found_strings": [
-     "\"userId\":"
+     "\"createdAt\":"
     ],
     "missing_status": [
      404
@@ -34876,7 +34916,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "wakatime",
@@ -36515,7 +36556,7 @@
      200
     ],
     "found_strings": [
-     "s profile | xHamster</title>"
+     "and bio on xHamster"
     ],
     "missing_status": [
      404
@@ -36553,7 +36594,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "xing",
@@ -36655,7 +36697,8 @@
     "wmn"
    ],
    "detect_source": "wmn",
-   "weak": false
+   "weak": false,
+   "payload_format": "simple"
   },
   {
    "id": "xvideos",

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="630" viewBox="0 0 920 630" role="img" aria-labelledby="title desc">
 <title id="title">How Consensus combines and maintains 19 source projects</title>
-<desc id="desc">Nineteen source projects list 12,356 modules and rules including overlaps. Expert review tests, improves, standardises and deduplicates candidates before 7,989 enabled modules and rules enter Consensus. Experts scan sources, identify changes, review candidates and update Consensus, targeting a weekly review cadence. A default query selects relevant modules, removes duplicate routes and presents unified results.</desc>
+<desc id="desc">Nineteen source projects listed 12,356 modules and rules in the 3 October snapshot, including overlaps. Consensus has 9,778 enabled modules and rules in the 16 October inventory after expert review, testing and integration. These are inventory snapshots, not measured batch throughput. Experts target a weekly review cadence. A default query selects relevant modules, removes duplicate routes and presents unified results.</desc>
 <rect width="920" height="630" rx="18" fill="#ffffff"/>
 <defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#c65316" stroke-width="1.5"/></marker></defs>
 <g font-family="Segoe UI, Helvetica, Arial, sans-serif">
@@ -22,7 +22,7 @@
 <text x="356" y="203" font-size="12" fill="#c65316" font-weight="700" text-anchor="start">04</text>
 <text x="385" y="203" font-size="14" fill="#18212b" font-weight="400" text-anchor="start">Integrate modules</text>
 <text x="774" y="91" font-size="20" fill="#18212b" font-weight="650" text-anchor="middle">Consensus</text>
-<text x="774" y="143" font-size="36" fill="#c65316" font-weight="700" text-anchor="middle">7,989</text>
+<text x="774" y="143" font-size="36" fill="#c65316" font-weight="700" text-anchor="middle">9,778</text>
 <text x="774" y="169" font-size="14" fill="#526171" font-weight="400" text-anchor="middle">enabled modules and rules</text>
 <text x="774" y="202" font-size="13" fill="#18212b" font-weight="600" text-anchor="middle">One maintained tool</text>
 <path d="M280 145L326 145" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
@@ -30,7 +30,7 @@
 <path d="M594 145L640 145" fill="none" stroke="#c65316" stroke-width="2" marker-end="url(#arrow)"/>
 <text x="617" y="128" font-size="11" fill="#526171" font-weight="400" text-anchor="middle">integrate</text>
 <text x="24" y="262" font-size="12" fill="#526171" font-weight="400" text-anchor="start">* Counts include overlaps and declared routes; Mailcat is separate and SherlockV2 is unverified.</text>
-<text x="896" y="262" font-size="12" fill="#526171" font-weight="400" text-anchor="end">Inventory snapshot: 3 October 2026</text>
+<text x="896" y="262" font-size="12" fill="#526171" font-weight="400" text-anchor="end">Snapshots: sources 3 Oct; Consensus 16 Oct 2026</text>
 <rect x="24" y="287" width="872" height="145" rx="12" fill="#fff4eb" stroke="#c65316" stroke-width="2"/>
 <text x="460" y="318" font-size="19" fill="#c65316" font-weight="700" text-anchor="middle">EXPERT REVIEW · WEEKLY TARGET</text>
 <rect x="40" y="339" width="192" height="70" rx="12" fill="#f6f8fa" stroke="#d5dce3" stroke-width="1"/>
