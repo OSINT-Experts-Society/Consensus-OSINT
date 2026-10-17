@@ -108,6 +108,17 @@ def network_problem(exc: Exception) -> str:
     return str(exc)
 
 
+def require_update_route():
+    """Every interactive/manual update entry point must honour the scan-route guard."""
+    from .config import get_config
+
+    defaults = get_config().get("defaults", {})
+    if os.environ.get("CONSENSUS_PROXY") or defaults.get("proxy") or defaults.get("tor"):
+        raise ValueError("Automatic update routing does not support the configured scan proxy/Tor. "
+                         "No update network request was made. Use your existing installation tool "
+                         "with its own proxy configuration to update Consensus.")
+
+
 def command(args) -> int:
     from .. import __version__
     from . import update_backend
@@ -119,14 +130,8 @@ def command(args) -> int:
         # Scan routes do not configure urllib, Git, pip, uv or pipx together.
         # Until every update backend supports that route, fail before networking
         # rather than silently exposing a direct connection. Rollback is local.
-        from .config import get_config
-
-        defaults = get_config().get("defaults", {})
-        if ((check or not getattr(args, "rollback", False))
-                and (os.environ.get("CONSENSUS_PROXY") or defaults.get("proxy") or defaults.get("tor"))):
-            raise ValueError("Automatic update routing does not support the configured scan proxy/Tor. "
-                             "No update network request was made. Use your existing installation tool "
-                             "with its own proxy configuration to update Consensus.")
+        if check or not getattr(args, "rollback", False):
+            require_update_route()
         root = manager.install_root()
         if check:
             latest = (manager.release_for(root) if manager.managed_install(root) else manager.latest_release())["version"]
@@ -210,11 +215,7 @@ def startup_notice(*, disabled=False, auto_install=False) -> None:
     try:
         root = manager.install_root()
         managed = manager.managed_install(root)
-        from .config import get_config
-
-        defaults = get_config().get("defaults", {})
-        if os.environ.get("CONSENSUS_PROXY") or defaults.get("proxy") or defaults.get("tor"):
-            return
+        require_update_route()
         if managed and auto_install and os.environ.get("CONSENSUS_AUTO_UPDATE", "1").lower() not in ("0", "false", "no"):
             from .auto_update import start
 
