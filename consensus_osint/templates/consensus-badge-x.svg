@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="113" height="24" viewBox="0 0 113 24" role="img" aria-label="X: community">
+  <title>X: community</title>
+  <clipPath id="rounded"><rect width="113" height="24" rx="4"/></clipPath>
+  <g clip-path="url(#rounded)"><rect width="26" height="24" fill="#30363d"/><rect x="26" width="87" height="24" fill="#f09a45"/></g>
+  <g font-family="Verdana,Arial,sans-serif" font-size="11" text-anchor="middle">
+    <text x="13" y="16" fill="#fff">X</text>
+    <text x="69.5" y="16" fill="#18212b" font-weight="bold">community</text>
+  </g>
+</svg>

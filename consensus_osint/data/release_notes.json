@@ -2,6 +2,27 @@
   "schema": 1,
   "releases": [
     {
+      "version": "0.4.11",
+      "previous_version": "0.4.10",
+      "new_modules": [],
+      "bug_fixes": [
+        "threads-inconclusive-pages: Treat generic Threads login, landing and unbound responses as inconclusive; require matching named profile evidence for a positive result.",
+        "interactive-update-routing: Apply the proxy and Tor safety guard to interactive update actions as well as command-line updates.",
+        "retry-cooldown-duplicates: Prevent duplicate error results from bypassing a rate-limited check's cooldown.",
+        "result-save-state: Only mark complete successful saves as saved; preserve current results on failed history loads and cancel interrupted updates safely.",
+        "original-search-settings: Preserve the original search limit, filters and timing settings when searching again, with renewed consent for sensitive routes and notifying checks."
+      ],
+      "other_changes": [
+        "guided-search-followup: Choose between searching again, starting fresh and expanding coverage; retry unsuccessful checks with guidance that a proxy may help some blocks.",
+        "safe-search-preferences: Explicitly remember safe preferred search settings without storing identifiers, credentials, proxy routes or notification consent.",
+        "unsaved-results-guidance: Show saved or unsaved status and offer save, discard or cancel before replacing results or exiting.",
+        "export-format-picker: Choose a report format interactively while retaining the existing save-path command.",
+        "offline-setup-health: View installation, catalogue and optional capability status together in an offline setup and health screen.",
+        "consistent-checks-wording: Describe combined site and module totals consistently as checks.",
+        "readme-community-updates: Add official community links, tested-platform badges and clearer update instructions; show measured upstream lookup activity rather than implied release schedules."
+      ]
+    },
+    {
       "version": "0.4.10",
       "previous_version": "0.4.9",
       "new_modules": [
