@@ -482,6 +482,7 @@ class Scanner:
         self.matcher = None
         options = {k: v for k, v in vars(args).items() if k not in ("queries",) and not k.startswith("_")}
         options["proxy"] = redact_proxy(self.http.proxy)  # never write credentials into reports
+        options.update(timeout=self.timeout, concurrency=self.concurrency, tor=self.tor)
         self.summary = ScanSummary(options=options)
         self._streamed: list = []   # every finding as it arrives, so an interrupted scan keeps them
         self.unchecked: list = []   # queries whose filters left nothing to run: not a negative result
@@ -595,7 +596,7 @@ class Scanner:
             self.unchecked.append(username)
             self.printer.warn(f"Nothing was checked for {username}: the chosen filters (--site, --tags, --exclude, --source "
                               "and similar) leave no sites or modules for this search. This is not a negative result.")
-        self.printer.message(f"{total} sites being scanned for this {id_type}", "dim")
+        self.printer.message(f"{total} checks selected for this {id_type}", "dim")
         self.printer.activity("Scanning", self._tool_names(sites, modules))
         self.printer.start_progress(total, f"scanning {username}")
         try:
@@ -697,7 +698,7 @@ class Scanner:
 
             _, modules = limit_plan([], modules, limit, self.sites_db().sites)
         self.printer.activity("Scanning", self._tool_names([], modules))
-        self.printer.message(f"   {len(modules)} sites being scanned for this email", "cyan")
+        self.printer.message(f"   {len(modules)} checks selected for this email", "cyan")
         self.printer.start_progress(len(modules), f"checking {email}")
         async def domain_analysis():
             from .core.scan_control import checkpoint
@@ -787,7 +788,7 @@ class Scanner:
         if self.continuation:
             modules = self.continuation.select(number, "phone", modules, "module:")
         self.printer.activity("Scanning", self._tool_names([], modules))
-        self.printer.message(f"   {len(modules)} sites being scanned for this phone number", "cyan")
+        self.printer.message(f"   {len(modules)} checks selected for this phone number", "cyan")
         self.printer.start_progress(len(modules), f"checking {e164}")
         def collect_phone(finding):
             # Send the normalized number, but keep every result under the user's
@@ -1086,13 +1087,14 @@ def _rescue_results(summary: ScanSummary, failed: Path) -> Path | None:
     return None
 
 
-def cmd_scan(args: argparse.Namespace, *, on_summary=None, in_session=False) -> int:
+def cmd_scan(args: argparse.Namespace, *, on_summary=None, on_report_saved=None, in_session=False) -> int:
     from .core.terminal_ui import TerminalUI, current_ui, supported
 
     if (not in_session and current_ui() is None and not args.no_footer and not args.quiet
             and not args.jsonl and not (args.format and not args.output)
             and supported(color=not args.no_color)):
-        return TerminalUI(animate=not args.no_animation, network=True).run(lambda read: cmd_scan(args, on_summary=on_summary))
+        return TerminalUI(animate=not args.no_animation, network=True).run(
+            lambda read: cmd_scan(args, on_summary=on_summary, on_report_saved=on_report_saved))
     try:
         queries = expand_queries(args)
     except (OSError, UnicodeError, ValueError) as exc:
@@ -1268,6 +1270,8 @@ def cmd_scan(args: argparse.Namespace, *, on_summary=None, in_session=False) -> 
             if printer.terminal_ui:
                 printer.terminal_ui.update("Saving report")
             path = save_report(summary, args.output, args.format, include_all=args.all)
+            if on_report_saved is not None and args.all:
+                on_report_saved(summary, path)
             printer.report_saved(path)
             if note := _format_note(args.output, args.format):
                 printer.warn(note)
@@ -1704,7 +1708,8 @@ def cmd_catalogue_update(args: argparse.Namespace) -> int:
     return 0
 
 
-def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_session=False, continuation=None) -> int:
+def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, on_report_saved=None,
+         in_session=False, continuation=None) -> int:
     _utf8_console(sys.stdout, sys.stderr)
     raw_argv = list(sys.argv[1:] if argv is None else argv)
     # A global startup switch works before or after the command. Preserve tokens
@@ -1763,7 +1768,7 @@ def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, in_se
                            or bool(getattr(args, "jsonl", False)) or bool(getattr(args, "quiet", False))
                            or bool(getattr(args, "proxy", None)) or bool(getattr(args, "tor", False)), **update_options)
         if cmd in ("scan", "user", "email", "phone"):
-            return cmd_scan(args, on_summary=on_summary, in_session=in_session)
+            return cmd_scan(args, on_summary=on_summary, on_report_saved=on_report_saved, in_session=in_session)
         if cmd == "update":
             from .core import update_backend
 

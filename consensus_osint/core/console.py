@@ -314,7 +314,7 @@ class Printer:
         table.add_column("What it does", ratio=3, overflow="fold")
         headings = {"positional arguments": "What to search / open", "options": "Help",
                     "output": "Results & reports", "network": "Connection",
-                    "scope": "Choose sites", "pivoting": "Input & discovery"}
+                    "scope": "Choose checks", "pivoting": "Input & discovery"}
         for group in parser._action_groups:
             actions = [a for a in group._group_actions if a.help != argparse.SUPPRESS]
             if not actions:
@@ -374,7 +374,7 @@ class Printer:
                        table_column=Column(max_width=max(12, self.console.width // 3), no_wrap=True, overflow="ellipsis")),
             BarColumn(bar_width=None, complete_style=ACCENT, finished_style=ACCENT),
             MofNCompleteColumn(),
-            TextColumn("sites"),
+            TextColumn("checks"),
             TimeElapsedColumn(),
             console=self.console,
             transient=True,
@@ -621,7 +621,9 @@ class Printer:
 
             render, detail = result_pages(summary, show_all=self.show_all, limit=self.summary_limit,
                                           filters=getattr(self.terminal_ui, "result_filters", None))
-            self.terminal_ui.review(render, detail=detail, follow_end=follow_end)
+            saved = getattr(self.terminal_ui, "result_save_status", "")
+            self.terminal_ui.review(render, detail=detail, follow_end=follow_end,
+                                    title="Search results" + (" · " + saved if saved else ""))
             return
         if self.terminal_ui:
             self.terminal_ui.update("Displaying results")

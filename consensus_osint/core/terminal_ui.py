@@ -316,7 +316,7 @@ class TerminalUI:
                     + right)
 
         def gauge(columns):
-            counter = f"{completed}/{total} sites"
+            counter = f"{completed}/{total} checks"
             bar_width = min(24, columns - len(counter) - 3)
             prefix = []
             if bar_width < 2:
@@ -351,7 +351,7 @@ class TerminalUI:
         if width >= 76 and (not scanning or cell_len(counts) <= side):
             centre = width - 2 * side - 4
             if scanning:
-                progress = gauge(centre)[-1] if total else "Preparing site checks"
+                progress = gauge(centre)[-1] if total else "Preparing checks"
                 credit_width = min(max(side, cell_len(credit)), width - len(version) - 12)
                 path_width = width - credit_width - len(version) - 4
                 credit_text = fit(credit, credit_width)
@@ -473,7 +473,7 @@ class TerminalUI:
 
             moving = self.animate and activity not in ("Paused", "Stopping")
             mark = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"[int(time.monotonic() * 8) % 10] if moving else "•"
-            label = (self.phase_label or "Searching sites…") if activity == "Scanning" else activity
+            label = (self.phase_label or "Running checks…") if activity == "Scanning" else activity
             if activity in ("Paused", "Stopping") and self.phase_label:
                 label += " · " + self.phase_label
             body = Text(" " + mark + "  " + clean(label))

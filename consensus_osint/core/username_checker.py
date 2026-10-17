@@ -103,6 +103,13 @@ def evaluate(site: Site, resp: Response, username: str) -> tuple:
             return Status.BLOCKED, "error-page", str(err)
         return Status.UNKNOWN, "error-page", str(err)
 
+    from .threads_contracts import catalogue_outcome as threads_outcome
+    from .threads_contracts import catalogue_scope as threads_scope
+
+    if threads_scope(site):
+        outcome, note = threads_outcome(resp, username)
+        return outcome, "query-bound Threads profile evidence", note
+
     from .forge_profiles import catalogue_scope, profile_outcome
 
     if catalogue_scope(site):

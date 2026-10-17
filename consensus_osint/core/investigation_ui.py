@@ -67,13 +67,37 @@ def follow_up(session, mode):
     flags = []
     # Replay scope and safety preferences, never report paths or expansion flags.
     values = ("site", "exclude", "tags", "exclude_tags", "source", "family", "timeout", "concurrency",
-              "delay", "per_host", "phone_region")
-    toggles = ("nsfw", "allow_loud", "no_breach", "no_sites", "no_modules", "no_extract", "no_impersonate", "tor", "all_modules")
+              "delay", "per_host", "phone_region", "browser_pages")
+    toggles = ("nsfw", "no_breach", "no_sites", "no_modules", "no_extract", "no_impersonate", "tor", "all_modules",
+               "all_sites", "browser", "browser_visible", "details", "all", "compare_queries")
     for key in values:
         value = previous.options.get(key)
         if value is not None and value != "":
             flags += ["--" + key.replace("_", "-"), str(value)]
     flags += ["--" + key.replace("_", "-") for key in toggles if previous.options.get(key) is True]
+    if mode in ("recheck", "retry"):
+        top = previous.options.get("top")
+        if top is not None:
+            flags += ["--top", str(top)]
+        else:
+            flags += ["--fast" if previous.options.get("fast") else "--full"]
+    if previous.options.get("allow_loud"):
+        if session.back_prompt("This search included checks that may send email/SMS. Include them again? [y/N]: ").strip().lower() not in ("y", "yes"):
+            session.printer.message("Follow-up cancelled. Start a new search without --allow-loud to exclude notifying checks.")
+            return
+        flags.append("--allow-loud")
+    if mode == "retry":
+        count = sum(len(keys - continuation.completed.get(query, set())) for query, keys in continuation.retryable.items())
+        session.printer.message("Retry only unsuccessful checks; completed results and exclusions are retained. "
+                                "A proxy may help with some access blocks, but is not guaranteed to help. "
+                                "Do not use it to bypass service rate limits; no route is changed automatically.")
+        if continuation.deferred:
+            session.printer.message(f"{continuation.deferred} rate-limited checks are still cooling down; try them later.")
+        if not count:
+            session.printer.message("No unsuccessful checks are ready to retry. Skipped/disabled checks are not retried.")
+            return
+        if session.back_prompt(f"Retry up to {count} unsuccessful checks now? [y/N]: ").strip().lower() not in ("y", "yes"):
+            return
     proxy = previous.options.get("proxy")
     if proxy:
         # Saved metadata deliberately lacks credentials; never silently fall
@@ -82,6 +106,11 @@ def follow_up(session, mode):
         if not proxy:
             return
         flags += ["--proxy", proxy]
+    if previous.options.get("flaresolverr"):
+        endpoint = session.back_prompt("FlareSolverr URL for this follow-up (Enter cancels): ").strip()
+        if not endpoint:
+            return
+        flags += ["--flaresolverr", endpoint]
     if previous.options.get("no_verify"):
         raise ValueError("This search disabled TLS verification. Start a new verified search before continuing it.")
     if mode == "new":
@@ -92,7 +121,10 @@ def follow_up(session, mode):
         session.printer.message(f"{sum(counts.values())} new lookup opportunities; your saved filters still apply.")
     session.printer.message({"continue": "Continuing the full search; completed lookups will be retained.",
                              "new": "Searching new sources; existing results will be retained.",
-                             "recheck": "Rechecking saved identifiers and comparing the returned information."}[mode])
+                             "recheck": "Rechecking saved identifiers with the original limit and filters; comparing returned information.",
+                             "retry": "Retrying unsuccessful checks only; existing results will be retained."}[mode])
+    session.printer.message("Follow-ups do not repeat recursive expansion or optional web-search/mailbox discovery. "
+                            "Use a new search to change those options.", "dim")
     session.execute(["scan", *flags, "--", *queries], continuation=continuation)
     return True
 
@@ -100,12 +132,12 @@ def follow_up(session, mode):
 def actions(session):
     while True:
         session.printer.message("1 Continue full search   2 Search new sources   3 Recheck & compare\n"
-                                "4 View changes   5 Investigations   0 Back")
+                                "4 View changes   5 Investigations   6 Retry unsuccessful checks   0 Back")
         answer = session.back_prompt("Follow-up action: ", zero=True).strip()
         if answer in ("", "0"):
             return
-        if answer in ("1", "2", "3"):
-            return follow_up(session, {"1": "continue", "2": "new", "3": "recheck"}[answer])
+        if answer in ("1", "2", "3", "6"):
+            return follow_up(session, {"1": "continue", "2": "new", "3": "recheck", "6": "retry"}[answer])
         if answer == "4":
             show_changes(session)
         elif answer == "5":
@@ -178,6 +210,7 @@ def case_screen(session, store, key):
                 if session.back_prompt("Save the latest search in this investigation? [y/N]: ").lower() in ("y", "yes"):
                     store.save(key, session.latest)
                     session.latest = store.open_search(key)
+                    session.mark_saved(session.latest, "investigation: " + value["name"], record=("investigation", key))
             elif choice in ("n", "r"):
                 label = "Notes" if choice == "n" else "New name"
                 updated = session.back_prompt(label + " (Enter cancels; - clears notes): ")
@@ -186,6 +219,7 @@ def case_screen(session, store, key):
             elif choice == "d":
                 if session.back_prompt("Delete this investigation and its saved searches? [y/N]: ").lower() in ("y", "yes"):
                     store.delete(key)
+                    session.forget_saved_record("investigation", key)
                     return
             elif choice == "c":
                 pair = session.back_prompt("Two search numbers, oldest first (e.g. 1 2): ").split()
@@ -198,7 +232,10 @@ def case_screen(session, store, key):
                 show_changes(session, compare(store.open_search(key, int(pair[0])-1), store.open_search(key, int(pair[1])-1)))
                 session.back_prompt("Enter to return: ")
             elif choice == "f":
+                if not session.confirm_leave():
+                    continue
                 session.latest = store.open_search(key)
+                session.mark_saved(session.latest, "investigation: " + value["name"], record=("investigation", key))
                 if actions(session):
                     return True
             elif choice == "v":
@@ -220,11 +257,17 @@ def case_screen(session, store, key):
                     raise ValueError("Choose relevant, unrelated or unreviewed.")
                 note = session.back_prompt("Review note (optional): ")
                 if session.back_prompt("Save this analyst decision and note? [y/N]: ").lower() in ("y", "yes"):
+                    if not session.confirm_leave():
+                        continue
                     store.review(key, found[int(number)-1], decision, note)
                     session.latest = store.open_search(key)
+                    session.mark_saved(session.latest, "investigation: " + value["name"], record=("investigation", key))
             elif choice.isdecimal() and 1 <= int(choice) <= len(value["searches"]):
+                if not session.confirm_leave():
+                    continue
                 opened = store.open_search(key, int(choice)-1)
                 session.latest = opened
+                session.mark_saved(session.latest, "investigation: " + value["name"], record=("investigation", key))
                 if session.printer.terminal_ui:
                     session.printer.terminal_ui.result_filters = {}
                 session.show_latest()

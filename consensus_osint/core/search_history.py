@@ -135,6 +135,7 @@ def screen(session):
         elif choice == "clear":
             if session.back_prompt("Delete all locally saved searches? [y/N]: ").strip().lower() in ("y", "yes"):
                 history.clear()
+                session.forget_saved_record("history")
         else:
             delete = choice.startswith("delete ")
             number = choice[7:].strip() if delete else choice
@@ -144,18 +145,28 @@ def screen(session):
             key, _ = entries[int(number)-1]
             if delete:
                 history.delete(key)
+                session.forget_saved_record("history", key)
             else:
                 previous = session.latest
                 ui = session.printer.terminal_ui
                 filters = ui.result_filters if ui else None
+                saved = None
                 try:
-                    session.latest = history.load(key)
+                    opened = history.load(key)
+                    if not session.confirm_leave():
+                        continue
+                    saved = session._saved_summary, session._saved_location, session._saved_record
+                    session.latest = opened
+                    session.mark_saved(session.latest, "local history (last 10 searches)", record=("history", key))
                     if session.printer.terminal_ui:
                         session.printer.terminal_ui.result_filters = {}
                     session.show_latest()
                     return True
                 except (OSError, ValueError, TypeError, KeyError, RecursionError, AttributeError, OverflowError):
                     session.latest = previous
+                    if saved is not None:
+                        session._saved_summary, session._saved_location, session._saved_record = saved
                     if ui:
                         ui.result_filters = filters
+                        ui.result_save_status = "Saved" if session._saved_summary is previous else "Unsaved"
                     session.printer.warn("This saved search cannot be opened. You can delete it from history.")

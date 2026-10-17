@@ -14,6 +14,7 @@ from .branding import ACCENT, PHONE_GUIDANCE
 from .console import Printer
 from .models import QueryType, redact_options
 from .scan_control import terminal_available
+from .session_preferences import DEFAULTS as _DEFAULTS
 
 CHOICES = (
     ("1", "Username", "user"), ("2", "Email", "email"), ("3", "Phone", "phone"),
@@ -21,11 +22,10 @@ CHOICES = (
     ("6", "Save latest report", "save"), ("7", "Settings", "settings"),
     ("8", "Investigations", "investigations"), ("9", "Help", "help"), ("0", "Exit", "exit"),
 )
-_DEFAULTS = {"details": False, "all": False, "fast": True, "top": None, "no_breach": False, "timeout": None}
 _SETTINGS = (
     ("details", "Expand comparison evidence"), ("all", "Show all outcomes"),
     ("search_size", "Default search size (username/email)"), ("no_breach", "Exclude breach lookups"),
-    ("timeout", "Site timeout"),
+    ("timeout", "Check timeout"),
 )
 _COMMANDS = {"scan", "user", "username", "email", "phone", "sites", "modules", "report", "version", "update"}
 # Words people type expecting a command or answering a prompt that is no longer open. Each would otherwise
@@ -68,7 +68,20 @@ class Session:
         self.printer = printer or Printer(color=color, animate=animate)
         self.read = read or input
         self.preferences = dict(_DEFAULTS)
+        try:
+            from .session_preferences import load
+
+            saved = load()
+            self.animate = animate and saved.pop("animation", True)
+            self.preferences.update(saved)
+        except (OSError, ValueError, TypeError, RecursionError) as exc:
+            self.printer.warn(f"Could not load saved preferences: {exc}. Using defaults; the file was not changed.")
+        if self.printer.terminal_ui and self.animate != animate:
+            self.printer.terminal_ui.update(animate=self.animate)
         self.latest = None
+        self._saved_summary = None
+        self._saved_location = None
+        self._saved_record = None
         self._saved_report = None
         self._saved_graph_report = None
         self.restart_requested = False
@@ -102,7 +115,7 @@ class Session:
         self.printer.actions(has_results=self.latest is not None)
         if self.latest is not None:
             self.printer.message(f"Latest search: {len(self.latest.queries)} queries · {len(self.latest.findings)} results. "
-                                 "Use last to view or save to export.", "dim")
+                                 f"{self.saved_status()}. Use last to view or save to export.", "dim")
         self.printer.message("Or type a username, email or phone — we detect its type. / shows commands; /config opens settings.", "dim")
         self.printer.message("Username and email searches offer Quick (300), Custom or Full. Settings changes the session default.", "dim")
 
@@ -117,7 +130,7 @@ class Session:
 
         default = "2" if self.preferences['top'] is not None else "1" if self.preferences['fast'] else "3"
         while True:
-            self.printer.message("How many sites and modules should we check?\n"
+            self.printer.message("How many checks should we run?\n"
                                  "1 Quick — up to 300 checks\n2 Custom — enter a number\n"
                                  "3 Full — all eligible checks\n0 Back")
             self.printer.message("Counts lookup checks, not individual requests. Email domain analysis is separate.", "dim")
@@ -150,14 +163,56 @@ class Session:
     def remember(self, summary):
         # Retain only the latest scan; never add findings from earlier people.
         self.latest = summary
+        self._saved_summary = None
+        self._saved_location = None
+        self._saved_record = None
         if self.printer.terminal_ui:
             self.printer.terminal_ui.result_filters = {}
+            self.printer.terminal_ui.result_save_status = "Unsaved"
         try:
             from .search_history import SearchHistory
 
-            SearchHistory().save(summary)
+            key = SearchHistory().save(summary)
+            if key:
+                self.mark_saved(summary, "local history (last 10 searches)", record=("history", key))
         except (OSError, ValueError, TypeError) as exc:
             self.printer.warn(f"Could not retain local history: {exc}. Results are still available in this session.")
+
+    def mark_saved(self, summary, location, *, record=None):
+        if summary is self.latest:
+            self._saved_summary = summary
+            self._saved_location = str(location)
+            self._saved_record = record
+            if self.printer.terminal_ui:
+                self.printer.terminal_ui.result_save_status = "Saved"
+
+    def forget_saved_record(self, kind, key=None):
+        if self._saved_record and self._saved_record[0] == kind and (key is None or key == self._saved_record[1]):
+            self._saved_summary = self._saved_location = self._saved_record = None
+            if self.printer.terminal_ui:
+                self.printer.terminal_ui.result_save_status = "Unsaved"
+
+    def saved_status(self):
+        if self.latest is not None and self._saved_summary is self.latest:
+            return "Saved: " + self._saved_location
+        return "Unsaved results"
+
+    def confirm_leave(self):
+        if self.latest is None or self._saved_summary is self.latest:
+            return True
+        self.printer.message("Your latest results have not been saved. S Save · D Discard · Enter / Esc Cancel")
+        answer = self.back_prompt("Unsaved results: ").strip().lower()
+        if answer in ("d", "discard"):
+            return True
+        if answer in ("s", "save"):
+            self.save_latest([])
+            return self._saved_summary is self.latest
+        return False
+
+    def home(self, *args, **kwargs):
+        self.printer.home(*args, **kwargs)
+        if self.latest is not None:
+            self.printer.message(self.saved_status(), "dim")
 
     def execute(self, tokens, *, remember=False, continuation=None):
         from ..cli import main
@@ -170,20 +225,25 @@ class Session:
             tokens = [tokens[0], "--no-color", *tokens[1:]]
         if not self.animate and "--no-animation" not in tokens and tokens[0] in {"scan", "user", "username", "email", "phone"}:
             tokens = [tokens[0], "--no-animation", *tokens[1:]]
-        defaults = dict(self.preferences)
+        defaults = dict(_DEFAULTS if continuation else self.preferences)
         options = tokens[:tokens.index("--")] if "--" in tokens else tokens
         if continuation or any(t in {"--fast", "--full", "--top"} or t.startswith("--top=") for t in options):
             defaults.update(fast=False, top=None)
         extra = {"continuation": continuation} if continuation else {}
-        code = main(tokens, scan_defaults=defaults, on_summary=self.remember, in_session=True, **extra)
+        code = main(tokens, scan_defaults=defaults, on_summary=self.remember,
+                    on_report_saved=self.mark_saved, in_session=True, **extra)
         from . import update_backend
 
         if update_backend.pending():
             self.printer.message("Updating closes this session so its files can be replaced safely. Save any results you need first.")
             try:
                 approved = self.back_prompt("Close and update now? [y/N]: ").strip().lower() in {"y", "yes"}
+                approved = approved and self.confirm_leave()
             except (EOFError, KeyboardInterrupt):
                 approved = False
+            except Exception:
+                update_backend.cancel()
+                raise
             if approved:
                 self.update_requested = True
             else:
@@ -283,6 +343,7 @@ class Session:
         if self.latest is None:
             self.printer.message("No search results yet. Choose Username, Email, Phone or Bulk search.")
             return
+        self.printer.message(self.saved_status(), "dim")
         Printer(color=self.color, details=self.preferences["details"], show_all=self.preferences["all"],
                 summary_limit=0).finish(self.latest, review=True)
 
@@ -296,19 +357,47 @@ class Session:
         from .session_info import SessionInfo
 
         info = self.printer.terminal_ui.info if self.printer.terminal_ui else SessionInfo.current()
-        default = str(info.report_folder / ("consensus-" + datetime.now().strftime("%Y%m%d-%H%M%S-%f") + ".html"))
+        extension = ".html"
         if not arguments:
-            self.printer.message("Enter saves two files: an HTML report and an interactive evidence graph. Both links appear below the menu.\n"
-                                 "Or choose .graph.html, .json, .csv, .md, .txt or .pdf for a single export. Ctrl+C cancels.")
+            formats = [("HTML report + graph", ".html"), ("JSON (reusable results)", ".json"),
+                       ("CSV spreadsheet", ".csv"), ("PDF", ".pdf"), ("Plain text", ".txt"),
+                       ("Markdown", ".md"), ("Interactive graph only", ".graph.html"),
+                       ("JSON lines", ".jsonl"), ("Neo4j graph", ".neo4j.json"), ("XMind", ".xmind")]
+            self.printer.summary_table([["Choose", "Export format"],
+                                        *[[str(i), label] for i, (label, _) in enumerate(formats, 1)]], "Save results")
+            self.printer.message("Every outcome is saved, including results hidden by display filters. 0 / Esc cancels.")
+            self.printer.message("HTML + graph creates two files. Ctrl+C cancels saving.", "dim")
+            while True:
+                choice = self.back_prompt("Export format [1; Enter = HTML + graph]: ", zero=True, escape_value="0").strip()
+                if choice.lower() in _LEAVE_WORDS:
+                    return False
+                if not choice:
+                    choice = "1"
+                if choice.isdecimal() and 1 <= int(choice) <= len(formats):
+                    extension = formats[int(choice) - 1][1]
+                    break
+                self.printer.message("Choose a listed format or 0 to cancel.")
+        default = str(info.report_folder / ("consensus-" + datetime.now().strftime("%Y%m%d-%H%M%S-%f") + extension))
+        if not arguments:
             self.printer.message("Suggested file: " + default)
-        path = arguments[0] if arguments else _unquote(self.read("Save here? Press Enter, or type a different path: ")) or default
+        path = arguments[0] if arguments else _unquote(self.back_prompt(
+            "Save here? Press Enter, or type a different path (Esc cancels): ", escape_value="cancel"))
+        if not arguments:
+            if path.lower() in _LEAVE_WORDS:
+                return False
+            path = path or default
+            if not Path(path).suffix and not Path(path).expanduser().is_dir():
+                path += extension
         from .reports import infer_format, save_report
 
         if Path(path).expanduser().is_dir():
             raise ValueError(f"{path} is a folder: add a file name, for example {Path(path) / 'report.html'}")
+        if not arguments and infer_format(path) != infer_format("report" + extension):
+            raise ValueError("The filename extension does not match your chosen format. Choose Save again or use save PATH explicitly.")
         if self.printer.terminal_ui:
             self.printer.terminal_ui.update("Saving report")
         saved = save_report(self.latest, Path(path).expanduser(), include_all=True)
+        self.mark_saved(self.latest, saved)
         graph = None
         if infer_format(saved) == "html":
             try:
@@ -321,6 +410,7 @@ class Session:
             self._saved_graph_report = graph
         else:
             self.printer.report_saved(saved, graph_path=graph)
+        return True
 
     def change_setting(self, name, value):
         from ..cli import _positive_float, _positive_int
@@ -363,14 +453,33 @@ class Session:
             ] + [[str(len(_SETTINGS) + 1), "Loading, footer and tab animations", "on" if self.animate else "off"],
                  ["u", "Installation & updates", "Open"],
                  ["h", "Recent searches", "Open"],
+                 ["i", "Setup / health (offline)", "Open"],
+                 ["s", "Save these preferences as my defaults", "Future sessions"],
+                 ["d", "Forget saved defaults", "Keep this session"],
                  ["0", "Back", ""], ["reset", "Reset session and forget latest results", ""]],
-                "Settings · search preferences apply to this session")
+                "Settings · changes apply now; S remembers them for future sessions")
             choice = self.back_prompt("Setting to change [0 / Esc = back]: ", zero=True).strip().lower()
             if not choice or choice in _LEAVE_WORDS:
                 return
             if choice == "reset":
                 self.reset()
                 return
+            if choice in ("s", "d"):
+                from . import session_preferences
+
+                if choice == "s":
+                    session_preferences.save(self.preferences, animation=self.animate)
+                    self.printer.message("Preferences saved for future sessions. No identifiers, proxy credentials or notifying-check consent are saved.")
+                elif self.back_prompt("Forget saved preferences? This session stays unchanged. [y/N]: ").strip().lower() in ("y", "yes"):
+                    session_preferences.clear()
+                    self.printer.message("Saved preferences removed; next launch uses the built-in defaults.")
+                continue
+            if choice == "i":
+                from .installation_ui import health_screen
+
+                health_screen(self)
+                self.clear_menu()
+                continue
             if choice == "u":
                 from .installation_ui import screen
 
@@ -399,19 +508,23 @@ class Session:
                     self.change_setting("search_size", flags[1] if flags[0] == "--top"
                                         else "quick" if flags[0] == "--fast" else "full")
             elif name == "timeout":
-                value = self.back_prompt("Seconds per site, or default (Esc cancels): ").strip()
+                value = self.back_prompt("Seconds per check, or default (Esc cancels): ").strip()
                 if value and value.lower() not in _LEAVE_WORDS:
                     self.change_setting(name, value)
             else:
                 self.preferences[name] = not self.preferences[name]
 
     def reset(self):
+        if not self.confirm_leave():
+            return
         self.preferences = dict(_DEFAULTS)
         self.change_setting("animation", "on" if self.initial_animation else "off")
         self.latest = None
+        self._saved_summary = None
+        self._saved_location = self._saved_record = None
         if self.printer.terminal_ui:
             self.printer.terminal_ui.clear_history()
-        self.printer.message("Session settings reset and latest results forgotten. Saved report files remain available.")
+        self.printer.message("Session settings reset and latest results forgotten. Saved report files and saved defaults remain available.")
 
     def help(self):
         if self.printer.terminal_ui:
@@ -430,10 +543,13 @@ class Session:
                              "reset = reset session · info = paths and version · about = project details · menu = home · exit = close")
         self.printer.message("Use email --help for scan options. Quote paths containing spaces; backslashes stay literal.", "dim")
         self.printer.message("Username and email searches offer Quick (300), Custom or Full. Settings selects the session default.\n"
+                             "In Settings, S saves your preferences for future sessions; D forgets saved defaults.\n"
                              "Use --top N, --fast or --full for one command; set search_size 500 changes the session default.\n"
                              "Use Continue full search under I Follow up in results.\n"
                              "8 Investigations saves named cases, notes and decisions. /new-sources searches additions; "
-                             "/recheck compares a fresh search; /changes shows differences.")
+                             "/recheck repeats the original limit and filters; /changes shows differences.\n"
+                             "/retry retries unsuccessful checks only; /health shows offline setup diagnostics.\n"
+                             "Save offers a format picker. Unsaved results prompt you before exit or reset.")
         if self.printer.terminal_ui:
             self.printer.message("At the main prompt, Up/Down recalls commands from this session, including guided searches. "
                                  "Edit a recalled command and press Enter to run it. History clears on reset or exit.", "dim")
@@ -442,9 +558,9 @@ class Session:
                                  "Consensus cannot clear history retained by the terminal itself.", "dim")
         preview_available = self.printer.terminal_ui or (self.printer.console and self.printer.console.is_interactive)
         self.printer.message(("V shows/hides a compact hit preview. " if preview_available else "") +
-                             "P pauses new site checks, R continues, S stops a running scan. Ctrl+C cancels a search "
-                             "or an input form; at the main prompt it exits. Checks already running may finish.\n"
-                             "Only Settings/set persists options. Extra command flags apply to that command. "
+                             "P pauses new checks, R continues, S stops a running scan. Ctrl+C cancels a search "
+                             "or an input form; at the main prompt it asks before discarding unsaved results. Checks already running may finish.\n"
+                             "Settings/set changes this session; Settings → S saves defaults for future sessions. Extra command flags apply to that command. "
                              "Queries, report paths and cross-query comparison are never carried into the next search.", "dim")
 
     def dispatch(self, tokens):
@@ -472,10 +588,10 @@ class Session:
         if command in {"menu", "help", "?", "info", "about", "examples", "settings", "last", "reset", "exit", "quit", "q"} and arguments:
             raise ValueError(f"{command} does not take extra arguments.")
         if command in {"exit", "quit", "q"}:
-            return False
+            return not self.confirm_leave()
         if command in {"menu", "help", "?"}:
             if command == "menu":
-                self.printer.home(__version__, has_results=self.latest is not None)
+                self.home(__version__, has_results=self.latest is not None)
             else:
                 self.help()
         elif command == "about":
@@ -485,6 +601,15 @@ class Session:
             if self.printer.terminal_ui and self.printer.terminal_ui.last_report:
                 self.printer.report_saved(self.printer.terminal_ui.last_report,
                                           graph_path=self.printer.terminal_ui.last_graph_report)
+        elif command == "health":
+            if arguments:
+                raise ValueError("health does not take extra arguments.")
+            from .installation_ui import health_screen
+
+            try:
+                health_screen(self)
+            finally:
+                self._return_home = True
         elif command == "examples":
             self.printer.examples()
             self.printer.message("Inside this session, leave off the initial consensus in those examples.", "dim")
@@ -507,7 +632,7 @@ class Session:
                 screen(self)
             finally:
                 self._return_home = True
-        elif command in {"investigations", "followup", "continue", "new-sources", "recheck", "changes"}:
+        elif command in {"investigations", "followup", "continue", "new-sources", "recheck", "retry", "changes"}:
             if arguments:
                 raise ValueError(f"{command} does not take extra arguments.")
             from .investigation_ui import actions, follow_up, screen, show_changes
@@ -522,7 +647,7 @@ class Session:
             elif command == "changes":
                 show_changes(self)
             else:
-                follow_up(self, {"continue": "continue", "new-sources": "new", "recheck": "recheck"}[command])
+                follow_up(self, {"continue": "continue", "new-sources": "new", "recheck": "recheck", "retry": "retry"}[command])
         elif command == "set":
             if len(arguments) != 2:
                 raise ValueError("Use set SETTING VALUE, for example: set details on.")
@@ -586,11 +711,16 @@ class Session:
                     self.save_latest([])
                     return
                 if action == "again":
-                    from .reports import group_by_query
-
-                    groups = [v for v in group_by_query(self.latest) if not v.parent]
-                    if groups:
-                        ui.prefill = shlex.join(["scan", "--", *[v.query_type + ":" + v.query for v in groups]])
+                    self.printer.message("1 Repeat original limit and filters · 2 New search with current settings · 3 Expand to full · 0 Back")
+                    choice = self.back_prompt("Search again: ", zero=True).strip()
+                    if choice == "1":
+                        ui.prefill = "recheck"
+                        self.printer.message("Press Enter to recheck using the original limit, filters and routing safeguards.")
+                    elif choice == "2":
+                        ui.prefill = "scan "
+                        self.printer.message("Enter identifiers and options for a new search. Current settings apply; previous per-command options do not.")
+                    elif choice == "3":
+                        ui.prefill = "continue"
                     return  # Prefill only. Enter is required to issue another search.
                 if action == "filter":
                     self.printer.message("1 Site name · 2 Enriched only · 3 Possible matches · 4 Clear all · 0 Back")
@@ -612,7 +742,7 @@ class Session:
             self.show_latest()
 
     def run(self):
-        self.printer.home(__version__, has_results=self.latest is not None)
+        self.home(__version__, has_results=self.latest is not None)
         last_update_notice = ""
         while True:
             try:
@@ -624,8 +754,20 @@ class Session:
                         self.printer.message(notice, ACCENT)
                         last_update_notice = notice
                 line = self.read("consensus> ").strip()
-            except (EOFError, KeyboardInterrupt):
+            except EOFError:
+                if self.latest is not None and self._saved_summary is not self.latest:
+                    self.printer.warn("Input closed with unsaved results. No report was written.")
                 break
+            except KeyboardInterrupt:
+                try:
+                    if self.confirm_leave():
+                        break
+                except (EOFError, KeyboardInterrupt):
+                    self.printer.warn("Closing with unsaved results; no report was written.")
+                    break
+                except (OSError, ValueError) as exc:
+                    self.printer.warn(f"Could not save: {exc}. Results remain in this session.")
+                continue
             if not line:
                 continue
             try:
@@ -646,14 +788,14 @@ class Session:
                     if ui is not None:
                         ui.returned_from_results = False
                         ui.update("Ready")
-                    self.printer.home(__version__, has_results=self.latest is not None,
+                    self.home(__version__, has_results=self.latest is not None,
                                       saved_report=self._saved_report, graph_report=self._saved_graph_report,
                                       reset_screen=True)
                     self._saved_report = None
                     self._saved_graph_report = None
                     continue
                 if self._saved_report is not None:
-                    self.printer.home(__version__, has_results=self.latest is not None,
+                    self.home(__version__, has_results=self.latest is not None,
                                       saved_report=self._saved_report, graph_report=self._saved_graph_report)
                     self._saved_report = None
                     self._saved_graph_report = None
@@ -661,6 +803,8 @@ class Session:
                 if tokens and tokens[0].lower() == "menu":
                     continue
             except EOFError:
+                if self.latest is not None and self._saved_summary is not self.latest:
+                    self.printer.warn("Input closed with unsaved results. No report was written.")
                 break
             except KeyboardInterrupt:
                 self.printer.message("Cancelled. Back to the menu.", "yellow")
@@ -671,13 +815,13 @@ class Session:
                 message = redact_options({"error": str(exc)})["error"]
                 if self._return_home:
                     self._return_home = False
-                    self.printer.home(__version__, has_results=self.latest is not None, reset_screen=True)
+                    self.home(__version__, has_results=self.latest is not None, reset_screen=True)
                     self.printer.warn(f"Could not complete that action: {message}")
                     continue
                 self.printer.warn(f"Could not complete that action: {message}")
             if self._return_home:
                 self._return_home = False
-                self.printer.home(__version__, has_results=self.latest is not None, reset_screen=True)
+                self.home(__version__, has_results=self.latest is not None, reset_screen=True)
             else:
                 self.menu()
         self.printer.message("\nConsensus closed. Saved reports remain available.")

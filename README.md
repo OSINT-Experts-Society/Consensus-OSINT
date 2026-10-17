@@ -12,12 +12,21 @@
 
 <p align="center">A unified lookup tool combining 9,700+ modules and site rules from 19 open-source projects, maintained by our experts, with a weekly review target.</p>
 
-<p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#see-consensus-in-action">See it in action</a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a></p>
+<p align="center"><a href="#install"><strong>Install</strong></a> &middot; <a href="#see-consensus-in-action">See it in action</a> &middot; <a href="#key-features">Features</a> &middot; <a href="#compare">Compare</a> &middot; <a href="#updates">Updates</a></p>
 
 <p align="center">
   <a href="#compare"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-projects.svg" alt="19 projects combined" height="24"></a>
   <a href="#key-features"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-modules.svg" alt="9,700+ lookup modules and site rules" height="24"></a>
   <a href="#why-consensus"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-review.svg" alt="Expert review: weekly target" height="24"></a>
+  <a href="#tested-platforms"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-windows.svg" alt="Tested on Windows" height="24"></a>
+  <a href="#tested-platforms"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-linux.svg" alt="Tested on Linux" height="24"></a>
+</p>
+
+<p align="center">
+  <a href="https://osint.ngo"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-website.svg" alt="Visit the OSINT Experts Society website" height="24"></a>
+  <a href="https://x.com/i/communities/1830313810718015507"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-x.svg" alt="Join the OSINT Experts Society X community" height="24"></a>
+  <a href="https://www.linkedin.com/groups/13047129/"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-linkedin.svg" alt="Join the OSINT Experts Society LinkedIn group" height="24"></a>
+  <a href="https://www.reddit.com/r/OSINTExperts/"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-reddit.svg" alt="Join the OSINT Experts Society Reddit community" height="24"></a>
 </p>
 
 <p align="center">
@@ -50,17 +59,19 @@
 <sub>Counts are a documented snapshot from 3 October 2026. Scroll the table horizontally on smaller screens.</sub>
 </p>
 
+Lookup activity for **User Scanner, Maigret and WhatsMyName** was rechecked for **17 September–16 October 2026 (30 complete UTC days)**. Their entries count distinct days with non-merge changes to lookup files, not releases or a promised update schedule. Other frequency figures retain the six-month snapshot ending 3 October; they are historical median gaps, not commitments.
+
 <div align="center">
 <table align="center">
   <thead>
-    <tr><th align="left">Tool</th><th align="center">Username</th><th align="center">Email</th><th align="center">Phone</th><th align="center">Duplicate<br>ratio</th><th align="center">Update<br>frequency</th><th align="center">Last&nbsp;module<br>update</th></tr>
+    <tr><th align="left">Tool</th><th align="center">Username</th><th align="center">Email</th><th align="center">Phone</th><th align="center">Duplicate<br>ratio</th><th align="center">Observed lookup<br>update activity</th><th align="center">Last&nbsp;module<br>update</th></tr>
   </thead>
   <tbody>
     <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-dark.svg"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches</sub></td><td align="center"><strong>Weekly review<br>target</strong></td><td align="center">16&nbsp;Oct&nbsp;2026</td></tr>
-    <tr><td align="left"><a href="https://github.com/soxoj/maigret/tree/b6642744988e7e6c2d21f75db60ec3093019ba25">Maigret</a></td><td align="center">5,483</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>40.8%</strong><br><sub>5,482/5,483&nbsp;mapped</sub></td><td align="center">Every&nbsp;2&nbsp;days</td><td align="center"><a href="https://github.com/soxoj/maigret/commit/3d2b613cfd9a18bebc9d65bb22bcf8af13aa18ef">25&nbsp;Sep&nbsp;2026</a></td></tr>
-    <tr><td align="left"><a href="https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b">User Scanner</a></td><td align="center">2,511</td><td align="center">211</td><td align="center">—</td><td align="center"><strong>68.9%</strong><br><sub>2,575/2,722&nbsp;mapped</sub></td><td align="center">Every&nbsp;1&nbsp;day</td><td align="center"><a href="https://github.com/kaifcodec/user-scanner/commit/8f4de8e7b3e68672c50ba318b2d15a9d2b4617e9">29&nbsp;Sep&nbsp;2026</a></td></tr>
+    <tr><td align="left"><a href="https://github.com/soxoj/maigret/tree/b6642744988e7e6c2d21f75db60ec3093019ba25">Maigret</a></td><td align="center">5,483</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>40.8%</strong><br><sub>5,482/5,483&nbsp;mapped</sub></td><td align="center">8 update days<br><sub>in the 30-day window</sub></td><td align="center"><a href="https://github.com/soxoj/maigret/commit/ec2d90ce19ffd419a4467997edf6c0e9cdf14e1f">10&nbsp;Oct&nbsp;2026</a></td></tr>
+    <tr><td align="left"><a href="https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b">User Scanner</a></td><td align="center">2,511</td><td align="center">211</td><td align="center">—</td><td align="center"><strong>68.9%</strong><br><sub>2,575/2,722&nbsp;mapped</sub></td><td align="center">13 update days<br><sub>in the 30-day window</sub></td><td align="center"><a href="https://github.com/kaifcodec/user-scanner/commit/3518f8430219570f2717e305e1787ab34040918e">15&nbsp;Oct&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/arxhr007/Aliens_eye/tree/b1316648fe0e648469d30512bb0535ebc8c4bbc7">Aliens Eye</a></td><td align="center">840</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>65.4%</strong><br><sub>837/840&nbsp;mapped</sub></td><td align="center">Too few updates</td><td align="center"><a href="https://github.com/arxhr007/Aliens_eye/commit/eb10623492e1e171ff2d7d9cfc043a4a0a0e493a">10&nbsp;Jun&nbsp;2026</a></td></tr>
-    <tr><td align="left"><a href="https://github.com/WebBreacher/WhatsMyName/tree/062bcfe48df79fa618e96edc79dc9673f3fe5643">WhatsMyName</a></td><td align="center">716</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>60.8%</strong><br><sub>716/716&nbsp;mapped</sub></td><td align="center">Every&nbsp;3.5&nbsp;days</td><td align="center"><a href="https://github.com/WebBreacher/WhatsMyName/commit/062bcfe48df79fa618e96edc79dc9673f3fe5643">16&nbsp;Sep&nbsp;2026</a></td></tr>
+    <tr><td align="left"><a href="https://github.com/WebBreacher/WhatsMyName/tree/062bcfe48df79fa618e96edc79dc9673f3fe5643">WhatsMyName</a></td><td align="center">716</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>60.8%</strong><br><sub>716/716&nbsp;mapped</sub></td><td align="center">3 update days<br><sub>in the 30-day window</sub></td><td align="center"><a href="https://github.com/WebBreacher/WhatsMyName/commit/ec273f81aa1b8728a932589dcba71c6894001acc">15&nbsp;Oct&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/sherlock-project/sherlock/tree/e40a45ec2a074b90703b3b4b842c8a3adbd6ada3">Sherlock</a></td><td align="center">481</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>98.5%</strong><br><sub>479/481&nbsp;mapped</sub></td><td align="center">Too few updates</td><td align="center"><a href="https://github.com/sherlock-project/sherlock/commit/dca64e35d36217335fb45373cde4891226aae182">28&nbsp;Apr&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/0xSaikat/findme/tree/85a860357f9b6a0df2dfb16ccd495fef93a5dfa1">FindMe</a></td><td align="center">412</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>99.8%</strong><br><sub>410/412&nbsp;mapped</sub></td><td align="center">No updates<br>in 6 months</td><td align="center"><a href="https://github.com/0xSaikat/findme/commit/ce2d34c54ed109f56fe798cda6171ce1f93b331d">14&nbsp;Jan&nbsp;2025</a></td></tr>
     <tr><td align="left"><a href="https://github.com/Yvesssn/DetectDee/tree/551817c911ddf3a25eba9d4addb56df1e15b8f2b">DetectDee</a></td><td align="center">375</td><td align="center">3</td><td align="center">4</td><td align="center"><strong>82.5%</strong><br><sub>380/382&nbsp;mapped</sub></td><td align="center">No updates<br>in 6 months</td><td align="center"><a href="https://github.com/Yvesssn/DetectDee/commit/6f54e661f2afdfe2a297dd54ee7d7cbab476dbca">19&nbsp;Jul&nbsp;2023</a></td></tr>
@@ -86,23 +97,25 @@
 
 ### Coverage and maintenance
 
-- **Expert-maintained coverage.** Our team aims to review all 19 source projects weekly and evaluates new OSINT projects as they emerge. The latest completed review is dated above. Suitable modules are tested, improved and integrated; broken modules are retired.
-- **Keep investigations current.** Search newly added lookup sources, or recheck saved identifiers and see newly discovered matches, changed details and inconclusive results.
-- **Choose your search size.** Guided username and email searches offer **Quick** (up to 300 checks), **Custom** (enter a number) and **Full** (all eligible checks). Settings changes the default for this session; each search can override it. Eligible enrichment stays enabled, and email domain analysis is separate.
-- **Balanced limited searches.** `--top 500` and Quick aim for 50/50 site checks and modules, filling unused slots from the other group. Limits apply per username/email after exclusions; email's module-only plan uses the available modules. Stored ranks order each group, not verified current popularity. Modules do not guarantee returned enrichment. Continue the full search to add remaining coverage, or use `--full`.
-- **Automatic update checks.** Interactive launches notify you about new releases. Use `consensus update` with your existing installation; installer-managed copies also support automatic installation, repair and rollback.
+- 🛠️ **Expert-maintained coverage.** Our team aims to review all 19 source projects weekly and evaluates new OSINT projects as they emerge. The latest completed review is dated above. Suitable modules are tested, improved and integrated; broken modules are retired.
+- 🔄 **Keep investigations current.** Search newly added lookup sources, or recheck saved identifiers with the original limit and filters. Compare newly discovered matches, changed details and inconclusive results.
+- 🎛️ **Choose your search size.** Guided username and email searches offer **Quick** (up to 300 checks), **Custom** (enter a number) and **Full** (all eligible checks). Use settings once, or choose **Settings → Save these preferences as my defaults** for future sessions. Eligible enrichment stays enabled, and email domain analysis is separate.
+- ⚖️ **Balanced limited searches.** `--top 500` and Quick aim for 50/50 site checks and modules, filling unused slots from the other group. Limits apply per username/email after exclusions; email's module-only plan uses the available modules. Stored ranks order each group, not verified current popularity. Modules do not guarantee returned enrichment. Continue the full search to add remaining coverage, or use `--full`.
+- 🔔 **Automatic update checks.** See new-release notices inside Consensus and update with your existing installation. See [Updates](#updates).
 
 ### Investigation workflow
 
-- **Follow new leads automatically.** Enable recursive search to investigate usernames, email addresses and linked accounts discovered in your results, expanding your search without entering each new lead yourself.
-- **Enriched results.** Go beyond found/not found with available profile details, including names, biographies and linked accounts. Inspect the returned information, see source coverage and compare details across results.
-- **Bulk search and advanced controls.** Process lists, generate username variations, filter sites and categories, and use proxies.
-- **Save your investigation.** Keep named investigations with multiple saved searches, notes and relevant/unrelated decisions. Storage is local and explicit; optional recent-search history is separate.
+- 🔀 **Follow new leads automatically.** Enable recursive search to investigate usernames, email addresses and linked accounts discovered in your results, expanding your search without entering each new lead yourself.
+- 👤 **Enriched results.** Go beyond found/not found with available profile details, including names, biographies and linked accounts. Inspect the returned information, see source coverage and compare details across results.
+- 📋 **Bulk search and advanced controls.** Process lists, generate username variations, filter sites and categories, and use proxies.
+- 🔁 **Retry unsuccessful checks.** Retry errors, blocks and inconclusive responses without repeating completed checks. Rate-limited checks cool down first. A proxy may help some access blocks, but is not a guaranteed fix or a reason to bypass rate limits.
+- 💾 **Save your investigation.** Keep named investigations, notes and review decisions. Saved/unsaved status and exit prompts help protect results. Storage is local and explicit; recent-search history is optional.
+- 🩺 **Check your setup.** **Settings → Setup / health** shows local installation details, optional dependencies, missing keys and report locations without contacting providers.
 
 ### Reports and integrations
 
-- **Reports and evidence graphs.** Export HTML, PDF, CSV or JSON; explore connections visually, with XMind and Neo4j exports also available.
-- **AI integration.** Optional MCP support connects compatible assistants to Consensus lookups and results.
+- 📂 **Reports and evidence graphs.** Choose a format when saving: HTML, PDF, CSV, JSON and more. Explore connections visually, with XMind and Neo4j exports also available.
+- 🤖 **AI integration.** Optional MCP support connects compatible assistants to Consensus lookups and results.
 
 ## See Consensus in action
 
@@ -137,7 +150,7 @@ Follow a search from query to evidence. Click any image to enlarge. Console scre
   </tr>
 </table>
 
-After a search, choose **Save report** and press **Enter**. Consensus saves both an HTML report and an interactive graph, with a separate link to open each in your browser.
+After a search, choose **Save report**, select a format, then confirm the location. The default **HTML report + graph** saves two files, with a separate link to open each in your browser. All outcomes are saved, including those hidden by display filters.
 
 ## Install
 
@@ -145,11 +158,15 @@ The Windows install bundle is recommended for most users. It sets up Python and 
 
 ### Windows quick install — no coding needed
 
-1. **Download:** open [Releases](https://github.com/OSINT-Experts-Society/Consensus-OSINT/releases), find **Assets**, and save the `Consensus-<version>.zip` installer to your Downloads folder.
-2. **Extract it:** right-click the ZIP, select **Extract All**, then **Extract**.
-3. **Install:** open the extracted folder, double-click **Install.cmd**, and wait for installation to finish. Keep your internet connection on.
-4. **Open Consensus:** choose **Launch Consensus** when prompted, or press the Windows key, type **Consensus**, and open the Start menu shortcut.
-5. **Start searching:** choose **Username**, **Email** or **Phone**, then enter what you want to look up.
+1. 📥 **Download:** open [Releases](https://github.com/OSINT-Experts-Society/Consensus-OSINT/releases), find **Assets**, and save the `Consensus-<version>.zip` installer to your Downloads folder.
+2. 📦 **Extract it:** right-click the ZIP, select **Extract All**, then **Extract**.
+3. ⚙️ **Install:** open the extracted folder, double-click **Install.cmd**, and wait for installation to finish. Keep your internet connection on.
+4. 🚀 **Open Consensus:** choose **Launch Consensus** when prompted, or press the Windows key, type **Consensus**, and open the Start menu shortcut.
+5. 🔎 **Start searching:** choose **Username**, **Email** or **Phone**, then enter what you want to look up.
+
+### Tested platforms
+
+The published **0.4.10** release was tested on **Windows and Linux**, including installation/update checks. Native macOS testing was not completed for that release; macOS installation instructions are available, but it is not labelled as tested. Platform tests do not guarantee that every external provider is available.
 
 ### Other installation options
 
@@ -185,7 +202,7 @@ Use `py` instead of `python` on Windows, or `python3` on macOS/Linux, if require
 2. Enter your query. Include the country code for phone numbers.
 3. Review matches, open enriched details, then **Save report**, **Filter results** or **Search again**.
 
-Choose **I Follow up** in results to continue a full search, search new sources, recheck or view changes. Choose **8 Investigations** from the main menu to save searches and notes together. Newly discovered profiles are not necessarily newly created accounts; an unavailable result does not prove deletion.
+Choose **I Follow up** in results to continue a full search, search new sources, recheck, retry unsuccessful checks or view changes. Choose **8 Investigations** to save searches and notes together. Newly discovered profiles are not necessarily newly created accounts; an unavailable result does not prove deletion. Follow-ups retain starting identifiers and filters, but do not repeat recursive expansion or optional web-search/mailbox discovery.
 
 Press **Esc** or **S** to stop an interactive scan; type `exit` to quit. Enable **Recent searches** in Settings to keep up to 10 searches locally. History is off by default.
 
@@ -203,9 +220,19 @@ Explore more with `consensus --help` or `consensus examples`.
 
 </details>
 
-## Update Consensus
+<a id="update-consensus"></a>
 
-Run `consensus update`, or choose **Settings → Installation & updates → Install update**. The command uses your existing installer, pip, pipx, uv tool, or clean Git checkout—no migration required. It retains installed optional capability groups and verifies the updated version and catalogue signature. The interactive interface asks before closing so you can save results first.
+## Updates
+
+🔔 **Check inside Consensus.** On launch, Consensus checks for a new version in the background and shows an update notice when one is available. **(latest)** beside the version means a recent successful check confirmed it. You can also open **Settings → Installation & updates → Check now**; offline or proxy-restricted checks may leave the latest version unknown.
+
+⬆️ **Get the latest version from your command line.** Close Consensus, then run this in **Command Prompt or PowerShell** on Windows, or **Terminal** on macOS/Linux—not at the `consensus>` prompt:
+
+```console
+consensus update
+```
+
+Alternatively, choose **Settings → Installation & updates → Install update**. Updates use your existing installer, pip, pipx, uv tool, or clean Git checkout—no migration required. Installed optional capabilities are retained. The interface asks before closing so you can save results first.
 
 Restart Consensus after updating. Source updates fast-forward the checkout's configured branch; installed source copies are reinstalled in the same environment. Local edits, pins, locked projects and OS-managed Python are protected: if an automatic update is unsafe, the command explains what needs attention rather than forcing it.
 
@@ -307,6 +334,7 @@ The server provides username, email and phone lookups, paginated results and det
 
 <p align="center">
   <a href="https://osint.ngo"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-website.svg" alt="Visit the OSINT Experts Society website" height="24"></a>
+  <a href="https://x.com/i/communities/1830313810718015507"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-x.svg" alt="Join our X community" height="24"></a>
   <a href="https://www.linkedin.com/groups/13047129/"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-linkedin.svg" alt="Join our LinkedIn community" height="24"></a>
   <a href="https://www.reddit.com/r/OSINTExperts/"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-badge-reddit.svg" alt="Join our Reddit community" height="24"></a>
 </p>
