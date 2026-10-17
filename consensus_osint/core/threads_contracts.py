@@ -10,6 +10,33 @@ from .mailbox_contracts import http_issue
 from .named_user_contracts import _text, _url
 
 
+def catalogue_scope(site):
+    return (site.id_type == "username" and site.method == "GET" and not site.url_probe
+            and re.fullmatch(r"https://(?:www\.)?threads\.(?:net|com)/@\{username\}/?", site.url) is not None)
+
+
+def catalogue_outcome(response, user):
+    """A shared login/landing page cannot establish either presence or absence."""
+    from types import SimpleNamespace
+
+    from consensus_osint.vendor.user_scanner.core.result import Status as NativeStatus
+
+    from .models import Status
+
+    try:
+        final = urlsplit(response.url)
+        if (final.scheme != "https" or final.hostname not in ("threads.net", "www.threads.net", "threads.com", "www.threads.com")
+                or final.username or final.password or final.port not in (None, 443)
+                or final.path.rstrip("/").casefold() != "/@" + user.casefold()):
+            return Status.UNKNOWN, "Redirect did not return the requested Threads profile"
+    except ValueError:
+        return Status.UNKNOWN, "Invalid Threads response URL"
+    observed = result(SimpleNamespace(status_code=response.status, text=response.text, headers=response.headers), user)
+    if observed.status is NativeStatus.TAKEN:
+        return Status.FOUND, None
+    return Status.UNKNOWN, "Inconclusive Threads response: " + str(observed.reason or "no query-bound profile evidence")
+
+
 def valid_user(user):
     return isinstance(user, str) and re.fullmatch(r"[A-Za-z0-9._]{1,30}", user) is not None
 
