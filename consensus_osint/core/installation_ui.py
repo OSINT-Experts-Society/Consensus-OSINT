@@ -13,6 +13,48 @@ from .. import __version__
 from . import install_manager as manager
 
 
+def health_rows():
+    """Read local metadata only: no provider calls, installs, keys or query values."""
+    from importlib import metadata
+
+    from .config import _ENV_KEYS, config_path, get_config, unused_settings
+    from .session_info import SessionInfo
+    from .update_backend import _FEATURES
+
+    rows = list(SessionInfo.current().rows())
+    rows += [("Python", sys.version.split()[0]), ("Python executable", sys.executable),
+             ("Environment", sys.prefix), ("Settings file", str(config_path()))]
+    for label, packages in _FEATURES.items():
+        missing = []
+        for package in packages:
+            try:
+                metadata.version(package)
+            except metadata.PackageNotFoundError:
+                missing.append(package)
+        rows.append((label.capitalize(), "Dependencies present (not operationally tested)" if not missing else
+                     "Missing dependencies: " + ", ".join(missing)))
+    cfg = get_config()
+    route = os.environ.get("CONSENSUS_PROXY") or cfg.get("defaults", {}).get("proxy")
+    rows.append(("Default scan route", "Proxy configured (not tested)" if route else
+                 "Tor configured (not tested)" if cfg.get("defaults", {}).get("tor") else "No Consensus proxy configured"))
+    keys = cfg.get("keys", {})
+    for name in _ENV_KEYS:
+        rows.append(("Optional key: " + name, "Configured (not tested)" if keys.get(name) else "Not configured"))
+    if unused_settings(cfg):
+        rows.append(("Settings warning", "Some settings are not recognised; check the config file before searching."))
+    return rows
+
+
+def health_screen(session):
+    session.printer.summary_table([["Setup / health", "Local status"], *health_rows()], "Setup / health · offline")
+    session.printer.message("No network tests or changes were made. Missing optional keys do not prevent ordinary searches. "
+                            "Browser dependencies do not prove that a browser is installed or usable.")
+    session.printer.message("For missing capabilities, use the optional-extras instructions in the README with your existing "
+                            "installation method. For keys, close Consensus and run 'consensus keys --help'. "
+                            "Open Settings → Installation & updates for update options.")
+    session.back_prompt("Enter / Esc to return: ")
+
+
 def status(root):
     managed = manager.managed_install(root)
     state = manager.active_install(root) if managed else None
@@ -108,12 +150,17 @@ def screen(session):
         if choice in ("", "0", "back", "cancel"):
             return
         try:
+            if choice in ("1", "2", "4", "6"):
+                from .app_update import require_update_route
+
+                require_update_route()
             if choice == "1":
-                from .app_update import notice_root, update_instruction
+                from .app_update import checked_release, notice_root, update_instruction
 
                 release = manager.release_for(root) if managed else manager.latest_release()
                 cache_root = root if managed else notice_root(root)
                 manager.atomic_json(cache_root / "update-check.json", {"checked_at": time.time(), "version": release["version"]})
+                checked_release(release["version"], time.time())
                 session.printer.message("Available version: " + release["version"])
                 if not managed:
                     session.printer.message(update_instruction())
@@ -135,7 +182,8 @@ def screen(session):
                     migrate(root, bundle, user_config_dir().resolve(), info.report_folder)
                     session.printer.message(f"Managed installation ready. Start with {root / 'bin' / ('consensus.cmd' if os.name == 'nt' else 'consensus')}")
                     session.printer.message("Switching closes this session. Save results first if local history is off.")
-                    if session.back_prompt("Switch to it now? [y/N]: ").strip().lower() in ("y", "yes"):
+                    if (session.back_prompt("Switch to it now? [y/N]: ").strip().lower() in ("y", "yes")
+                            and session.confirm_leave()):
                         session.restart_requested = True
                         return
             elif not managed and choice == "2":
@@ -154,7 +202,8 @@ def screen(session):
                     session.printer.message(f"Consensus {result['version']} is already up to date.")
             elif managed and choice == "3":
                 session.printer.message("Restart closes this session. Save results first if local history is off.")
-                if session.back_prompt("Restart now? [y/N]: ").strip().lower() in ("y", "yes"):
+                if (session.back_prompt("Restart now? [y/N]: ").strip().lower() in ("y", "yes")
+                        and session.confirm_leave()):
                     session.restart_requested = True
                     return
             elif managed and choice in ("4", "5"):

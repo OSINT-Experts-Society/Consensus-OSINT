@@ -108,7 +108,7 @@ def handle_key(key, control, owner, printer):
         printer.toggle_preview()
     elif key == "p" and not control.paused:
         control.pause()
-        printer.scan_state("Paused", "New site checks paused; checks already running may finish. R resumes, S stops.")
+        printer.scan_state("Paused", "New checks paused; checks already running may finish. R resumes, S stops.")
     elif key in ("r", "c") and control.paused:
         control.resume()
         printer.scan_state("Scanning", "Continuing scan. P pauses, S stops.")

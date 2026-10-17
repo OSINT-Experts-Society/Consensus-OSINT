@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import copy
 import json
+import math
+import time
 from datetime import datetime, timezone
 
 from .models import INFO_CATEGORIES, ScanSummary, Status
@@ -61,16 +63,44 @@ def new_source_counts(summary, current=None):
 
 class Continuation:
     def __init__(self, previous, mode):
-        if mode not in ("continue", "new", "recheck"):
+        if mode not in ("continue", "new", "recheck", "retry"):
             raise ValueError("Unknown search action")
         self.previous, self.mode = previous, mode
         self.old = saved_inventory(previous) if mode == "new" else {}
         self.completed = {}
+        self.retryable = {}
+        self.deferred = 0
+        cooling = set()
+        now = time.time()
         for finding in previous.findings:
             if finding.status.is_definitive:
                 self.completed.setdefault((finding.query, finding.query_type), set()).add(lookup_id(finding))
+            if (mode == "retry" and finding.category not in INFO_CATEGORIES
+                    and finding.status in (Status.ERROR, Status.BLOCKED, Status.UNKNOWN, Status.RATE_LIMITED)):
+                if finding.status is Status.RATE_LIMITED:
+                    # Never immediately hammer a throttled service. Honour a recorded
+                    # numeric Retry-After when available; otherwise wait at least a minute.
+                    delay = finding.extra.get("retry_after", 60)
+                    try:
+                        valid_delay = type(delay) in (int, float) and math.isfinite(delay) and delay >= 60
+                    except OverflowError:
+                        valid_delay = False
+                    if not valid_delay:
+                        delay = 60
+                    if now < finding.ts + delay:
+                        cooling.add((finding.query, finding.query_type, lookup_id(finding)))
+                        continue
+                self.retryable.setdefault((finding.query, finding.query_type), set()).add(lookup_id(finding))
+        # One throttled observation suppresses the entire lookup, even if another
+        # result from it was an error. Input order must not bypass a cooldown.
+        for query, kind, key in cooling:
+            self.retryable.get((query, kind), set()).discard(key)
+        self.deferred = len(cooling)
 
     def allows(self, query, kind, key):
+        if self.mode == "retry":
+            return (key in self.retryable.get((query, kind), set())
+                    and key not in self.completed.get((query, kind), set()))
         if self.mode == "new":
             return key not in self.old.get(kind, []) and key not in self.completed.get((query, kind), set())
         return self.mode == "recheck" or key not in self.completed.get((query, kind), set())
