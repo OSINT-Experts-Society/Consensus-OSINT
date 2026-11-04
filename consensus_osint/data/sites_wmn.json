@@ -25879,7 +25879,7 @@
   },
   {
    "id": "pronouns-page",
-   "name": "Pronouns.Page",
+   "name": "Pronouns.page",
    "url": "https://pronouns.page/@{username}",
    "url_main": "https://pronouns.page",
    "url_probe": "https://pronouns.page/api/profile/get/{username}?version=2",
@@ -25894,13 +25894,13 @@
      200
     ],
     "found_strings": [
-     "username"
+     "\"username\":"
     ],
     "missing_status": [
-     304
+     404
     ],
     "missing_strings": [
-     "\"profiles\": {}"
+     "Page was not found"
     ]
    },
    "regex_check": null,
