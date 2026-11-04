@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "consensus-osint"
-version = "0.4.11"
+version = "0.4.12"
 description = "Expert-maintained username, email and phone intelligence with 9,700+ lookup checks from 19 open-source projects."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,6 +22,7 @@ classifiers = [
 # The default install scans the 5,700+ site database, does e-mail and phone analysis,
 # keyless breach / Gravatar checks, and every report format except PDF.
 dependencies = [
+  "certifi>=2026.10.23",          # current CA removals for HTTP/curl transports
   "httpx[http2,socks]>=0.28,<1",   # includes socks5h support; h2 and socksio are pure-Python
   "rich>=13.0",                  # terminal output (degrades to plain text if absent)
   "prompt-toolkit>=3.0.51,<4",    # pinned session footer, input editing and terminal restoration
@@ -37,10 +38,10 @@ dependencies = [
 # profile-metadata extraction, and browser TLS impersonation. This is where the few
 # larger compiled packages live, keeping the default installation small.
 modules = [
-  "aiohttp>=3.14.3",         # socialscan
+  "aiohttp>=3.14.5",         # socialscan; current parser/connection fixes
   "trio>=0.27",           # holehe, ignorant
   "lxml>=6.1.0",            # faster HTML parsing
-  "curl_cffi>=0.15.0",       # TLS-fingerprint impersonation for protected sites
+  "curl_cffi>=0.17.0",       # updated bundled Brotli and TLS fingerprints
   "socid-extractor>=0.0.27", # scrape structured metadata from a found profile
   "requests>=2.33.0",       # a couple of vendored modules
   "termcolor>=2.0",

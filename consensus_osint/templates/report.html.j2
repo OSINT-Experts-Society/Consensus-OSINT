@@ -91,6 +91,7 @@
   {{ community() }}
   <p class="notice"><strong>Health &amp; lawful use.</strong> {{ identity.warning }}</p>
   {% if facts.interrupted %}<p class="notice"><strong>Partial scan.</strong> The scan was interrupted. These are the results collected before it stopped.</p>{% endif %}
+  {% if facts.budget_notice %}<p class="notice">{{ facts.budget_notice }}</p>{% endif %}
   {% if facts.omitted %}<p class="notice"><strong>Filtered input.</strong> The saved input omitted {{ facts.omitted }} result(s). Re-rendering cannot recover them; totals here describe the available rows.</p>{% endif %}
   <div class="stats" aria-label="Scan totals">
     <div class="stat"><b>{{ facts.matches }}</b><span>matches reported</span></div>

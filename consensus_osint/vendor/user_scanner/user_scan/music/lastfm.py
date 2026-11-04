@@ -1,11 +1,16 @@
 from consensus_osint.vendor.user_scanner.core.orchestrator import generic_validate, Result
+from consensus_osint.core.profile_page_contracts import native_guard
+from urllib.parse import quote
 
 
 def validate_lastfm(user):
-    url = f"https://www.last.fm/user/{user}"
-    show_url = f"https://www.last.fm/user/{user}"
+    url = f"https://www.last.fm/user/{quote(user, safe='')}"
+    show_url = url
 
     def process(response):
+        guarded = native_guard("lastfm", response, user)
+        if guarded is not None:
+            return guarded.update(url=show_url)
         if response.status_code == 404:
             return Result.available()
         elif response.status_code == 200:
