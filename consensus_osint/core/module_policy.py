@@ -18,6 +18,11 @@ class Restriction:
 
 
 RESTRICTIONS: Mapping[str, Restriction] = MappingProxyType({
+    "us-user-community-sidvind": Restriction(disabled_reason='Unavailable in this release.'),
+    "us-user-dev-hotwired": Restriction(disabled_reason='Unavailable in this release.'),
+    "us-user-dev-pihole": Restriction(disabled_reason='Unavailable in this release.'),
+    "us-user-music-allthelyrics": Restriction(disabled_reason='Unavailable in this release.'),
+    "us-user-music-greenday": Restriction(disabled_reason='Unavailable in this release.'),
     "us-user-email-protonmail": Restriction(disabled_reason='Unavailable in this release.'),
     "us-user-dev-bitquery": Restriction(disabled_reason='Unavailable in this release.'),
     "us-user-dev-gumloop": Restriction(disabled_reason='Unavailable in this release.'),
@@ -168,7 +173,7 @@ RESTRICTIONS: Mapping[str, Restriction] = MappingProxyType({
     'us-email-creator-flickr': Restriction(disabled_reason='Unavailable in this release.'),
     'us-email-creator-gumroad': Restriction(disabled_reason='Unavailable in this release.', require_loud=True),
     'us-email-crm-hubspot': Restriction(require_loud=True),
-    'us-email-dating-locanto': Restriction(disabled_reason='Unavailable in this release.'),
+    'us-email-dating-locanto': Restriction(disabled_reason='Unavailable in this release.', require_loud=True),
     'us-email-dev-codewars': Restriction(disabled_reason='Unavailable in this release.'),
     'us-email-dev-devrant': Restriction(disabled_reason='Unavailable in this release.'),
     'us-email-dev-hackerone': Restriction(disabled_reason='Unavailable in this release.'),

@@ -575,10 +575,15 @@ def _valid_result_url(url) -> bool:
 
 
 async def _run_engine(name, fn, username, query, http, pages) -> list[dict]:
+    from .scan_budget import STOP_REASON, admit_check
+
     out = SearchResults()
     if name != "yandex" and not _HAVE_BS4:
         _issue(out, username, name, Status.SKIPPED,
                "HTML search parsing requires beautifulsoup4; repair the Consensus core installation.")
+        return out
+    if not admit_check():
+        _issue(out, username, name, Status.SKIPPED, STOP_REASON)
         return out
     try:
         group = await fn(username, query, http, pages)

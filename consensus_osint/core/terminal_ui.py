@@ -18,7 +18,7 @@ import time
 from .session_info import SessionInfo
 
 _current = contextvars.ContextVar("consensus_terminal_ui", default=None)
-_controls = re.compile(r"[\x00-\x1f\x7f-\x9f]")
+_controls = re.compile(r"[\x00-\x1f\x7f-\x9f\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]")
 _SCAN_TIPS = (
     "A shared username is a lead, not proof that accounts share an owner.",
     "Compare names, biographies and linked websites before joining identities.",

@@ -14,6 +14,7 @@ from .branding import ACCENT
 from .models import INFO_CATEGORIES, Status
 from .presentation import assessment, enrichment_fields, has_details, split_fields
 from .provenance import repository_coverage
+from .scan_budget import budget_notice
 from .terminal_ui import clean
 
 
@@ -58,10 +59,13 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
         matches = [f for f in findings if f.status is Status.FOUND and f.category not in INFO_CATEGORIES]
         inconclusive = sum(f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
                            for f in findings if f.category not in INFO_CATEGORIES)
-        title = "Search stopped · partial results" if summary.options.get("interrupted") else "Search complete"
+        notice = budget_notice(summary.options)
+        title = "Search stopped · partial results" if summary.options.get("interrupted") or notice else "Search complete"
         if filters:
             title += " · filtered view"
         out.print(Text(title, style=f"bold {ACCENT}"))
+        if notice:
+            out.print(Text(notice, style="yellow"))
         if filters:
             label = " · ".join(clean(value) for value in (filters.get("site"), filters.get("kind")) if value)
             out.print(Text("Filter: " + label
@@ -82,7 +86,7 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
             out.print(Text("X = project lists this lookup; coverage does not mean separate searches.", style="dim"))
         if any(assessment(f)[0] == "Needs review" for f in matches):
             out.print(Text("Possible match = limited evidence. Select the result label to see why.", style="dim"))
-        if summary.options.get("interrupted"):
+        if summary.options.get("interrupted") or notice:
             out.print(Text("Only collected outcomes are shown; this is not a complete search.", style="yellow"))
         identifiers = {id(f): str(i + 1) for i, f in enumerate(findings)}
         groups = group_by_query(summary)
@@ -103,7 +107,7 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
             if not shown:
                 if filters:
                     message = "No rows match these filters. Press F to change or clear them."
-                elif summary.options.get("interrupted"):
+                elif summary.options.get("interrupted") or notice:
                     message = "No matches reported before the search stopped. This search is incomplete."
                 elif any(f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
                          for f in group.findings if f.category not in INFO_CATEGORIES):

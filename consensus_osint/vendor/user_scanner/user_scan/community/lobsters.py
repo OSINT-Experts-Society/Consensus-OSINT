@@ -4,9 +4,12 @@ from consensus_osint.vendor.user_scanner.core.helpers import get_random_user_age
 from consensus_osint.vendor.user_scanner.core.orchestrator import Result, generic_validate
 
 def validate_lobsters(user: str) -> Result:
-    encoded_user = urllib.parse.quote(user)
+    encoded_user = urllib.parse.quote(user, safe="")
     url = f"https://lobste.rs/~{encoded_user}"
     show_url = url
+
+    if "." in user:
+        return Result.error("Handles containing a period are not addressable", url=show_url)
 
     headers = {
         "User-Agent": get_random_user_agent(),

@@ -72,7 +72,9 @@ STATUS_SYMBOL = {
     Status.SKIPPED: "[ ]",
 }
 
-_CONTROLS = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f]")
+# Strip explicit direction overrides/isolation marks only at the display boundary;
+# ordinary Arabic/Hebrew text and joiners remain intact in both output and data.
+_CONTROLS = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]")
 
 
 def _display(value, *, single_line=False) -> str:
@@ -641,7 +643,10 @@ class Printer:
         # unparseable number or address is not a site that answered "no match".
         no_match, skipped = (sum(f.category not in INFO_CATEGORIES and f.status is status for f in summary.findings)
                              for status in (Status.NOT_FOUND, Status.SKIPPED))
-        title = "Partial scan" if summary.options.get("interrupted") else "Scan complete"
+        from .scan_budget import budget_notice
+
+        notice = budget_notice(summary.options)
+        title = "Partial scan" if summary.options.get("interrupted") or notice else "Scan complete"
         lines = [f"{len(matches)} matches  /  {details_count} with additional information  /  {review} need review",
                  f"{len(summary.findings)} results in {elapsed}  /  {info} background checks",
                  f"No match {no_match}  |  Inconclusive {incomplete}  |  Skipped {skipped}"]
@@ -657,6 +662,8 @@ class Printer:
                                      border_style=ACCENT, box=box.ROUNDED))
         else:
             self.message(title + " — " + "; ".join(lines), always=True)
+        if notice:
+            self.message(notice, "yellow", always=True)
         decoding = sum(bool(f.extra.get("_text_decoding")) for f in summary.findings)
         if decoding:
             self.message(f"Text decoding: {decoding} result(s) contain replaced characters; review their text.",

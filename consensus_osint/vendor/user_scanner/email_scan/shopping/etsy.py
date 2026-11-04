@@ -14,18 +14,20 @@ async def _check(email: str) -> Result:
     url = "https://www.etsy.com/api/v3/ajax/public/users/by-identity-optional"
     show_url = "https://www.etsy.com"
 
-    params = {"identity": email}
+    params = {"identity": email,
+              "features": "api.oauth2.consent_page:on,design_systems.signin_flow_experiment:on"}
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Mobile Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Linux; Android 11; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/155.0.8059.46 Mobile Safari/537.36 Mobile/1 EtsyInc/8.1.0 Android/1",
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "identity",
-        "x-detected-locale": "INR|en-IN|IN",
+        "x-etsy-protection": "1",
+        "x-requested-with": "com.etsy.android",
         "sec-ch-ua-platform": '"Android"',
-        "sec-ch-ua": '"Brave";v="147", "Not.A/Brand";v="8", "Chromium";v="147"',
+        "sec-ch-ua": '"Android WebView";v="155", "Chromium";v="155", "Not(A:Brand";v="24"',
         "sec-ch-ua-mobile": "?1",
         "Content-Type": "application/json",
-        "Referer": "https://www.etsy.com/join/email",
+        "Referer": "https://www.etsy.com/oauth2/signin",
         "Priority": "u=1, i",
     }
 

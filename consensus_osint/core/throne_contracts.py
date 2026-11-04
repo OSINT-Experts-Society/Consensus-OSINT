@@ -57,7 +57,11 @@ def result(response, user, request):
             or "__N_REDIRECT" in page_props or "__N_REDIRECT_STATUS" in page_props):
         return Result.error("Fallback did not establish a creator profile")
     fallback = page_props.get("fallback")
-    profile = fallback.get(f"$sub$public/useCreatorByUsername/{user}") if isinstance(fallback, dict) and not has_service_error(fallback) else None
+    profiles = [fallback[key] for key in (f"public/useCreatorByUsername/{user}",
+                                         f"$sub$public/useCreatorByUsername/{user}") if key in fallback] if isinstance(fallback, dict) and not has_service_error(fallback) else []
+    if len(profiles) == 2 and profiles[0] != profiles[1]:
+        return Result.error("Conflicting creator profile objects")
+    profile = profiles[0] if profiles else None
     if not isinstance(profile, dict) or has_service_error(profile) or profile.get("username") != user:
         return Result.error("Creator identity does not match query")
     extra, media = {"username": user}, {}

@@ -1,14 +1,19 @@
 {
   "schema": 1,
-  "expert_review_date": "2026-10-16",
-  "catalogue_date": "2026-10-16",
-  "added_modules": 13,
-  "added_site_rules": 1782,
+  "expert_review_date": "2026-11-01",
+  "catalogue_date": "2026-11-03",
+  "added_modules": 12,
+  "added_site_rules": 342,
   "repaired_modules": null,
   "retired_modules": null,
-  "scope": "Accepted weekly intake; implementation counts, not unique websites. One changed eBay rule reaccepted.",
-  "source_review_date": "2026-10-15",
+  "scope": "Completed weekly acceptance; new website hosts and existing-site improvements counted separately.",
+  "source_review_date": "2026-11-01",
   "held_module_candidates": 11,
-  "held_site_candidates": 161,
-  "enabled_implementations": 9778
+  "held_site_candidates": 193,
+  "accepted_intake_date": "2026-11-02",
+  "pending_module_candidates": 0,
+  "pending_site_candidates": 30,
+  "new_websites": 321,
+  "existing_website_improvements": 33,
+  "single_sided_acceptances": 1
 }

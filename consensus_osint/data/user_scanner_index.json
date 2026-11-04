@@ -874,7 +874,7 @@
   },
   "email_scan/shopping/etsy.py": {
    "sha256": [
-    "15982083918a70b4686b4ca2d298a5dd81326d5d9193085e8bd5197a2b6d8572"
+    "066aba040ffc74c807224098475bc0323650501c67d16ba48c69d3f009648481"
    ],
    "url_main": "https://www.etsy.com"
   },
@@ -2422,7 +2422,7 @@
   },
   "user_scan/community/lobsters.py": {
    "sha256": [
-    "c429b91c5fb23cbd71306d2d9d2f302bbed8b57710a2fc5352cbbc0ff21dc16f"
+    "b1b76da67d97fe6d82730513b063ab11f4fafcead39053c7bd05950dc7593896"
    ],
    "url_main": "https://lobste.rs/~{username}"
   },
@@ -7354,19 +7354,19 @@
   },
   "user_scan/gaming/git_eden_emu_dev.py": {
    "sha256": [
-    "b3db88c99d3a41632d92f53668b0626af8ccbbdd5485c1b0f53f90c94308c791"
+    "ea3e9922d3015b5038775595e4b80e18d17a0a8e985e49b9ce6ce181a498d07a"
    ],
    "url_main": "https://git.eden-emu.dev/{username}"
   },
   "user_scan/gaming/git_minestar_com_ua.py": {
    "sha256": [
-    "f3aff44f8b27e245cb63c6009e6c31cdaff6c3fbfd63ca4a4440928f416b58c8"
+    "78a7796751ce6f9c6e503adf00407c744d9323bfc05e322dd0944f278cdae1b0"
    ],
    "url_main": "https://git.minestar.com.ua/{username}"
   },
   "user_scan/gaming/git_xeondev_com.py": {
    "sha256": [
-    "e41dbed988ed7bda782c7f50209e0be6b36e67e3b8ac2270753f7e08a7a576cc"
+    "1f58337505672e8e7e410d529df92d5f30c56c19d3e610a1f8f0cbbf47386d98"
    ],
    "url_main": "https://git.xeondev.com/{username}"
   },
@@ -7381,6 +7381,60 @@
     "3726336361c2248706d222861356f2e60796127ba7c18f9b1becc8b22367149b"
    ],
    "url_main": "https://forum.godotengine.org/u/{username}"
+  },
+  "user_scan/gaming/habbo_com.py": {
+   "sha256": [
+    "5d21cdf942f847c4a6434cc3b1ca2bd2f629b959ded1276dd7917e4ed8224b29"
+   ],
+   "url_main": "https://www.habbo.com/profile/{username}"
+  },
+  "user_scan/gaming/habbo_com_br.py": {
+   "sha256": [
+    "aa365cb8cb3042eb4bbf01fce29436ce36e382cf2378fea682aa7b213498c7f3"
+   ],
+   "url_main": "https://www.habbo.com.br/profile/{username}"
+  },
+  "user_scan/gaming/habbo_com_tr.py": {
+   "sha256": [
+    "0549a3db26af1bc57f588f50f4887a37f740f8a75c8def8bebff3294b927d5d2"
+   ],
+   "url_main": "https://www.habbo.com.tr/profile/{username}"
+  },
+  "user_scan/gaming/habbo_de.py": {
+   "sha256": [
+    "d6b8479cb425ee9c1cff5aa81a1d91f891779c8fc01cf388bd8e42ff9bf0c4c2"
+   ],
+   "url_main": "https://www.habbo.de/profile/{username}"
+  },
+  "user_scan/gaming/habbo_es.py": {
+   "sha256": [
+    "16bdb925cd3e803311f1fae6bef214cf7faa4b3a4cf5a3a1adad4672529c6e98"
+   ],
+   "url_main": "https://www.habbo.es/profile/{username}"
+  },
+  "user_scan/gaming/habbo_fi.py": {
+   "sha256": [
+    "2eb333207c91841b6ed7edbdb0368a15605e5454e7d6d00683cab9c76777a0dd"
+   ],
+   "url_main": "https://www.habbo.fi/profile/{username}"
+  },
+  "user_scan/gaming/habbo_fr.py": {
+   "sha256": [
+    "6209350f5d2056fe60115c49b3782ffa8b2c2bbf4bf0a78784f89c57fb5e3510"
+   ],
+   "url_main": "https://www.habbo.fr/profile/{username}"
+  },
+  "user_scan/gaming/habbo_it.py": {
+   "sha256": [
+    "71bd35f75c3bfb178931dc43cb5e372732c53a49a79de89c740ae4c1d22857e6"
+   ],
+   "url_main": "https://www.habbo.it/profile/{username}"
+  },
+  "user_scan/gaming/habbo_nl.py": {
+   "sha256": [
+    "fa6d70a120c6fee025b82c6d776d88156646e00069f79ebb3014659519dc6404"
+   ],
+   "url_main": "https://www.habbo.nl/profile/{username}"
   },
   "user_scan/gaming/heroiclabs.py": {
    "sha256": [
@@ -7543,6 +7597,24 @@
     "3529bfdcbb3e56ecdd0e1fe2053c1c839b18e779668bfab6a19d44d1c61fcb34"
    ],
    "url_main": "https://forum.openmod.org/u/{username}"
+  },
+  "user_scan/gaming/origins_habbo_com.py": {
+   "sha256": [
+    "5b5eb2f4b9caa681ac56b45cf5927ed7f44877076a76b4c700eb314cf2aed7b3"
+   ],
+   "url_main": "https://origins.habbo.com/profile/{username}"
+  },
+  "user_scan/gaming/origins_habbo_com_br.py": {
+   "sha256": [
+    "37bb1e058cf7b1e052c2648a08b5499e3cc4d2dd0671b978ef30a176be076b86"
+   ],
+   "url_main": "https://origins.habbo.com.br/profile/{username}"
+  },
+  "user_scan/gaming/origins_habbo_es.py": {
+   "sha256": [
+    "8b4e6a6a34c2e972f3fb865288b8bd8e0ee50e3cff4b647d43ddafa12ae7d417"
+   ],
+   "url_main": "https://origins.habbo.es/profile/{username}"
   },
   "user_scan/gaming/phaser.py": {
    "sha256": [

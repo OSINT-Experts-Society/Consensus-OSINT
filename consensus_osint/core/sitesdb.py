@@ -37,6 +37,18 @@ DEFAULT_FILES = [DATA_DIR / "sites.json", DATA_DIR / "sites_wmn.json", DATA_DIR 
 
 # Reviewed request contracts; overrides cannot make these ambiguous probes valid.
 _AUDIT_RESTRICTIONS = MappingProxyType({
+    "fredmiranda": 'Unavailable in this release.',
+    "smart-lab-ru": 'Unavailable in this release.',
+    "swame-com": 'Unavailable in this release.',
+    "indiblogger-in": 'Unavailable in this release.',
+    "intake-catalogue-community-nanit-com": 'Unavailable in this release.',
+    "intake-catalogue-blaseball-wiki": 'Unavailable in this release.',
+    "dalnoboi": 'Unavailable in this release.',
+    "ifilo": 'Unavailable in this release.',
+    "intake-catalogue-fsmi-social": 'Unavailable in this release.',
+    "weekly-maigret-forum-mineland-net-f1c47afb": 'Unavailable in this release.',
+    "weekly-maigret-techniarabia-com-5f57cc05": 'Unavailable in this release.',
+    "weekly-maigret-maxumownersclub-com-385867c7": 'Unavailable in this release.',
     "g-news": 'Unavailable in this release.',
     "3dcadforums": 'Unavailable in this release.',
     "amperka": 'Unavailable in this release.',

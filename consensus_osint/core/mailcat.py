@@ -587,6 +587,8 @@ _CONFIDENCE = {Status.FOUND: 0.8, Status.NOT_FOUND: 0.6}
 
 
 async def _run_provider(pc: ProviderCheck, username: str, http: Http, timeout: float) -> Finding:
+    from .scan_budget import STOP_REASON, admit_check
+
     base = dict(
         query=username,
         query_type="username",
@@ -600,6 +602,8 @@ async def _run_provider(pc: ProviderCheck, username: str, http: Http, timeout: f
         return Finding(status=Status.SKIPPED, error="SMTP checks cannot use the configured proxy", **base)
     if pc.disabled_reason:
         return Finding(status=Status.SKIPPED, error=pc.disabled_reason, **base)
+    if not admit_check():
+        return Finding(status=Status.SKIPPED, error=STOP_REASON, extra={"_budget_skipped": True}, **base)
     try:
         status, email, extra = await asyncio.wait_for(pc.check(username, http, timeout), timeout=timeout + 5)
     except asyncio.TimeoutError:
