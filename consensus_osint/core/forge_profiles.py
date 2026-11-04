@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import json
 
+from .email_validation import _unique_object
 from .models import Status
+from .provider_contracts import has_service_error
 
 HOSTS = {"codeberg": "codeberg.org", "gitea": "gitea.com"}
 
@@ -26,7 +28,7 @@ def profile_outcome(code: int, text: str, query: str, headers=None) -> tuple[Sta
     if code not in (200, 404):
         return (Status.ERROR if code >= 500 else Status.UNKNOWN), {}, f"Unexpected profile response (HTTP {code})"
     try:
-        data = json.loads(text)
+        data = json.loads(text, object_pairs_hook=_unique_object)
     except (ValueError, TypeError):
         return Status.UNKNOWN, {}, "Profile response is not valid JSON"
     if not isinstance(data, dict):
@@ -39,7 +41,7 @@ def profile_outcome(code: int, text: str, query: str, headers=None) -> tuple[Sta
         if missing and data.get("id") is None and data.get("login") is None:
             return Status.NOT_FOUND, {}, None
         return Status.UNKNOWN, {}, "Response lacks explicit missing-user evidence"
-    if (type(data.get("id")) is not int or data["id"] <= 0 or not isinstance(data.get("login"), str)
+    if (has_service_error(data) or type(data.get("id")) is not int or data["id"] <= 0 or not isinstance(data.get("login"), str)
             or not data["login"] or data["login"].lower() != query.lower() or data.get("message") or data.get("error")):
         return Status.UNKNOWN, {}, "Response lacks a typed profile matching the requested username"
     fields = {"id": data["id"], "login": data["login"]}

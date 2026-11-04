@@ -27,17 +27,26 @@ def _url(value):
 
 
 def result(response, site, query):
-    issue, reason = http_issue(response.status_code, response.headers, response.text)
+    issue, reason = http_issue(response.status_code, response.headers, response.text,
+                               accepted=(200, 404) if site == "habbo" else (200,))
     if issue is not None:
         return Result.error(reason)
+    if site == "habbo" and response.status_code == 404:
+        try:
+            missing = json.loads(response.text, object_pairs_hook=_unique_object)
+        except (TypeError, ValueError):
+            missing = None
+        if missing == {"error": "not-found"}:
+            return Result.available()
+        return Result.error("No explicit missing Habbo profile")
     try:
         data = json.loads(response.text, object_pairs_hook=_unique_object)
     except (TypeError, ValueError):
         data = None
     if not isinstance(data, dict) or has_service_error(data):
         return Result.error("No coherent user object")
-    username = data.get("login" if site in ("gitee", "githubgist") else "username")
-    identity = data.get("player_id" if site == "chess_com" else "id")
+    username = data.get("name" if site == "habbo" else "login" if site in ("gitee", "githubgist") else "username")
+    identity = data.get("uniqueId" if site == "habbo" else "player_id" if site == "chess_com" else "id")
     valid_identity = (
         (type(identity) is int and identity > 0)
         if site in ("scratch", "chess_com", "gitee", "githubgist")
@@ -53,7 +62,17 @@ def result(response, site, query):
     if site != "hex_pm":
         extra["user_id"] = identity
     media = {}
-    if site == "codewars":
+    if site == "habbo":
+        for key in ("motto", "memberSince", "lastAccessTime"):
+            if value := _text(data.get(key)):
+                extra[key] = value
+        for key in ("online", "profileVisible"):
+            if type(data.get(key)) is bool:
+                extra[key] = data[key]
+        for key in ("currentLevel", "totalExperience", "starGemCount"):
+            if type(data.get(key)) is int and data[key] >= 0:
+                extra[key] = data[key]
+    elif site == "codewars":
         extra["id"] = identity
         for key in ("name", "clan"):
             if value := _text(data.get(key)):
@@ -121,6 +140,11 @@ def result(response, site, query):
                 extra[key] = value
         if type(data.get("followers")) is int and data["followers"] >= 0:
             extra["followers"] = str(data["followers"])
+        if value := _url(data.get("country")):
+            extra["country"] = value
+        for key in ("joined", "last_online"):
+            if type(data.get(key)) is int and 0 <= data[key] < 253402300800:
+                extra[key] = data[key]
         if value := _url(data.get("avatar")):
             media["avatar"] = value
         if value := _url(data.get("twitch_url")):
