@@ -50,10 +50,12 @@ class SearchHistory:
         key = uuid.uuid4().hex
         atomic_json(self.path(key), value)
         from .reports import group_by_query
+        from .scan_budget import budget_notice
 
         atomic_json(self.path(key).with_suffix(".meta"), {
             "title": ", ".join(v.title for v in group_by_query(summary)), "found": len(summary.found),
-            "partial": bool(summary.options.get("interrupted")), "saved_at": summary.finished or summary.started})
+            "partial": bool(summary.options.get("interrupted") or budget_notice(summary.options)),
+            "saved_at": summary.finished or summary.started})
         for path in self.files()[KEEP:]:
             self.delete(path.stem)
         return key

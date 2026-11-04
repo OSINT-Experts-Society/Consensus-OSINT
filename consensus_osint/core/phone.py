@@ -442,8 +442,12 @@ def _changed_resource(requested: str, returned: str | None) -> bool:
 
 
 async def _guarded(fn: Callable[[], Awaitable[Finding]], base: dict, info: dict) -> Finding:
+    from .scan_budget import STOP_REASON, admit_check
+
     if not _online_allowed(info):
         return Finding(status=Status.SKIPPED, error="online phone checks require +country code or an explicit default region", **base)
+    if not admit_check():
+        return Finding(status=Status.SKIPPED, error=STOP_REASON, extra={"_budget_skipped": True}, **base)
     try:
         return await fn()
     except Exception as exc:  # noqa: BLE001 - scrapers must never break a scan

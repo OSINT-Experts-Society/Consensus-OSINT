@@ -10,6 +10,9 @@ from .mailbox_contracts import http_issue
 from .models import Status
 
 ROUTES = {
+    "lastfm": ["https://www.last.fm/user/{query}"],
+    "officiating": ["https://forum.officiating.com/members/{query}.html", "https://forum.officiating.com/u/{query}"],
+    "fl": ["https://www.fl.ru/users/{query}", "https://www.fl.ru/users/{query}/portfolio/"],
     "atcoder": ["https://atcoder.jp/users/{query}"],
     "bio_link": ["https://bio.link/{query}"],
     "gumroad": ["https://{query}.gumroad.com/", "https://www.gumroad.com/{query}"],
@@ -27,6 +30,8 @@ ROUTES = {
                     "https://tripadvisor.com/members/{query}", "https://www.tripadvisor.com/members/{query}"],
 }
 CATALOGUE = {
+    "last-fm": "lastfm",
+    "officiating": "officiating", "fl": "fl", "fl-ru": "fl",
     "atcoder": "atcoder",
     "biolink": "bio_link", "gumroad": "gumroad", "gumroad-x-gumroad-com": "gumroad",
     "itch-io-2": "itch_io", "bitbucket": "bitbucket", "crowdin": "crowdin",
@@ -133,7 +138,17 @@ def verdict(provider, code, text, query, headers, final_url="", missing_strings=
         if code == 200 and marker and not re.search(r"not found|error|unavailable", title, re.I):
             return Status.FOUND, None
         return unknown  # An absent profile page is not account absence.
-    if provider == "bio_link":
+    if provider == "lastfm":
+        marker = bool(page.select_one(".header-title, .header-title-display-name, .header-title-secondary")
+                      and (bound or (canonical and named)))
+    elif provider == "officiating":
+        marker = bool(page.select_one(".user-profile, .user-main, .member-profile")
+                      and (bound or (canonical and named)))
+    elif provider == "fl":
+        marker = bool(page.select_one(".profile_header--info, .page-profile")
+                      and (bound or (canonical and named)))
+        missing_strings = (*missing_strings, "Страница не найдена")
+    elif provider == "bio_link":
         marker = bound
     elif provider == "gumroad":
         marker = bool("gumroad" in title.casefold() and page.find("img", alt=re.compile(r"['’]s profile picture", re.I)))

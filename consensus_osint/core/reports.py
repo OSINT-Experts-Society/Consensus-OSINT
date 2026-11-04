@@ -50,6 +50,7 @@ from .continuity import observation_time
 from .models import INFO_CATEGORIES, Finding, QueryType, ScanSummary, Status, redact_options
 from .presentation import assessment, enrichment_fields, has_details, split_fields
 from .provenance import LEGEND, coverage_text, information_source, repository_coverage
+from .scan_budget import budget_notice
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 HTML_TEMPLATE = "report.html.j2"
@@ -501,6 +502,7 @@ def _facts(summary: ScanSummary, views: list) -> dict:
                                _status(f) in (Status.UNKNOWN, Status.ERROR, Status.BLOCKED, Status.RATE_LIMITED)
                                for f in findings)),
         "interrupted": bool((summary.options or {}).get("interrupted")),
+        "budget_notice": budget_notice(summary.options or {}),
         "omitted": (summary.options or {}).get("_input_omitted_results", 0),
         "counts_line": summary_counts_line(summary),
     }
@@ -560,6 +562,8 @@ def render_text(summary: ScanSummary, include_all: bool = False) -> str:
         run.append(f"duration {facts['duration']}")
     run.append(f"checks {facts['checks']}")
     out.append("Run:       " + " · ".join(run))
+    if facts["budget_notice"]:
+        out.append(facts["budget_notice"])
     for v in views:
         out.append("")
         head = f"== {_clean_text(v.title)}"
@@ -639,6 +643,8 @@ def render_markdown(summary: ScanSummary, include_all: bool = False) -> str:
         run.append(f"duration {facts['duration']}")
     run.append(f"checks {facts['checks']}")
     out.append("- **Run:** " + " · ".join(run))
+    if facts["budget_notice"]:
+        out.extend(["", _md_text(facts["budget_notice"]), ""])
     out.append(f"- **Recorded outcomes:** {facts['counts_line']}")
     for v in views:
         out.append("")
@@ -1180,6 +1186,8 @@ def render_pdf(summary: ScanSummary, include_all: bool = False) -> bytes:
     run.append(f"checks {facts['checks']}")
     story.append(Spacer(1, 5))
     story.append(P("Run: " + esc(" · ".join(run)), small))
+    if facts["budget_notice"]:
+        story.append(P(esc(facts["budget_notice"]), small))
     story.append(P("Recorded outcomes: " + esc(facts["counts_line"]), small))
 
     for v in views:

@@ -20,8 +20,9 @@ from urllib.parse import urlparse
 
 from .decoding import capture_decoding
 from .http import Http
-from .models import Finding
+from .models import Finding, Status
 from .modules import Context, Module
+from .scan_budget import STOP_REASON, admit_check, budget_exhausted
 from .scan_control import checkpoint
 from .sitesdb import Site
 from .username_checker import check_site
@@ -52,11 +53,13 @@ async def _gather_stream(coros: list, hosts: list, concurrency: int, on_result: 
 
     async def wait_for_start():
         nonlocal last_start
-        if delay <= 0:
+        if delay <= 0 or budget_exhausted():
             await checkpoint()
             return
         async with start_lock:
             await checkpoint()
+            if budget_exhausted():
+                return
             loop = asyncio.get_running_loop()
             if last_start is not None:
                 # Event-loop timers may wake up one clock-resolution early.
@@ -151,7 +154,13 @@ async def _checked(call, query: str, item, query_type: str) -> Finding:
     """Keep unexpected checker failures visible in the scan and its counts."""
     with capture_decoding() as decoding:
         try:
-            finding = await call()
+            if admit_check():
+                finding = await call()
+            else:
+                finding = Finding(query=query, query_type=query_type, site=item.name, site_id=item.id,
+                                  status=Status.SKIPPED, error=STOP_REASON,
+                                  source=getattr(item, "source", "sites-db"),
+                                  category=getattr(item, "category", "misc"), extra={"_budget_skipped": True})
             if not isinstance(finding, Finding):
                 raise TypeError("checker must return a Finding")
         except Exception as exc:  # cancellation still propagates
