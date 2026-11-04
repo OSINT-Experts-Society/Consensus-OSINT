@@ -215,6 +215,8 @@ def add_scan_options(p: argparse.ArgumentParser, *, full_help: bool = False) -> 
                    help="cross-scan: follow usernames, e-mails and profile links discovered in results")
     x.add_argument("--depth", type=_nonnegative_int, default=1, help="recursion depth for -r (default 1)")
     x.add_argument("--max-pivots", type=_nonnegative_int, default=10, help="max new identifiers per round (default 10)")
+    x.add_argument("--max-checks", type=_nonnegative_int, default=30_000,
+                   help="total check budget across all queries and recursive follow-ups (default 30000; 0 unlimited); not an HTTP request limit")
     x.add_argument("--search-engines", action="store_true", help="also collect profile links from web search engines")
     x.add_argument("--mailcat", action="store_true", help="username -> discover existing e-mail addresses at mail providers")
     x.add_argument("-P", "--permute", metavar="PATTERN",
@@ -411,6 +413,42 @@ def _not_a_search(word: str) -> int:
     return 2
 
 
+def _leading_positional(argv: list) -> str | None:
+    """Locate a shorthand query without mistaking option values for commands."""
+    options = argparse.ArgumentParser(add_help=False)
+    add_scan_options(options)
+    actions = options._option_string_actions
+    index = 0
+    while index < len(argv):
+        token = argv[index]
+        if token == "--":
+            return None  # Everything following this is an explicit literal query.
+        if not token.startswith("-") or token == "-":
+            return token
+        name, equals, _ = token.partition("=")
+        action = actions.get(name)
+        attached = bool(equals)
+        if action is None and name.startswith("--"):
+            matches = [key for key in actions if key.startswith(name)]
+            if len(matches) == 1:
+                action = actions[matches[0]]
+        elif action is None and token.startswith("-") and not token.startswith("--"):
+            # argparse accepts clusters (-qv) and attached values (-t15, -ofile).
+            for offset, letter in enumerate(token[1:], 1):
+                action = actions.get("-" + letter)
+                if action is None:
+                    break
+                if action.nargs != 0:
+                    attached = offset < len(token) - 1
+                    break
+        if action is None:
+            return None  # The real parser rejects this unknown/ambiguous option.
+        if action.nargs not in (None, 0):
+            raise ValueError("Unsupported leading option; put the command first")
+        index += 1 + (action.nargs is None and not attached)
+    return None
+
+
 def normalise_argv(argv: list) -> list:
     if not argv:
         return ["--help"]
@@ -425,6 +463,12 @@ def normalise_argv(argv: list) -> list:
         if first == "username":
             return ["user"] + argv[1:]
         return argv
+    if first.startswith("-"):
+        word = _leading_positional(argv)
+        if word and (word.lower() in NOT_A_SEARCH or word.lower() in SUBCOMMANDS or word.lower() == "help"):
+            print("consensus: put the command before its options, for example "
+                  "'consensus user NAME --no-color'. No search was started.", file=sys.stderr)
+            raise SystemExit(2)
     return ["scan"] + argv
 
 
@@ -451,7 +495,10 @@ def _route(args: argparse.Namespace) -> tuple[str | None, bool]:
 # ---------------------------------------------------------------------------
 class Scanner:
     def __init__(self, args: argparse.Namespace, printer: Printer):
+        from .core.scan_budget import DEFAULT_MAX_CHECKS, ScanBudget
+
         self.args = args
+        self.budget = ScanBudget(getattr(args, "max_checks", DEFAULT_MAX_CHECKS))
         self.printer = printer
         cfg = get_config().get("defaults", {})
         self.concurrency = _positive_int(args.concurrency if args.concurrency is not None else cfg.get("concurrency", 100))
@@ -484,6 +531,7 @@ class Scanner:
         options["proxy"] = redact_proxy(self.http.proxy)  # never write credentials into reports
         options.update(timeout=self.timeout, concurrency=self.concurrency, tor=self.tor)
         self.summary = ScanSummary(options=options)
+        self.summary.options["scan_budget"] = self.budget.state
         self._streamed: list = []   # every finding as it arrives, so an interrupted scan keeps them
         self.unchecked: list = []   # queries whose filters left nothing to run: not a negative result
         self.seen: set = set()
@@ -817,13 +865,14 @@ class Scanner:
         self.printer.query_heading(query, qtype)
         token = self._query_context.set((depth, parent))
         try:
-            if qtype == QueryType.EMAIL.value:
-                return await self.scan_email(query, depth, parent)
-            if qtype == QueryType.PHONE.value:
-                return await self.scan_phone(query, depth, parent)
-            if qtype == QueryType.USERNAME.value:
-                return await self.scan_username(query, depth, parent)
-            return await self.scan_username(query, depth, parent, id_type=qtype)
+            with self.budget.activate():
+                if qtype == QueryType.EMAIL.value:
+                    return await self.scan_email(query, depth, parent)
+                if qtype == QueryType.PHONE.value:
+                    return await self.scan_phone(query, depth, parent)
+                if qtype == QueryType.USERNAME.value:
+                    return await self.scan_username(query, depth, parent)
+                return await self.scan_username(query, depth, parent, id_type=qtype)
         finally:
             self._query_context.reset(token)
 
@@ -871,12 +920,22 @@ class Scanner:
         from .core.recursion import LinkMatcher, extract_pivots, plan_next_queries
 
         self.summary.options["lookup_inventory"] = inventory(self.sites_db().sites)
+        limit = self.budget.state["limit"]
+        self.printer.message(f"Scan budget: {limit:,} checks across all queries" if limit else
+                             "Scan budget: unlimited (explicit --max-checks 0)", "dim")
 
         frontier = [(q, t, 0, None) for q, t in queries]
         scheduled = {(q, t) for q, t in queries}
         pivots_per_depth: dict[int, int] = {}
         depth_limit = self.args.depth if self.args.recursive else 0
         while frontier:
+            if self.budget.exhausted:
+                pending = [row for row in frontier if (row[0], row[1]) not in self.seen]
+                if pending:
+                    self.budget.defer(len(pending))
+                    self.summary.queries.extend(dict(query=q, type=t, depth=d, parent=p)
+                                                for q, t, d, p in pending)
+                break
             q, t, depth, parent = frontier.pop(0)
             findings = await self.scan_query(q, t, depth, parent)
             self.summary.findings.extend(findings)
@@ -1242,6 +1301,10 @@ def cmd_scan(args: argparse.Namespace, *, on_summary=None, on_report_saved=None,
     if solver_line:
         printer.message(solver_line, "dim")
     interrupted = interrupted or bool(summary.options.get("interrupted"))
+    from .core.scan_budget import budget_notice
+
+    if printer.jsonl and (notice := budget_notice(summary.options)):
+        printer.warn(notice)
     if getattr(args, "_continuation", None):
         summary = args._continuation.merge(summary)
     if on_summary is not None:
