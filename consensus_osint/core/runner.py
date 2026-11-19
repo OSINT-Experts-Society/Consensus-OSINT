@@ -16,6 +16,7 @@ import logging
 import re
 from collections import deque
 from collections.abc import Callable, Iterable
+from contextvars import ContextVar
 from urllib.parse import urlparse
 
 from .decoding import capture_decoding
@@ -31,6 +32,7 @@ log = logging.getLogger("consensus.runner")
 
 #: Simultaneous requests allowed to any one host.
 DEFAULT_PER_HOST = 4
+_pace_control = ContextVar("pace_negative_control", default=checkpoint)
 
 
 def host_of(url: str | None) -> str:
@@ -70,10 +72,12 @@ async def _gather_stream(coros: list, hosts: list, concurrency: int, on_result: 
             last_start = loop.time()
 
     async def wrapped(coro):
+        token = _pace_control.set(wait_for_start)
         try:
             await wait_for_start()
             return await coro
         finally:
+            _pace_control.reset(token)
             if inspect.iscoroutine(coro):
                 coro.close()
 
@@ -142,6 +146,15 @@ async def _gather_stream(coros: list, hosts: list, concurrency: int, on_result: 
                     # Repeated Stop/Ctrl-C must not interrupt client cleanup
                     # or strand the unscheduled coroutine objects below.
                     cancelled = True
+            # A worker may have finished just as its parent was stopped, before
+            # the completion queue was drained. Retain those primary results.
+            if on_result:
+                for task in tasks:
+                    if not task.cancelled() and task.exception() is None:
+                        try:
+                            on_result(task.result())
+                        except Exception:
+                            log.debug("on_result callback failed during cleanup", exc_info=True)
         for coro in coros:
             if inspect.iscoroutine(coro):
                 coro.close()
@@ -178,6 +191,35 @@ async def _checked(call, query: str, item, query_type: str) -> Finding:
         return finding
 
 
+async def _lookup(call, query, item, kind, verify, on_result):
+    primary = await _checked(functools.partial(call, query), query, item, kind)
+    if not verify:
+        return primary
+    from .negative_verification import assess_control, collect_control_evidence, control_input
+
+    try:
+        control, reason = control_input(item, primary)
+        if control is None:
+            primary.negative_verification = {"outcome": "not_verified", "reason": reason}
+            return primary
+        await _pace_control.get()()
+        token = collect_control_evidence.set(True)
+        try:
+            observation = await _checked(functools.partial(call, control), control, item, kind)
+        finally:
+            collect_control_evidence.reset(token)
+        primary.negative_verification = assess_control(primary, observation, control)
+    except asyncio.CancelledError:
+        primary.negative_verification = {"outcome": "not_verified", "reason": "Control cancelled"}
+        if on_result:
+            on_result(primary)
+        raise
+    except Exception:
+        log.debug("negative control assessment failed for %s", item.id, exc_info=True)
+        primary.negative_verification = {"outcome": "inconclusive", "reason": "Control assessment unavailable"}
+    return primary
+
+
 async def run_sites(
     query: str,
     sites: Iterable[Site],
@@ -189,10 +231,11 @@ async def run_sites(
     query_type: str = "username",
     delay: float = 0.0,
     per_host: int = DEFAULT_PER_HOST,
+    verify_negative: bool = False,
 ) -> list:
     sites = list(sites)
-    coros = [_checked(functools.partial(check_site, s, query, http, extract=extract, query_type=query_type),
-                      query, s, query_type) for s in sites]
+    coros = [_lookup(functools.partial(check_site, s, http=http, extract=extract, query_type=query_type),
+                     query, s, query_type, verify_negative, on_result) for s in sites]
     hosts = [host_of(s.url_probe or s.url) for s in sites]
     return await _gather_stream(coros, hosts, concurrency, on_result, delay, per_host)
 
@@ -206,9 +249,10 @@ async def run_modules(
     on_result: Callable | None = None,
     delay: float = 0.0,
     per_host: int = DEFAULT_PER_HOST,
+    verify_negative: bool = False,
 ) -> list:
     modules = list(modules)
-    coros = [_checked(functools.partial(m.run, query, ctx), query, m, m.kind) for m in modules]
+    coros = [_lookup(functools.partial(m.run, ctx=ctx), query, m, m.kind, verify_negative, on_result) for m in modules]
     hosts = [host_of(m.url_main) for m in modules]
     return await _gather_stream(coros, hosts, concurrency, on_result, delay, per_host)
 
@@ -227,6 +271,7 @@ async def run_all(
     query_type: str = "username",
     delay: float = 0.0,
     per_host: int = DEFAULT_PER_HOST,
+    verify_negative: bool = False,
 ) -> list:
     """Run data-driven sites and code modules together."""
     sites = list(sites)
@@ -236,10 +281,11 @@ async def run_all(
     async def module_run(module):
         async with module_sem:
             await checkpoint()
-            return await _checked(functools.partial(module.run, query, ctx), query, module, module.kind)
+            return await _lookup(functools.partial(module.run, ctx=ctx), query, module, module.kind,
+                                 verify_negative, on_result)
 
-    coros = [_checked(functools.partial(check_site, s, query, http, extract=extract, query_type=query_type),
-                      query, s, query_type) for s in sites]
+    coros = [_lookup(functools.partial(check_site, s, http=http, extract=extract, query_type=query_type),
+                     query, s, query_type, verify_negative, on_result) for s in sites]
     coros += [module_run(m) for m in modules]
     hosts = [host_of(s.url_probe or s.url) for s in sites] + [host_of(m.url_main) for m in modules]
     return await _gather_stream(coros, hosts, concurrency, on_result, delay, per_host)
@@ -248,6 +294,6 @@ async def run_all(
 def summarize(findings: list) -> dict:
     counts: dict = {}
     for f in findings:
-        counts[f.status.value] = counts.get(f.status.value, 0) + 1
+        counts[f.effective_status.value] = counts.get(f.effective_status.value, 0) + 1
     counts["total"] = len(findings)
     return counts

@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import math
 
-DEFAULTS = {"details": False, "all": False, "fast": True, "top": None, "no_breach": False, "timeout": None}
+DEFAULTS = {"details": False, "all": False, "fast": True, "top": None, "no_breach": False, "verify_negative": False, "timeout": None}
 
 
 def path():
@@ -17,7 +17,7 @@ def validated(values):
     if not isinstance(values, dict) or set(values) - (DEFAULTS.keys() | {"animation"}):
         raise ValueError("Saved search preferences contain unsupported settings")
     result = dict(DEFAULTS, **values)
-    for name in ("details", "all", "fast", "no_breach", "animation"):
+    for name in ("details", "all", "fast", "no_breach", "verify_negative", "animation"):
         if name in result and type(result[name]) is not bool:
             raise ValueError(f"Saved preference {name} must be on or off")
     top, timeout = result["top"], result["timeout"]

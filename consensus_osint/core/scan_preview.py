@@ -17,7 +17,7 @@ class HitPreview:
         self.lock = RLock()
 
     def add(self, finding):
-        if finding.status is not Status.FOUND or finding.category in INFO_CATEGORIES:
+        if finding.effective_status is not Status.FOUND or finding.category in INFO_CATEGORIES:
             return False
         fields = len(enrichment_fields(finding))
         row = (clean(finding.site), clean(finding.query), assessment(finding)[0], fields)

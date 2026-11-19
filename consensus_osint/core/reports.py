@@ -143,7 +143,7 @@ _CTRL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f\ud800-\udfff\ufffe\uffff
 # --------------------------------------------------------------------------- helpers
 def _status(f: Finding) -> Status:
     """Coerce ``f.status`` to :class:`Status` (tolerates raw strings)."""
-    s = f.status
+    s = f.effective_status
     if isinstance(s, Status):
         return s
     try:
@@ -270,7 +270,7 @@ def _is_image_key(key: Any) -> bool:
 
 def result_link(f: Finding) -> tuple[str | None, str]:
     """A navigable result, without inventing or verifying a public profile URL."""
-    if f.status is Status.FOUND and f.category not in INFO_CATEGORIES:
+    if f.found and f.category not in INFO_CATEGORIES:
         fields, _ = split_fields(f.extra)
         for key, value in fields.items():
             normalized = re.sub(r"[^a-z]", "", str(key).lower())
@@ -570,7 +570,7 @@ def render_text(summary: ScanSummary, include_all: bool = False) -> str:
         if v.parent:
             head += f" — discovered via {_clean_text(v.parent)} (depth {v.depth})"
         out.append(f"{head} ==  positive signals {_n(len(v.found))} of {_n(len(v.findings))}")
-        rows = v.findings if include_all else v.found
+        rows = v.findings if include_all else [f for f in v.findings if f.found or f.verification_failed]
         if not include_all and _unlisted_line(v):
             out.append("  " + _unlisted_line(v))
         if not rows:
@@ -617,7 +617,7 @@ def _md_field(df: DisplayField) -> str:
 
 def _unlisted_line(view) -> str:
     """What a matches-only report leaves out for one query, so silence is not read as a negative."""
-    rest = [f for f in view.findings if f.status is not Status.FOUND and f.category not in INFO_CATEGORIES]
+    rest = [f for f in view.findings if not f.found and not f.verification_failed and f.category not in INFO_CATEGORIES]
     if not rest:
         return ""
     no_match = sum(f.status is Status.NOT_FOUND for f in rest)
@@ -653,7 +653,7 @@ def render_markdown(summary: ScanSummary, include_all: bool = False) -> str:
         if v.parent:
             out.append(f"_Discovered via {_md_text(v.parent)} (depth {v.depth})._")
             out.append("")
-        rows = v.findings if include_all else v.found
+        rows = v.findings if include_all else [f for f in v.findings if f.found or f.verification_failed]
         out.append(f"Positive signals: {_n(len(v.found))} of {_n(len(v.findings))} checks; see each result's scope below.")
         out.append("")
         if not include_all and _unlisted_line(v):
@@ -717,7 +717,7 @@ def render_csv(summary: ScanSummary, include_all: bool = False) -> str:
     """Flat CSV, one row per finding.  Nested ``extra`` is kept as compact JSON."""
     rows = summary.findings or []
     if not include_all:
-        rows = [f for f in rows if _status(f) is Status.FOUND]
+        rows = [f for f in rows if f.found or f.verification_failed]
     buf = io.StringIO()
     w = csv.writer(buf)
     w.writerow(CSV_COLUMNS)
@@ -747,7 +747,8 @@ def render_csv(summary: ScanSummary, include_all: bool = False) -> str:
 # --------------------------------------------------------------------------- json / jsonl
 def _finding_dict(f: Finding) -> dict:
     d = dict(f.to_dict()) if isinstance(f.status, Status) else dict(vars(f))
-    d["status"] = _status(f).value
+    if not f.negative_verification:
+        d["status"] = _status(f).value
     return d
 
 
@@ -766,7 +767,7 @@ def _json_dumps(obj: Any, indent: int | None = 2) -> str:
 def build_json(summary: ScanSummary, include_all: bool = False) -> dict:
     """``ScanSummary.to_dict()`` plus generator info; findings filtered unless ``include_all``."""
     findings = summary.findings or []
-    rows = findings if include_all else [f for f in findings if _status(f) is Status.FOUND]
+    rows = findings if include_all else [f for f in findings if f.found or f.verification_failed]
     return {
         "generator": GENERATOR,
         "generated": time.time(),
@@ -789,7 +790,7 @@ def render_jsonl(summary: ScanSummary, include_all: bool = False) -> str:
     """One finding per line (ndjson)."""
     rows = summary.findings or []
     if not include_all:
-        rows = [f for f in rows if _status(f) is Status.FOUND]
+        rows = [f for f in rows if f.found or f.verification_failed]
     return "".join(_json_dumps(_finding_dict(f), indent=None) + "\n" for f in rows)
 
 
@@ -886,13 +887,13 @@ def build_neo4j(summary: ScanSummary, include_all: bool = False) -> dict:
             "upstream_repositories")
     for v in views:
         qn = query_node(v.query, v.depth, v.query_type)
-        rows = v.findings if include_all else v.found
+        rows = v.findings if include_all else [f for f in v.findings if f.found or f.verification_failed]
         for f in rows:
             st = _status(f)
             props: dict = {
                 "status": st.value,
                 "url": f.url,
-                "confidence": f.confidence,
+                "confidence": None if f.verification_failed else f.confidence,
                 "method": f.method,
                 "source": f.source,
                 "depth": int(f.depth or 0),
@@ -903,6 +904,9 @@ def build_neo4j(summary: ScanSummary, include_all: bool = False) -> dict:
                 "query_type": str(f.query_type),
                 "upstream_repositories": [r["id"] for r in repository_coverage(f)],
             }
+            if f.negative_verification:
+                props["primary_status"] = f.status.value
+                props["negative_verification"] = f.negative_verification.get("outcome")
             for k, val in _extra_dict(f.extra).items():
                 key = str(k)
                 if key in core or val is None or val == "" or val == [] or val == {}:
@@ -1039,7 +1043,7 @@ def build_html_context(summary: ScanSummary, include_all: bool = False) -> dict:
             "comparison": per_query[(v.query, v.query_type)],
             "cards": [_card(f) for f in sorted(matches, key=lambda f: (not has_details(f), str(f.site).casefold()))],
             "information": [_card(f) for f in information],
-            "others": [_card(f) for f in others] if include_all else [],
+            "others": [_card(f) for f in others if include_all or f.verification_failed],
         })
     top = [q["query"] for q in queries if not q["parent"]] or [q["query"] for q in queries]
     return {
@@ -1213,10 +1217,11 @@ def render_pdf(summary: ScanSummary, include_all: bool = False) -> bytes:
                                  P(esc(f.url or "", 400)), P("<br/>".join(lines)),
                                  P(esc(coverage_text(f)).replace("\n", "<br/>"))])
             story.append(table(rows, [w * 0.15, w * 0.10, w * 0.22, w * 0.35, w * 0.18]))
-        if include_all and v.others:
-            story.append(P(f"Other results ({_n(len(v.others))})", h3))
+        other_rows = [f for f in v.others if include_all or f.verification_failed]
+        if other_rows:
+            story.append(P(f"Other results ({_n(len(other_rows))})", h3))
             rows = [[P("Site", head), P("Status", head), P("URL", head), P("Note", head), P("Tools with this lookup", head)]]
-            for f in v.others:
+            for f in other_rows:
                 label, explanation, _ = assessment(f)
                 notes = [esc(explanation), "Observed: " + esc(observation_time(f))]
                 if f.error:
@@ -1287,9 +1292,10 @@ def build_xmind_sheet(summary: ScanSummary, include_all: bool = False) -> dict:
             kids.append(_xmind_topic(f"{cat} ({_n(len(items))})", children=sites))
         if not kids:
             kids.append(_xmind_topic("no positive lookup signals"))
-        if include_all and v.others:
+        other_rows = [f for f in v.others if include_all or f.verification_failed]
+        if other_rows:
             by_status: dict = {}
-            for f in v.others:
+            for f in other_rows:
                 by_status.setdefault(_status(f), []).append(f)
             st_topics = [
                 _xmind_topic(f"{st.label} ({_n(len(fs))})", children=[
@@ -1303,7 +1309,7 @@ def build_xmind_sheet(summary: ScanSummary, include_all: bool = False) -> dict:
                 ])
                 for st, fs in by_status.items()
             ]
-            kids.append(_xmind_topic(f"other results ({_n(len(v.others))})", children=st_topics))
+            kids.append(_xmind_topic(f"other results ({_n(len(other_rows))})", children=st_topics))
         qtopics.append(_xmind_topic(v.title, labels=[f"discovered via {v.parent}"] if v.parent else None,
                                     children=kids))
     root = _xmind_topic("Consensus: " + (facts["queries"] or "report"),

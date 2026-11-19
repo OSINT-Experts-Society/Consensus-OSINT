@@ -112,6 +112,7 @@ class Finding:
     depth: int = 0                       # recursion depth at which the finding was produced
     parent: str | None = None         # query that led to this one (recursion)
     ts: float = field(default_factory=time.time)
+    negative_verification: dict | None = None
 
     # ------------------------------------------------------------------ helpers
     def __post_init__(self) -> None:
@@ -124,6 +125,9 @@ class Finding:
         if not isinstance(self.extra, dict):
             self.extra = {} if self.extra is None else {"data": self.extra}
         self.extra = as_json_safe(self.extra)
+        if (not isinstance(self.negative_verification, dict) or
+                self.negative_verification.get("outcome") not in ("passed", "failed", "inconclusive", "not_verified")):
+            self.negative_verification = None
         # Errors can embed transport URLs; credentials are never finding data.
         for name in ("error", "url"):
             value = getattr(self, name)
@@ -132,7 +136,17 @@ class Finding:
 
     @property
     def found(self) -> bool:
-        return self.status is Status.FOUND
+        return self.effective_status is Status.FOUND
+
+    @property
+    def verification_failed(self) -> bool:
+        return isinstance(self.negative_verification, dict) and self.negative_verification.get("outcome") == "failed"
+
+    @property
+    def effective_status(self) -> Status:
+        if self.verification_failed and self.status in (Status.FOUND, Status.NOT_FOUND):
+            return Status.UNKNOWN
+        return self.status
 
     def to_dict(self) -> dict:
         from .continuity import observation_time
@@ -140,6 +154,11 @@ class Finding:
         from .provenance import repository_coverage
 
         result = as_json_safe(self)
+        if self.negative_verification is None:
+            result.pop("negative_verification", None)
+        else:
+            result["effective_status"] = self.effective_status.value
+            result["effective_confidence"] = None if self.verification_failed else self.confidence
         result["upstream_repositories"] = repository_coverage(self)
         label, explanation, _ = assessment(self)
         result["evidence"] = {"assessment": label, "explanation": explanation, "observed_at": observation_time(self)}
@@ -229,12 +248,12 @@ class ScanSummary:
     @property
     def found(self) -> list:
         """Positive account / exposure findings (local analysis rows excluded)."""
-        return [f for f in self.findings if f.status is Status.FOUND and f.category not in INFO_CATEGORIES]
+        return [f for f in self.findings if f.found and f.category not in INFO_CATEGORIES]
 
     def counts(self) -> dict:
         c: dict[str, int] = {}
         for f in self.findings:
-            c[f.status.value] = c.get(f.status.value, 0) + 1
+            c[f.effective_status.value] = c.get(f.effective_status.value, 0) + 1
         return c
 
     def to_dict(self) -> dict:
@@ -262,13 +281,17 @@ def dedupe_findings(findings: list) -> list:
     best: dict[tuple, Finding] = {}
     for f in findings:
         key = (f.query, f.query_type, f.site_id)
+        if f.negative_verification and isinstance(f.extra.get("_lookup_id"), str):
+            # A catalogue route and a native module can share a service slug.
+            # Their controls assess different implementations.
+            key += (f.extra["_lookup_id"],)
         if f.source == "search-engines":
             # Search engines use a host-level site ID; several returned pages
             # at that host remain distinct evidence throughout final exports.
             key += (f.url,)
         cur = best.get(key)
-        if cur is None or order[f.status] < order[cur.status] or (
-            order[f.status] == order[cur.status] and len(f.extra) > len(cur.extra)
+        if cur is None or order[f.effective_status] < order[cur.effective_status] or (
+            order[f.effective_status] == order[cur.effective_status] and len(f.extra) > len(cur.extra)
         ):
             best[key] = f
     return list(best.values())
