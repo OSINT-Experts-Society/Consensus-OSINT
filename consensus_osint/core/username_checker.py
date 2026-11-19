@@ -443,6 +443,16 @@ async def _check_site(
 
     f = Finding(status=status, method=method, http_status=resp.status if resp.ok else None,
                 elapsed=round(time.perf_counter() - t0, 3), error=note, **base)
+    if status is Status.NOT_FOUND:
+        from .negative_verification import collect_control_evidence
+        if collect_control_evidence.get() and 200 <= resp.status < 300:
+            # Legacy catalogue rules can infer absence from a missing positive
+            # marker. Only explicit negative evidence can verify another lookup.
+            missing = [s.replace("{username}", lookup_username) for s in (site.detect.get("missing_strings") or [])]
+            positive = [s.replace("{username}", lookup_username) for s in (site.detect.get("found_strings") or [])]
+            f._explicit_absence = (method.split(" (")[0] == "identity-bound community API" or
+                                   ((note == "soft 404" or _any_in(missing, resp.text or ""))
+                                    and not _any_in(positive, resp.text or "")))
     if status is Status.FOUND and extract and resp.text:
         from .forge_profiles import catalogue_scope, profile_outcome
         from .profile_api_contracts import catalogue_scope as api_scope
