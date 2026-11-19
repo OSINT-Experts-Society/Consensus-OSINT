@@ -56,8 +56,8 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
 
         out, stream = console(width)
         sections = []
-        matches = [f for f in findings if f.status is Status.FOUND and f.category not in INFO_CATEGORIES]
-        inconclusive = sum(f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
+        matches = [f for f in findings if f.effective_status is Status.FOUND and f.category not in INFO_CATEGORIES]
+        inconclusive = sum(f.effective_status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
                            for f in findings if f.category not in INFO_CATEGORIES)
         notice = budget_notice(summary.options)
         title = "Search stopped · partial results" if summary.options.get("interrupted") or notice else "Search complete"
@@ -95,7 +95,7 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
         for group in groups:
             out.print(Text("\n" + clean(group.title), style="bold"))
             rows = [f for f in group.findings if f.category not in INFO_CATEGORIES and
-                    (show_all or f.status is Status.FOUND)]
+                    (show_all or f.verification_failed or f.effective_status is Status.FOUND)]
             if filters:
                 rows = [f for f in rows if filters.get("site", "").casefold() in f.site.casefold()
                         and (filters.get("kind", "all") != "enriched" or has_details(f))
@@ -109,10 +109,10 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
                     message = "No rows match these filters. Press F to change or clear them."
                 elif summary.options.get("interrupted") or notice:
                     message = "No matches reported before the search stopped. This search is incomplete."
-                elif any(f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
+                elif any(f.effective_status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
                          for f in group.findings if f.category not in INFO_CATEGORIES):
                     message = "No matches reported. Some sites could not be checked conclusively."
-                elif not any(f.status is Status.NOT_FOUND for f in group.findings if f.category not in INFO_CATEGORIES):
+                elif not any(f.effective_status is Status.NOT_FOUND for f in group.findings if f.category not in INFO_CATEGORIES):
                     message = "No matches reported. No conclusive lookup results; review skipped or unavailable lookups in all outcomes."
                 else:
                     message = "No matches reported by the completed lookups. Try another identifier or review all outcomes."
@@ -130,6 +130,9 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
             # One separator cell, no expanding padding and no stacked coverage.
             # Small windows pan across the same single-row matrix.
             fixed_width = result_width + 8 + sum(cell_len(projects[k]) for k in keys) + len(keys) + 2
+            show_controls = any(f.negative_verification for f in shown)
+            if show_controls:
+                fixed_width += 13
             site_width = max(8, min(28, max(12, max(cell_len(clean(f.site)) for f in shown)), width - fixed_width))
             table_width = site_width + fixed_width
             table = Table(box=None, header_style=f"bold {ACCENT}", expand=False,
@@ -137,6 +140,8 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
             table.add_column("Site", width=site_width, no_wrap=True, overflow="ellipsis")
             table.add_column("Result", width=result_width, no_wrap=True, overflow="ellipsis")
             table.add_column("Enriched", width=8, no_wrap=True)
+            if show_controls:
+                table.add_column("Control", width=12, no_wrap=True)
             for key in keys:
                 table.add_column(projects[key], width=cell_len(projects[key]), justify="center", no_wrap=True)
             for f in shown:
@@ -148,8 +153,11 @@ def result_pages(summary, *, show_all=False, limit=0, filters=None):
                 if profile:
                     site.stylize(Style(link=profile, underline=True), 0, len(site))
                 result = link(verdict, key) if label == "Needs review" else Text(verdict)
-                result.stylize("yellow" if tone == "warn" else "green" if f.status is Status.FOUND else "dim")
+                result.stylize("yellow" if tone == "warn" else "green" if f.effective_status is Status.FOUND else "dim")
                 cells = [site, result, link("View", key) if has_details(f) else Text("-", style="dim")]
+                if show_controls:
+                    state = (f.negative_verification or {}).get("outcome", "not_verified")
+                    cells.append(link(state.replace("_", " "), key))
                 sources = {p["id"] for p in coverage[id(f)]}
                 cells.extend(Text("X" if k in sources else "-", style=ACCENT if k in sources else "dim") for k in keys)
                 table.add_row(*cells)

@@ -63,6 +63,22 @@ def split_fields(extra: object) -> tuple[dict, dict]:
 
 
 def assessment(f: Finding) -> tuple[str, str, str]:
+    label, detail, tone = _primary_assessment(f)
+    verification = f.negative_verification
+    if not isinstance(verification, dict):
+        return label, detail, tone
+    if f.verification_failed:
+        return "Failed control", (
+            f"The primary check reported {f.status.value}. The same check also matched a synthetic identifier. "
+            "Its result is unreliable and excluded from match totals, confidence and follow-ups."), "warn"
+    messages = {"passed": "Negative control passed. This alone does not confirm the primary match.",
+                "inconclusive": "Negative control inconclusive", "not_verified": "Not verified"}
+    message = messages.get(verification.get("outcome"), "Not verified")
+    reason = verification.get("reason") or verification.get("control_status")
+    return label, detail + " " + message + (f" ({reason})." if reason and verification.get("outcome") != "passed" else ""), tone
+
+
+def _primary_assessment(f: Finding) -> tuple[str, str, str]:
     """Label, explanation and visual tone, based on recorded evidence limits."""
     if f.category in INFO_CATEGORIES:
         if f.site_id == "email-local":
@@ -219,7 +235,7 @@ def enrichment_fields(f: Finding) -> dict:
     flags add no enrichment. This does not establish provider provenance or
     identity binding; those limits still travel with the finding.
     """
-    if f.status is not Status.FOUND or f.category in INFO_CATEGORIES:
+    if not f.found or f.category in INFO_CATEGORIES:
         return {}
     echo = unicodedata.normalize("NFKC", f.query).strip().casefold()
 

@@ -19,7 +19,7 @@ NAME_KEYS = ("fullname", "name", "display_name", "displayname", "real_name")
 
 
 def base_confidence(f: Finding, site: Site | None = None) -> float:
-    if f.status is not Status.FOUND:
+    if f.effective_status is not Status.FOUND:
         return 0.0
     if f.confidence is not None and f.source != "sites-db":
         return f.confidence
@@ -100,7 +100,7 @@ def apply_consensus(findings: Iterable[Finding]) -> None:
         if id(f) in seen:
             continue
         seen.add(id(f))
-        if f.status is Status.FOUND and f.category not in INFO_CATEGORIES:
+        if f.effective_status is Status.FOUND and f.category not in INFO_CATEGORIES:
             previous = getattr(f, "_consensus_scores", None)
             if previous is not None and f.confidence == previous[1]:
                 f.confidence = previous[0]

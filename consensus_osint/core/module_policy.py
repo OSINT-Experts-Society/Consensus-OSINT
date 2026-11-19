@@ -18,6 +18,7 @@ class Restriction:
 
 
 RESTRICTIONS: Mapping[str, Restriction] = MappingProxyType({
+    "us-user-dev-hhf": Restriction(disabled_reason='Unavailable in this release.'),
     "us-user-community-sidvind": Restriction(disabled_reason='Unavailable in this release.'),
     "us-user-dev-hotwired": Restriction(disabled_reason='Unavailable in this release.'),
     "us-user-dev-pihole": Restriction(disabled_reason='Unavailable in this release.'),

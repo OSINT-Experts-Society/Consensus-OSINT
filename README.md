@@ -45,7 +45,7 @@
 </p>
 
 <!-- maintenance-summary:start -->
-<p align="center"><sub>Last expert review: <strong>01 November 2026</strong> &middot; Accepted 02 November 2026: <strong>321 new websites + 33 existing-site improvements</strong> &middot; 30 candidates remain disabled &middot; 1 accepted check has single-sided evidence</sub></p>
+<p align="center"><sub>Last expert review: <strong>18 November 2026</strong> &middot; Accepted 18 November 2026: <strong>941 new websites + 7 existing-site improvements</strong> &middot; 510 candidates remain held &middot; 0 accepted checks have single-sided evidence</sub></p>
 <!-- maintenance-summary:end -->
 
 ## Compare
@@ -67,7 +67,7 @@ Lookup activity for **User Scanner, Maigret and WhatsMyName** was rechecked for 
     <tr><th align="left">Tool</th><th align="center">Username</th><th align="center">Email</th><th align="center">Phone</th><th align="center">Duplicate<br>ratio</th><th align="center">Observed lookup<br>update activity</th><th align="center">Last&nbsp;module<br>update</th></tr>
   </thead>
   <tbody>
-    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-dark.svg"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches</sub></td><td align="center"><strong>Weekly review<br>target</strong></td><td align="center">03&nbsp;Nov&nbsp;2026</td></tr>
+    <tr><td align="left"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-dark.svg"><img src="https://raw.githubusercontent.com/OSINT-Experts-Society/Consensus-OSINT/main/consensus_osint/templates/consensus-wordmark-light.svg" width="120" alt="Consensus"></picture><br><strong>Combined solution</strong></td><td align="center"><strong>7,782</strong></td><td align="center"><strong>205</strong></td><td align="center"><strong>2</strong></td><td align="center"><strong>Deduplicated</strong><br><sub>default searches</sub></td><td align="center"><strong>Weekly review<br>target</strong></td><td align="center">18&nbsp;Nov&nbsp;2026</td></tr>
     <tr><td align="left"><a href="https://github.com/soxoj/maigret/tree/b6642744988e7e6c2d21f75db60ec3093019ba25">Maigret</a></td><td align="center">5,483</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>40.8%</strong><br><sub>5,482/5,483&nbsp;mapped</sub></td><td align="center">8 update days<br><sub>in the 30-day window</sub></td><td align="center"><a href="https://github.com/soxoj/maigret/commit/ec2d90ce19ffd419a4467997edf6c0e9cdf14e1f">10&nbsp;Oct&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/kaifcodec/user-scanner/tree/780d077a468035c6afd6b4a0f987317db651528b">User Scanner</a></td><td align="center">2,511</td><td align="center">211</td><td align="center">—</td><td align="center"><strong>68.9%</strong><br><sub>2,575/2,722&nbsp;mapped</sub></td><td align="center">13 update days<br><sub>in the 30-day window</sub></td><td align="center"><a href="https://github.com/kaifcodec/user-scanner/commit/3518f8430219570f2717e305e1787ab34040918e">15&nbsp;Oct&nbsp;2026</a></td></tr>
     <tr><td align="left"><a href="https://github.com/arxhr007/Aliens_eye/tree/b1316648fe0e648469d30512bb0535ebc8c4bbc7">Aliens Eye</a></td><td align="center">840</td><td align="center">—</td><td align="center">—</td><td align="center"><strong>65.4%</strong><br><sub>837/840&nbsp;mapped</sub></td><td align="center">Too few updates</td><td align="center"><a href="https://github.com/arxhr007/Aliens_eye/commit/eb10623492e1e171ff2d7d9cfc043a4a0a0e493a">10&nbsp;Jun&nbsp;2026</a></td></tr>
@@ -222,6 +222,8 @@ Explore more with `consensus --help` or `consensus examples`.
 </details>
 
 <a id="update-consensus"></a>
+
+Use `--verify-negative` on a username or email search to repeat eligible public profile checks with a synthetic identifier. Both checks use the scan budget. A match on the synthetic identifier flags the original result as unreliable and excludes it from match totals and automatic follow-ups. A passing control alone cannot confirm the original match.
 
 ## Updates
 

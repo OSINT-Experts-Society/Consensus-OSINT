@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "consensus-osint"
-version = "0.4.12"
+version = "0.4.13"
 description = "Expert-maintained username, email and phone intelligence with 9,700+ lookup checks from 19 open-source projects."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,7 +27,8 @@ dependencies = [
   "rich>=13.0",                  # terminal output (degrades to plain text if absent)
   "prompt-toolkit>=3.0.51,<4",    # pinned session footer, input editing and terminal restoration
   "phonenumbers>=8.13",          # offline phone parsing - bundled data, no network
-  "dnspython>=2.6.1",              # e-mail MX / SPF / DMARC lookups
+  "dnspython>=2.6.1; python_version < '3.11'",
+  "dnspython>=2.9.2; python_version >= '3.11'",              # e-mail MX / SPF / DMARC lookups
   "jinja2>=3.1.6",                 # HTML report template
   "PyYAML>=6.0",                 # config file + phone dork lists
   "beautifulsoup4>=4.12",        # core catalogue profile-evidence parsing
@@ -47,9 +48,9 @@ modules = [
   "termcolor>=2.0",
   "colorama>=0.4",
 ]
-pdf = ["reportlab>=4.0", "pillow>=12.3.0"]          # PDF reports
+pdf = ["reportlab>=4.0", "pillow>=12.3.0; python_version < '3.11'", "pillow>=13.0.0; python_version >= '3.11'"]          # PDF reports
 browser = ["playwright>=1.40"]                    # headless-browser challenge bypass
-mcp = ["mcp>=1.28.1,<2", "PyJWT[crypto]>=2.15.0"]  # FastMCP v1; patched JWT dependency
+mcp = ["mcp>=1.30.0,<2", "PyJWT[crypto]>=2.15.0"]  # FastMCP v1; patched JWT dependency
 all = ["consensus-osint[modules,pdf,browser,mcp]"]
 
 [project.scripts]

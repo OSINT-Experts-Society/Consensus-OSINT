@@ -175,7 +175,7 @@ def extract_pivots(findings: Iterable[Finding], matcher: LinkMatcher | None = No
     known_usernames = known_values | {q for q, kind in typed if kind == QueryType.USERNAME.value}
     known_emails = known_values | {q for q, kind in typed if kind == QueryType.EMAIL.value}
     for f in findings:
-        if (f.status is not Status.FOUND or not f.extra or f.category in INFO_CATEGORIES
+        if (f.effective_status is not Status.FOUND or not f.extra or f.category in INFO_CATEGORIES
                 or (f.confidence is not None and f.confidence < 0.5)):
             continue
         src = f.site

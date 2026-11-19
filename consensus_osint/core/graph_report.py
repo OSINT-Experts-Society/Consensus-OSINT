@@ -22,7 +22,7 @@ def graph_data(summary, include_all=False):
 
     seen = set()
     for finding in summary.findings:
-        if finding.category in INFO_CATEGORIES or (not include_all and finding.status is not Status.FOUND):
+        if finding.category in INFO_CATEGORIES or (not include_all and not finding.verification_failed and finding.effective_status is not Status.FOUND):
             continue
         query = node(
             ("query", finding.query_type, finding.query),
@@ -44,7 +44,7 @@ def graph_data(summary, include_all=False):
             finding.source,
             finding.site_id,
             finding.url,
-            finding.status.value,
+            finding.effective_status.value,
         )
         result = node(
             key,
@@ -55,7 +55,7 @@ def graph_data(summary, include_all=False):
             {
                 "query": finding.query,
                 "query_type": finding.query_type,
-                "status": finding.status.value,
+                "status": finding.effective_status.value,
                 "assessment": assessment(finding)[0],
                 "explanation": assessment(finding)[1],
                 "observed_at": observation_time(finding),

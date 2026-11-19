@@ -25,7 +25,8 @@ CHOICES = (
 _SETTINGS = (
     ("details", "Expand comparison evidence"), ("all", "Show all outcomes"),
     ("search_size", "Default search size (username/email)"), ("no_breach", "Exclude breach lookups"),
-    ("timeout", "Check timeout"),
+    ("timeout", "Check timeout"), ("animation", "Loading, footer and tab animations"),
+    ("verify_negative", "Pair eligible checks with a synthetic negative control"),
 )
 _COMMANDS = {"scan", "user", "username", "email", "phone", "sites", "modules", "report", "version", "update"}
 # Words people type expecting a command or answering a prompt that is no longer open. Each would otherwise
@@ -108,6 +109,7 @@ class Session:
         return (f"Returned fields: all · Comparisons: {'expanded' if p['details'] else 'summary'} · "
                 f"Results: {'all outcomes' if p['all'] else 'matches'} · "
                 f"Username/email default: {self.search_size_label()} · "
+                f"Negative controls: {'on' if p.get('verify_negative') else 'off'} · "
                 f"Breaches: {'excluded' if p['no_breach'] else 'eligible checks only'} · "
                 f"Timeout: {str(p['timeout']) + 's' if p['timeout'] is not None else 'configured default'}")
 
@@ -430,7 +432,7 @@ class Session:
             else:
                 self.preferences.update(fast=False, top=_positive_int(value))
         elif name not in _DEFAULTS:
-            raise ValueError("Settings: search_size (quick, full or a number), details, all, fast, no_breach, timeout, animation.")
+            raise ValueError("Settings: search_size (quick, full or a number), details, all, fast, no_breach, verify_negative, timeout, animation.")
         elif name == "timeout":
             self.preferences[name] = None if value.lower() in ("default", "reset") else _positive_float(value)
         elif value.lower() in ("on", "true", "yes", "off", "false", "no"):
@@ -446,12 +448,12 @@ class Session:
         while True:
             self.printer.summary_table([["Choose", "Setting", "Current"]] + [
                 [str(i), label, self.search_size_label() if name == "search_size"
+                 else ("on" if self.animate else "off") if name == "animation"
                  else "configured default" if self.preferences[name] is None
                  else str(self.preferences[name]) if name == "timeout"
                  else "on" if self.preferences[name] else "off"]
                 for i, (name, label) in enumerate(_SETTINGS, 1)
-            ] + [[str(len(_SETTINGS) + 1), "Loading, footer and tab animations", "on" if self.animate else "off"],
-                 ["u", "Installation & updates", "Open"],
+            ] + [["u", "Installation & updates", "Open"],
                  ["h", "Recent searches", "Open"],
                  ["i", "Setup / health (offline)", "Open"],
                  ["s", "Save these preferences as my defaults", "Future sessions"],
@@ -495,13 +497,13 @@ class Session:
                     return
                 self.clear_menu()
                 continue
-            if choice == str(len(_SETTINGS) + 1):
-                self.change_setting("animation", "off" if self.animate else "on")
-                continue
             if not choice.isdigit() or not 1 <= int(choice) <= len(_SETTINGS):
                 self.printer.message("Choose a setting number or 0 to go back.", "yellow")
                 continue
             name = _SETTINGS[int(choice) - 1][0]
+            if name == "animation":
+                self.change_setting("animation", "off" if self.animate else "on")
+                continue
             if name == "search_size":
                 flags = self.choose_search_size()
                 if flags:

@@ -107,7 +107,7 @@ def _family(path) -> str | None:
 def _entries(findings):
     entries, truncated = [], False
     for f in findings:
-        if f.status is not Status.FOUND or f.category in INFO_CATEGORIES:
+        if f.effective_status is not Status.FOUND or f.category in INFO_CATEGORIES:
             continue
         site_key = _site_key(f)
         if site_key is None:
@@ -226,7 +226,7 @@ def compare_details(findings, *, across_queries=False) -> dict:
 def shared_sites(findings) -> list:
     groups = defaultdict(list)
     for f in findings:
-        if f.status is Status.FOUND and f.category not in INFO_CATEGORIES:
+        if f.effective_status is Status.FOUND and f.category not in INFO_CATEGORIES:
             host = _site_key(f)
             if host is None:
                 continue

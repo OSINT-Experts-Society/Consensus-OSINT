@@ -56,7 +56,7 @@ def new_source_counts(summary, current=None):
             continue
         kind = query["type"]
         completed = {lookup_id(f) for f in summary.findings
-                     if f.query == query["query"] and f.query_type == kind and f.status.is_definitive}
+                     if f.query == query["query"] and f.query_type == kind and f.effective_status.is_definitive}
         counts[kind] = counts.get(kind, 0) + len(set(current["types"].get(kind, [])) - set(old.get(kind, [])) - completed)
     return counts
 
@@ -73,11 +73,11 @@ class Continuation:
         cooling = set()
         now = time.time()
         for finding in previous.findings:
-            if finding.status.is_definitive:
+            if finding.effective_status.is_definitive:
                 self.completed.setdefault((finding.query, finding.query_type), set()).add(lookup_id(finding))
             if (mode == "retry" and finding.category not in INFO_CATEGORIES
-                    and finding.status in (Status.ERROR, Status.BLOCKED, Status.UNKNOWN, Status.RATE_LIMITED)):
-                if finding.status is Status.RATE_LIMITED:
+                    and finding.effective_status in (Status.ERROR, Status.BLOCKED, Status.UNKNOWN, Status.RATE_LIMITED)):
+                if finding.effective_status is Status.RATE_LIMITED:
                     # Never immediately hammer a throttled service. Honour a recorded
                     # numeric Retry-After when available; otherwise wait at least a minute.
                     delay = finding.extra.get("retry_after", 60)
@@ -151,7 +151,7 @@ def compare(previous, current):
         if evidence:
             known = Finding.from_dict(evidence)
             key = identity(known)
-            if known.status.is_definitive and key in before and not before[key].status.is_definitive:
+            if known.effective_status.is_definitive and key in before and not before[key].effective_status.is_definitive:
                 before[key] = known
     after = {identity(f): f for f in current.findings if f.category not in INFO_CATEGORIES}
     rows = []
@@ -161,11 +161,11 @@ def compare(previous, current):
         fields = []
         if new is None or (old is not None and old.ts == new.ts and old.to_dict() == new.to_dict()):
             change = "Not rechecked"
-        elif new.status in (Status.ERROR, Status.BLOCKED, Status.RATE_LIMITED, Status.UNKNOWN, Status.SKIPPED):
+        elif new.effective_status in (Status.ERROR, Status.BLOCKED, Status.RATE_LIMITED, Status.UNKNOWN, Status.SKIPPED):
             change = "Inconclusive"
         elif new.found and (old is None or not old.found):
             change = "Newly discovered"
-        elif old is not None and old.found and new.status is Status.NOT_FOUND:
+        elif old is not None and old.found and new.effective_status is Status.NOT_FOUND:
             change = "No longer observed"
         elif old is not None and old.found and new.found:
             a, b = enrichment_fields(old), enrichment_fields(new)
@@ -177,7 +177,7 @@ def compare(previous, current):
             change = "Unchanged"
         rows.append({"query": f.query, "query_type": f.query_type, "site": f.site, "site_id": f.site_id,
                      "source": f.source, "change": change, "fields": fields,
-                     "before": old.status.value if old else None, "after": new.status.value if new else None,
+                     "before": old.effective_status.value if old else None, "after": new.effective_status.value if new else None,
                      "previous_observed": old.ts if old else None, "observed": new.ts if new else None,
                      "previous_evidence": old.to_dict() if old and change in ("Inconclusive", "No longer observed", "Details changed") else None})
     return {"previous_started": previous.started, "current_started": current.started, "rows": rows,

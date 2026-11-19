@@ -1538,6 +1538,12 @@
    ],
    "url_main": "https://forum.cayas.fr/u/{username}"
   },
+  "user_scan/community/ccm.py": {
+   "sha256": [
+    "0630900a852e9135b65faacd05347d574236b818a9a66325cb12f59a505505e9"
+   ],
+   "url_main": "https://ccm.net/profile/user/{username}"
+  },
   "user_scan/community/cdr_uptake.py": {
    "sha256": [
     "b611339f9e037675b7913deee9fab1107b3ba7ad863667787f3b1e8d1d0d0031"
@@ -5120,6 +5126,12 @@
    ],
    "url_main": "https://www.hackerrank.com/"
   },
+  "user_scan/dev/hackthissite.py": {
+   "sha256": [
+    "a24a9020e6be7fdcc869004ecd1e963159855023fa925fcc7e8b3355f5de2b27"
+   ],
+   "url_main": "https://www.hackthissite.org/user/view/{username}"
+  },
   "user_scan/dev/haiku_os.py": {
    "sha256": [
     "78d97f2170cb6a9d966fe4433f5c8eec9a206e7f403c5ee35b8a69deb005cac4"
@@ -6379,6 +6391,12 @@
     "698ac5d2ff9b702b24cef0dd67d378d065513d1474e6e6a9504f2b79a24f5ee3"
    ],
    "url_main": "https://forum.kurviger.com/u/{username}"
+  },
+  "user_scan/entertainment/listal.py": {
+   "sha256": [
+    "da598f3b4e0e1b5e810f4034af18eaef8ab9259a6581651a909e0763cb2bc6ae"
+   ],
+   "url_main": "https://{username}.listal.com/"
   },
   "user_scan/entertainment/logik_tv.py": {
    "sha256": [
@@ -8792,6 +8810,12 @@
    ],
    "url_main": "https://www.mixcloud.com/{encoded}/"
   },
+  "user_scan/music/mixlr.py": {
+   "sha256": [
+    "03183b9f465d5acc1e39f45fd7a07fc8eae9bea360abd64aee9f4bfec098f8ab"
+   ],
+   "url_main": "https://mixlr.com/{username}"
+  },
   "user_scan/music/mod.py": {
    "sha256": [
     "47922b52340910678b10f2a689ce0ad111aee9bdd866e7bfb4bd3054bf2c842c"
@@ -8929,6 +8953,12 @@
     "6e34fe063387f16a105f6f4db2cae25aae2ff4f104c667f0ed99f5c503f3300b"
    ],
    "url_main": "https://forum.udo-audio.com/u/{username}"
+  },
+  "user_scan/music/ultimate_guitar.py": {
+   "sha256": [
+    "349e40a7dff8ebc85afa7d09ccc20d1115f2cec9f039455f7b7689e964d28f2a"
+   ],
+   "url_main": "https://www.ultimate-guitar.com/u/{username}"
   },
   "user_scan/music/vcvrack_forum.py": {
    "sha256": [
