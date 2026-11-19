@@ -215,6 +215,8 @@ def add_scan_options(p: argparse.ArgumentParser, *, full_help: bool = False) -> 
                    help="cross-scan: follow usernames, e-mails and profile links discovered in results")
     x.add_argument("--depth", type=_nonnegative_int, default=1, help="recursion depth for -r (default 1)")
     x.add_argument("--max-pivots", type=_nonnegative_int, default=10, help="max new identifiers per round (default 10)")
+    x.add_argument("--verify-negative", action="store_true",
+                   help="pair eligible public profile lookups with a synthetic negative control; both use the scan budget")
     x.add_argument("--max-checks", type=_nonnegative_int, default=30_000,
                    help="total check budget across all queries and recursive follow-ups (default 30000; 0 unlimited); not an HTTP request limit")
     x.add_argument("--search-engines", action="store_true", help="also collect profile links from web search engines")
@@ -494,10 +496,13 @@ def _route(args: argparse.Namespace) -> tuple[str | None, bool]:
 
 # ---------------------------------------------------------------------------
 class Scanner:
+    verify_negative = False
+
     def __init__(self, args: argparse.Namespace, printer: Printer):
         from .core.scan_budget import DEFAULT_MAX_CHECKS, ScanBudget
 
         self.args = args
+        self.verify_negative = getattr(args, "verify_negative", False)
         self.budget = ScanBudget(getattr(args, "max_checks", DEFAULT_MAX_CHECKS))
         self.printer = printer
         cfg = get_config().get("defaults", {})
@@ -612,7 +617,7 @@ class Scanner:
             f.depth = depth
             if parent and not f.parent:
                 f.parent = parent
-            if f.status is Status.FOUND and f.confidence is None:
+            if f.found and f.confidence is None:
                 site = self.site_index.get(f.site_id) if f.source == "sites-db" else None
                 f.confidence = base_confidence(f, site)
         return findings
@@ -650,6 +655,7 @@ class Scanner:
         try:
             findings = await run_all(username, sites=sites, modules=modules, http=self.http, ctx=self.ctx,
                                      concurrency=self.concurrency, on_result=self._collect,
+                                     verify_negative=self.verify_negative,
                                      extract=not self.args.no_extract, query_type=id_type, delay=self.args.delay,
                                      per_host=max(1, getattr(self.args, "per_host", 4) or 4))
         finally:
@@ -765,6 +771,7 @@ class Scanner:
         dns_task = asyncio.create_task(domain_analysis())
         try:
             findings = await run_modules(email, modules, self.ctx, concurrency=min(self.concurrency, 60),
+                                         verify_negative=self.verify_negative,
                                          on_result=self._collect, delay=self.args.delay, per_host=self.args.per_host)
             if not dns_task.done():
                 self.printer.activity("Finishing email domain analysis", ["Consensus"])
@@ -890,6 +897,8 @@ class Scanner:
                       | ({"Consensus"} if sources & {"extras", "rules", "bundled"} else set()))
 
     def _collect(self, f: Finding) -> None:
+        if self.verify_negative and f.negative_verification is None:
+            f.negative_verification = {"outcome": "not_verified", "reason": "Outside public profile control scope"}
         if f.source == "phone":
             f.extra.setdefault("_lookup_id", "phone:" + f.site_id)
         context = getattr(self, "_query_context", None)
@@ -924,6 +933,8 @@ class Scanner:
         self.printer.message(f"Scan budget: {limit:,} checks across all queries" if limit else
                              "Scan budget: unlimited (explicit --max-checks 0)", "dim")
 
+        if self.verify_negative:
+            self.printer.message("Negative verification enabled. Eligible checks can use twice the check budget.", "dim")
         frontier = [(q, t, 0, None) for q, t in queries]
         scheduled = {(q, t) for q, t in queries}
         pivots_per_depth: dict[int, int] = {}
