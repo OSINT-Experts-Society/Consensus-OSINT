@@ -453,12 +453,12 @@ class Printer:
 
     # ---------------------------------------------------------------- output
     def __call__(self, f: Finding) -> None:
-        self.counts[f.status.value] = self.counts.get(f.status.value, 0) + 1
-        if f.status is Status.FOUND and f.category not in INFO_CATEGORIES:
+        self.counts[f.effective_status.value] = self.counts.get(f.effective_status.value, 0) + 1
+        if f.effective_status is Status.FOUND and f.category not in INFO_CATEGORIES:
             self.match_count += 1
             self.detail_count += has_details(f)
         if self.jsonl:
-            if self.show_all or f.status is Status.FOUND:
+            if self.show_all or f.verification_failed or f.effective_status is Status.FOUND:
                 self.stream.write(json.dumps(f.to_dict(), ensure_ascii=False) + "\n")
                 self.stream.flush()
             return
@@ -483,8 +483,8 @@ class Printer:
             self._counter()
             return
         informational = f.category in INFO_CATEGORIES
-        if not (self.show_all or informational or f.status is Status.FOUND
-                or (self.verbose and f.status not in (Status.NOT_FOUND, Status.SKIPPED))):
+        if not (self.show_all or informational or f.verification_failed or f.effective_status is Status.FOUND
+                or (self.verbose and f.effective_status not in (Status.NOT_FOUND, Status.SKIPPED))):
             return
         self._print_line(f)
 
@@ -519,7 +519,7 @@ class Printer:
             details = f"Yes · {len(fields)} returned fields"
         else:
             details = ("No extra details" if not display else
-                       "Supporting returned fields" if f.status is Status.FOUND else "Unconfirmed fields")
+                       "Supporting returned fields" if f.effective_status is Status.FOUND else "Unconfirmed fields")
         if display:
             details += "\n" + "\n".join(f"{field.label}: {field.value}" for field in display)
         result = label
@@ -542,7 +542,7 @@ class Printer:
 
         site = Text(_display(context))
         site.stylize(Style(bold=True, link=_safe_http_url(f.url)), 0, len(_display(f.site)))
-        verdict = Text(_display(result), style="yellow" if tone == "warn" else STATUS_STYLE[f.status])
+        verdict = Text(_display(result), style="yellow" if tone == "warn" else STATUS_STYLE[f.effective_status])
         link = Text(link_label)
         if url:
             link.append("\n" + _display(url), style=Style(link=url, color=ACCENT))
@@ -631,17 +631,17 @@ class Printer:
             self.terminal_ui.update("Displaying results")
         from .reports import _fmt_duration, group_by_query
 
-        matches = [f for f in summary.findings if f.status is Status.FOUND and f.category not in INFO_CATEGORIES]
+        matches = [f for f in summary.findings if f.effective_status is Status.FOUND and f.category not in INFO_CATEGORIES]
         info = sum(f.category in INFO_CATEGORIES for f in summary.findings)
         review = sum(assessment(f)[0] == "Needs review" for f in matches)
         details_count = sum(has_details(f) for f in matches)
         elapsed = _fmt_duration((summary.finished or summary.started) - summary.started)
         incomplete = sum(f.category not in INFO_CATEGORIES and
-                         f.status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
+                         f.effective_status in (Status.UNKNOWN, Status.BLOCKED, Status.RATE_LIMITED, Status.ERROR)
                          for f in summary.findings)
         # Background analysis rows are reported once, as background checks: an
         # unparseable number or address is not a site that answered "no match".
-        no_match, skipped = (sum(f.category not in INFO_CATEGORIES and f.status is status for f in summary.findings)
+        no_match, skipped = (sum(f.category not in INFO_CATEGORIES and f.effective_status is status for f in summary.findings)
                              for status in (Status.NOT_FOUND, Status.SKIPPED))
         from .scan_budget import budget_notice
 
@@ -685,7 +685,7 @@ class Printer:
         for view in group_by_query(summary):
             self.separator("Results for " + view.title)
             self.common_details(compare_details(view.findings), "Information shared by multiple sites")
-            rows = list(view.findings) if self.show_all else list(view.found)
+            rows = list(view.findings) if self.show_all else [f for f in view.findings if f.found or f.verification_failed]
             rows = [f for f in rows if f.category not in INFO_CATEGORIES] + [
                 f for f in view.findings if f.category in INFO_CATEGORIES]
             rows.sort(key=lambda f: (assessment(f)[0] == "Needs review", not has_details(f), f.site.casefold()))

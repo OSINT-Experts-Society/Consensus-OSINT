@@ -68,7 +68,7 @@ def follow_up(session, mode):
     # Replay scope and safety preferences, never report paths or expansion flags.
     values = ("site", "exclude", "tags", "exclude_tags", "source", "family", "timeout", "concurrency",
               "delay", "per_host", "phone_region", "browser_pages", "max_checks")
-    toggles = ("nsfw", "no_breach", "no_sites", "no_modules", "no_extract", "no_impersonate", "tor", "all_modules",
+    toggles = ("verify_negative", "nsfw", "no_breach", "no_sites", "no_modules", "no_extract", "no_impersonate", "tor", "all_modules",
                "all_sites", "browser", "browser_visible", "details", "all", "compare_queries")
     for key in values:
         value = previous.options.get(key)

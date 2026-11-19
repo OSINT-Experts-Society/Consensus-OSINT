@@ -66,7 +66,10 @@ class ResultStore:
         if not isinstance(safe, dict) or not isinstance(safe.get("findings"), list):
             raise ValueError("scan result must contain a findings array")
         findings = safe.pop("findings")
-        statuses = tuple(row.get("status") if isinstance(row, dict) else None for row in findings)
+        if any(not isinstance(row, dict) or not isinstance(row.get("status"), str)
+               or row["status"] not in STATUSES for row in findings):
+            raise ValueError("each finding must have a recognised status")
+        statuses = tuple(row.get("effective_status", row["status"]) for row in findings)
         if any(not isinstance(status, str) or status not in STATUSES for status in statuses):
             raise ValueError("each finding must have a recognised status")
         # Serialize the header and each row exactly once; offsets address the
@@ -82,7 +85,7 @@ class ResultStore:
             raw = encode(row)
             if len(raw) > MAX_REPLY_BYTES - 4000:
                 preview = {key: str(row[key])[:200] for key in
-                           ("query", "query_type", "site", "site_id", "status") if key in row}
+                           ("query", "query_type", "site", "site_id", "status", "effective_status") if key in row}
                 interpretation = row.get("interpretation")
                 if isinstance(interpretation, dict):
                     preview["interpretation"] = {key: str(interpretation[key])[:500] for key in
