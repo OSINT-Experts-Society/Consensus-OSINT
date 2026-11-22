@@ -1791,6 +1791,11 @@ def main(argv: list | None = None, *, scan_defaults=None, on_summary=None, on_re
     boundary = raw_argv.index("--") if "--" in raw_argv else len(raw_argv)
     no_update_check = "--no-update-check" in raw_argv[:boundary]
     raw_argv = [arg for arg in raw_argv[:boundary] if arg != "--no-update-check"] + raw_argv[boundary:]
+    root_help = {"-h", "--help"}
+    help_options = root_help | {"--no-color", "--no-footer", "--no-animation"}
+    if root_help.intersection(raw_argv) and set(raw_argv) <= help_options:
+        build_parser(color="--no-color" not in raw_argv).print_help()
+        return 0
     if not raw_argv or all(arg in ("-h", "--help", "--no-color", "--no-footer", "--no-animation") for arg in raw_argv):
         from .core.scan_control import terminal_available
 
